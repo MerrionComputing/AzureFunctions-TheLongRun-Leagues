@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_EXTENSION_VERSION": "~1",
+    "ScmType": "None",
+    "WEBSITE_AUTH_ENABLED": "False",
+    "APPINSIGHTS_INSTRUMENTATIONKEY": "1530026d-1e9b-4eb7-985d-5d5da818d484",
+    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=thelongrunrunners;AccountKey=lLCrqEIOMad+i1VfbwSv+oEzbctLx8xM52uAdPXUdZnli9txB7mmo3qiXqKI5xfi4h0O4Ud4lUIi9DNPXepNxA==",
+    "WEBSITE_NODE_DEFAULT_VERSION": "6.5.0",
+    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "DefaultEndpointsProtocol=https;AccountName=thelongrunrunners;AccountKey=lLCrqEIOMad+i1VfbwSv+oEzbctLx8xM52uAdPXUdZnli9txB7mmo3qiXqKI5xfi4h0O4Ud4lUIi9DNPXepNxA==",
+    "WEBSITE_CONTENTSHARE": "thelongrun-runners-functionb78e",
+    "WEBSITE_SITE_NAME": "TheLongRun-Runners-Function",
+    "WEBSITE_SLOT_NAME": "Production",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=thelongrunrunners;AccountKey=lLCrqEIOMad+i1VfbwSv+oEzbctLx8xM52uAdPXUdZnli9txB7mmo3qiXqKI5xfi4h0O4Ud4lUIi9DNPXepNxA=="
+  }
+}

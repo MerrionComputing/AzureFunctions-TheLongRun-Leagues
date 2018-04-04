@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_EXTENSION_VERSION": "~1",
+    "ScmType": "None",
+    "WEBSITE_AUTH_ENABLED": "False",
+    "APPINSIGHTS_INSTRUMENTATIONKEY": "89d0f228-29cf-4141-acfe-d40069e58872",
+    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=thelongrunteams;AccountKey=vTY2oshPcsyquZTvAgOMlq5JtFSUvqPfNqYahZYlrTSXDuDAIOsWG0QdXqx6FcFJquVy7fDYEU24JrEu2leHQg==",
+    "WEBSITE_NODE_DEFAULT_VERSION": "6.5.0",
+    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "DefaultEndpointsProtocol=https;AccountName=thelongrunteams;AccountKey=vTY2oshPcsyquZTvAgOMlq5JtFSUvqPfNqYahZYlrTSXDuDAIOsWG0QdXqx6FcFJquVy7fDYEU24JrEu2leHQg==",
+    "WEBSITE_CONTENTSHARE": "thelongrun-teams-functionbfc0",
+    "WEBSITE_SITE_NAME": "TheLongRun-Teams-Function",
+    "WEBSITE_SLOT_NAME": "Production",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=thelongrunteams;AccountKey=vTY2oshPcsyquZTvAgOMlq5JtFSUvqPfNqYahZYlrTSXDuDAIOsWG0QdXqx6FcFJquVy7fDYEU24JrEu2leHQg=="
+  }
+}

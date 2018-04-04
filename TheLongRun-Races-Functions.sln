@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheLongRun-Races-Functions", "TheLongRun-Races-Function\TheLongRun-Races-Functions.csproj", "{4DE3ED4F-B1E5-4B19-A0CA-563921A1D6AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheLongRun.Common", "TheLongRun.Common\TheLongRun.Common.csproj", "{877028D0-DDED-4967-A699-8BB129EC0C6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Races.CommandDefinition", "..\..\..\Demo\The Long Run\Generated Code\Races.CommandDefinition.csproj", "{F8D5FCF0-4DBE-4830-A517-25BB304CACB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Races.QueryDefinition", "..\..\..\Demo\The Long Run\Generated Code\Races.QueryDefinition.csproj", "{5840FC41-C482-4B72-AA60-6471FF6485BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Races.EventSourcing", "..\..\..\Demo\The Long Run\Generated Code\Races.EventSourcing.csproj", "{0063CE52-CFFE-45FF-B2D0-A2E10474E71C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Races.CommandHandler", "..\..\..\Demo\The Long Run\Generated Code\Races.CommandHandler.csproj", "{640E0FDF-BE41-48C0-869A-3CAA484D1CC2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DE3ED4F-B1E5-4B19-A0CA-563921A1D6AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DE3ED4F-B1E5-4B19-A0CA-563921A1D6AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DE3ED4F-B1E5-4B19-A0CA-563921A1D6AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DE3ED4F-B1E5-4B19-A0CA-563921A1D6AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{877028D0-DDED-4967-A699-8BB129EC0C6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{877028D0-DDED-4967-A699-8BB129EC0C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{877028D0-DDED-4967-A699-8BB129EC0C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{877028D0-DDED-4967-A699-8BB129EC0C6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8D5FCF0-4DBE-4830-A517-25BB304CACB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8D5FCF0-4DBE-4830-A517-25BB304CACB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8D5FCF0-4DBE-4830-A517-25BB304CACB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8D5FCF0-4DBE-4830-A517-25BB304CACB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5840FC41-C482-4B72-AA60-6471FF6485BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5840FC41-C482-4B72-AA60-6471FF6485BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5840FC41-C482-4B72-AA60-6471FF6485BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5840FC41-C482-4B72-AA60-6471FF6485BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0063CE52-CFFE-45FF-B2D0-A2E10474E71C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0063CE52-CFFE-45FF-B2D0-A2E10474E71C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0063CE52-CFFE-45FF-B2D0-A2E10474E71C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0063CE52-CFFE-45FF-B2D0-A2E10474E71C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{640E0FDF-BE41-48C0-869A-3CAA484D1CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{640E0FDF-BE41-48C0-869A-3CAA484D1CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{640E0FDF-BE41-48C0-869A-3CAA484D1CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{640E0FDF-BE41-48C0-869A-3CAA484D1CC2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14B66F23-F6C2-48C8-91F7-A1A316F1F2AB}
+	EndGlobalSection
+EndGlobal

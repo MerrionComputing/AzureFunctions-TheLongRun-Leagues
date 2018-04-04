@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <RootNamespace>TheLongRunLeaguesFunction</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="1.0.0-beta2" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="1.0.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.10" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandHandler.csproj" />
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.EventSourcing.csproj" />
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryHandler.csproj" />
+    <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CQRSAzure.CommandDefinition">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.CommandHandler\CQRSAzure.CommandHandler\bin\Debug\CQRSAzure.CommandDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.CommandHandler">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.CommandHandler\CQRSAzure.CommandHandler\bin\Debug\CQRSAzure.CommandHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.EventSourcing">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.EventSourcing\bin\Debug\CQRSAzure.EventSourcing.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.IdentifierGroup">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.IdentifierGroup\bin\Debug\CQRSAzure.IdentifierGroup.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="host.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Classifiers\" />
+    <Folder Include="Identifier Groups\" />
+    <Folder Include="Queries\Handlers\" />
+  </ItemGroup>
+</Project>
