@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TheLongRun.Common.Attributes;
 
-using CQRSAzure.EventSourcing;
-
-namespace TheLongRun.Common.Bindings
+namespace TheLongRun.Common.Attributes
 {
     /// <summary>
-    /// Wrapper around the CQRSAzure event stream 
+    /// An attribute to mark a projection to use for reading data from
     /// </summary>
-    public class EventStream
+    /// <remarks>
+    /// This is not a trigger - we decide on a case by case basis what triggers a projection
+    /// and the same projection may have different invocations
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public sealed class ProjectionAttribute
+        : Attribute 
     {
-
-        
-        
 
         /// <summary>
         /// The domain name the aggregate instance belongs to
@@ -54,28 +54,27 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
-
-        /*
-        public async void AppendEvent<TEvent>(TEvent newEvent)
+        /// <summary>
+        /// The specific projection type to execute
+        /// </summary>
+        private readonly string _projectionTypeName;
+        public string ProjectionTypeName
         {
-           // Call IEventStreamWriter.AppendEvent...
+            get
+            {
+                return _projectionTypeName;
+            }
         }
-        */
 
-        public EventStream(string domainName,
-            string aggregateTypeName,
-            string aggregateInstanceKey)
+        public ProjectionAttribute(string domainName,
+                                string aggregateTypeName,
+                                string aggregateInstanceKey,
+                                string projectionTypeName)
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
             _aggregateInstanceKey = aggregateInstanceKey;
-        }
-
-        public EventStream(EventStreamAttribute attribute)
-        {
-            _domainName = attribute.DomainName ;
-            _aggregateTypeName = attribute.AggregateTypeName;
-            _aggregateInstanceKey = attribute.AggregateInstanceKey;
+            _projectionTypeName = projectionTypeName;
         }
     }
 }

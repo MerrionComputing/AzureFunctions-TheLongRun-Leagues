@@ -11,10 +11,12 @@
     "WEBSITE_CONTENTSHARE": "thelongrun-leagues-function9446",
     "WEBSITE_SITE_NAME": "TheLongRun-Leagues-Function",
     "WEBSITE_SLOT_NAME": "Production",
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=thelongrunleagues;AccountKey=uguIt44W/o30zVqlEvpf9euSUr5mGD2qwJ6yQPlBZ1iodU8Mu6KfOqR2h+/E2B2YcEYeTeXM4RJyBbTGdJ0H9A==",
-    "CommandStorageConnectionAppSetting": "DefaultEndpointsProtocol=https;AccountName=thelongrunleagues;AccountKey=ICJZv7PT8oa6zxMWvTgg3oSFmX2BP8wft4Cvc+qyiY4tCDQ/rZLI/+ixTATky+oEWCOIhLIoCkknAdZPey0h0g==;EndpointSuffix=core.windows.net",
-    "QueryStorageConnectionAppSetting": "DefaultEndpointsProtocol=https;AccountName=thelongrunleagues;AccountKey=uguIt44W/o30zVqlEvpf9euSUr5mGD2qwJ6yQPlBZ1iodU8Mu6KfOqR2h+/E2B2YcEYeTeXM4RJyBbTGdJ0H9A==;EndpointSuffix=core.windows.net",
-    "EventSteam.Leagues.League": "",
-    "Snapshot.Leagues.League.League_Summary_Information" :  ""
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=thelongrunleagues;AccountKey=M+wTCz4TatKfYWOwuk6Fvq9+Ox4Lu6+khM2n1w00uUC2EDK4SB3kDd7cGp1PFoZLOYuUf5Ms1PHLtenRm1FBJg==;EndpointSuffix=core.windows.net",
+    "CommandStorageConnectionAppSetting": "DefaultEndpointsProtocol=https;AccountName=thelongrunleagues;AccountKey=OuGsydujuCLu7xK6p1Iqpbvo8oTjMNwV3lNAfre24mMmostXzAKO/YEj+c3vvJetamGoSqhTSFbeCMM3dut3bA==;EndpointSuffix=core.windows.net",
+    "QueryStorageConnectionAppSetting": "DefaultEndpointsProtocol=https;AccountName=thelongrunleagues;AccountKey=M+wTCz4TatKfYWOwuk6Fvq9+Ox4Lu6+khM2n1w00uUC2EDK4SB3kDd7cGp1PFoZLOYuUf5Ms1PHLtenRm1FBJg==;EndpointSuffix=core.windows.net",
+    "LeaguesConnectionString": "DefaultEndpointsProtocol=https;AccountName=thelongrunleagues;AccountKey=M+wTCz4TatKfYWOwuk6Fvq9+Ox4Lu6+khM2n1w00uUC2EDK4SB3kDd7cGp1PFoZLOYuUf5Ms1PHLtenRm1FBJg==;EndpointSuffix=core.windows.net",
+    "EventSteam.Leagues.League": "ImplementationType=AzureBlob;ConnectionStringName=LeaguesConnectionString;DomainName=Leagues",
+    "EventSteam.Leagues.Season": "ImplementationType=AzureBlob;ConnectionStringName=LeaguesConnectionString;DomainName=Leagues",
+    "Snapshot.Leagues.League.League_Summary_Information": ""
   }
 }

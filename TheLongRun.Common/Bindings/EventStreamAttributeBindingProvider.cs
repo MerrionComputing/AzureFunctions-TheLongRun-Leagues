@@ -15,7 +15,7 @@ namespace TheLongRun.Common.Bindings
     /// Output binding provider to select the event stream on which to append 
     /// events or run projections or classifiers.
     /// </summary>
-    public class EventStreamAttributeBindingProvider
+    public sealed class EventStreamAttributeBindingProvider
         : IBindingProvider
     {
 

@@ -55,7 +55,7 @@ namespace TheLongRun.Common
         /// Settings that can be set for an append blob backed event stream
         /// </summary>
         /// <remarks>
-        /// ImplementationType="AzureBlob" ConnectionStringName="LeaguesConnectionString" DomainName="Leagues"
+        /// ImplementationType=AzureBlob;ConnectionStringName=LeaguesConnectionString;DomainName=Leagues
         /// </remarks>
         public class AppendBlobConnectionSettings
             : ConnectionSettingsBase
@@ -74,7 +74,7 @@ namespace TheLongRun.Common
         /// Settings that can be set for an azure table backed event stream
         /// </summary>
         /// <remarks>
-        /// ImplementationType="AzureTable" ConnectionStringName="LeaguesConnectionString" SequenceNumberFormat="00000000"
+        /// ImplementationType=AzureTable;ConnectionStringName;LeaguesConnectionString;SequenceNumberFormat=00000000
         /// </remarks>
         public class TableConnectionSettings
             : ConnectionSettingsBase
@@ -118,12 +118,35 @@ namespace TheLongRun.Common
         /// Settings that can be set for a file backed event stream
         /// </summary>
         /// <remarks>
-        /// ImplementationType="AzureFile" ConnectionStringName="LeaguesConnectionString" InitialSize="20000" 
+        /// ImplementationType=AzureFile;ConnectionStringName=LeaguesConnectionString;InitialSize=20000 
         /// </remarks>
         public class FileConnectionSettings
         {
 
             private const int DEFAULT_INITIAL_SIZE = 20000;
+
+            /// <summary>
+            /// The initial size to create the event stream file
+            /// </summary>
+            private string _initialSize;
+            public int InitialSize
+            {
+                get
+                {
+                    if (! string.IsNullOrWhiteSpace(_initialSize ))
+                    {
+                        int ret;
+                        if (int.TryParse(_initialSize , out ret) )
+                        {
+                            if (ret > 0)
+                            {
+                                return ret;
+                            }
+                        }
+                    }
+                    return DEFAULT_INITIAL_SIZE;
+                }
+            }
 
 
         }
