@@ -8,13 +8,9 @@ using TheLongRun.Common.Attributes;
 
 namespace TheLongRun.Common.Bindings
 {
-    /// <summary>
-    /// Output binding provider to select the projection runner to run for a function
-    /// </summary>
-    public sealed class ProjectionAttributeBindingProvider
+    public sealed class ClassifierAttributeBindingProvider
         : IBindingProvider
     {
-
 
 
         public Task<IBinding> TryCreateAsync(BindingProviderContext context)
@@ -27,7 +23,7 @@ namespace TheLongRun.Common.Bindings
 
             // Determine whether we should bind to the current parameter
             ParameterInfo parameter = context.Parameter;
-            ProjectionAttribute attribute = parameter.GetCustomAttribute<ProjectionAttribute>(inherit: false);
+            ClassifierAttribute attribute = parameter.GetCustomAttribute<ClassifierAttribute>(inherit: false);
 
             if (attribute == null)
             {
@@ -35,15 +31,15 @@ namespace TheLongRun.Common.Bindings
             }
 
             // What data type(s) can this attribute be attached to?
-            IEnumerable<Type> supportedTypes = new Type[] { typeof(Projection ) };
+            IEnumerable<Type> supportedTypes = new Type[] { typeof(Classifier) };
 
             if (!ValueBinder.MatchParameterType(context.Parameter, supportedTypes))
             {
                 throw new InvalidOperationException(
-                    $"Can't bind ProjectionAttribute to type '{parameter.ParameterType}'.");
+                    $"Can't bind ClassifierAttribute to type '{parameter.ParameterType}'.");
             }
 
-            return Task.FromResult<IBinding>(new ProjectionAttributeBinding(parameter));
+            return Task.FromResult<IBinding>(new ClassifierAttributeBinding(parameter));
 
         }
     }

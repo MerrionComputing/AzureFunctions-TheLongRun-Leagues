@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Description;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,8 +16,10 @@ namespace TheLongRun.Common.Attributes
     /// and the same projection may have different invocations
     /// </remarks>
     [AttributeUsage(AttributeTargets.Parameter)]
+    [Binding]
     public sealed class ProjectionAttribute
-        : Attribute 
+        : Attribute ,
+        CQRSAzure.EventSourcing.IEventStreamUntypedIdentity 
     {
 
         /// <summary>
@@ -46,7 +50,8 @@ namespace TheLongRun.Common.Attributes
         /// The unique identifier of the specific instance of the aggregate
         /// </summary>
         private readonly string _aggregateInstanceKey;
-        public string AggregateInstanceKey
+        [AutoResolve]
+        public string InstanceKey
         {
             get
             {

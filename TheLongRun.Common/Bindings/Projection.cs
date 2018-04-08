@@ -15,6 +15,8 @@ namespace TheLongRun.Common.Bindings
     public class Projection
     {
 
+        private readonly IProjectionProcessorUntyped _projectionProcessor = null;
+
         /// <summary>
         /// The domain name the aggregate instance belongs to
         /// </summary>
@@ -63,16 +65,41 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
+        public void  Process(IProjectionUntyped projectionToProcess)
+        {
+            if (null != _projectionProcessor )
+            {
+                _projectionProcessor.Process(projectionToProcess);
+            }
+        }
+
         public Projection (string domainName,
                             string aggregateTypeName,
                             string aggregateInstanceKey,
                             string projectionTypeName)
+            : this(new ProjectionAttribute(domainName ,
+                aggregateTypeName,
+                aggregateInstanceKey ,
+                projectionTypeName ) )
         {
-            _domainName = domainName;
-            _aggregateTypeName = aggregateTypeName;
-            _aggregateInstanceKey = aggregateInstanceKey;
-            _projectionTypeName = projectionTypeName;
         }
+
+        public Projection(ProjectionAttribute attribute)
+        {
+
+            _domainName = attribute.DomainName ;
+            _aggregateTypeName = attribute.AggregateTypeName;
+            _aggregateInstanceKey = attribute.InstanceKey;
+            _projectionTypeName = attribute.ProjectionTypeName;
+
+            if (null == _projectionProcessor)
+            {
+                // TODO : Cater for different backing technologies... currently just AppendBlob
+                _projectionProcessor = CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamReaderUntyped.CreateProjectionProcessor(attribute);
+            }
+
+        }
+
     }
 
 

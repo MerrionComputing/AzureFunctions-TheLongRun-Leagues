@@ -262,3 +262,6 @@ __pycache__/
 
 # Config settings
 local.settings.json
+
+#publish profiles
+*.pubxml

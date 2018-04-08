@@ -6,18 +6,15 @@ using System.Threading.Tasks;
 using TheLongRun.Common.Attributes;
 
 using CQRSAzure.EventSourcing;
-using CQRSAzure.EventSourcing.Azure.Blob.Untyped;
 
 namespace TheLongRun.Common.Bindings
 {
     /// <summary>
-    /// Wrapper around the CQRSAzure event stream 
+    /// Wrapper for a CQRSAzure classifier which is used to calculate membership (or not) of an identifier
+    /// group
     /// </summary>
-    public class EventStream
+    public class Classifier
     {
-
-        private readonly IEventStreamWriterUntyped _writer = null;
-
         /// <summary>
         /// The domain name the aggregate instance belongs to
         /// </summary>
@@ -55,39 +52,34 @@ namespace TheLongRun.Common.Bindings
         }
 
         /// <summary>
-        /// Append an event to the event stream for this aggregate instance
+        /// The type of the classifier we are going to run 
         /// </summary>
-        /// <param name="eventToAdd">
-        /// The event to append to the aggregate instance
-        /// </param>
-        public void AppendEvent(IEvent eventToAdd)
+        private readonly string _classifierTypeName;
+        public string ClassifierTypeName
         {
-            if (null != _writer)
+            get
             {
-                _writer.AppendEvent(eventToAdd);
+                return _classifierTypeName;
             }
         }
 
-        public EventStream(string domainName,
-            string aggregateTypeName,
-            string aggregateInstanceKey)
-            : this(new EventStreamAttribute(domainName, aggregateTypeName , aggregateInstanceKey  ) )
+        public Classifier (string domainName,
+                            string aggregateTypeName,
+                            string aggregateInstanceKey,
+                            string classifierTypeName)
         {
+            _domainName = domainName;
+            _aggregateTypeName = aggregateTypeName;
+            _aggregateInstanceKey = aggregateInstanceKey;
+            _classifierTypeName = classifierTypeName;
         }
 
-        public EventStream(EventStreamAttribute attribute)
+        public Classifier(ClassifierAttribute attribute )
+            : this(attribute.DomainName,
+                  attribute.AggregateTypeName ,
+                  attribute.InstanceKey ,
+                  attribute.ClassifierTypeName )
         {
-            _domainName = attribute.DomainName;
-            _aggregateTypeName = attribute.AggregateTypeName;
-            _aggregateInstanceKey = attribute.InstanceKey;
-
-            // wire up the event stream writer 
-            // TODO : Cater for different backing technologies... currently just AppendBlob
-            _writer = new CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamWriterUntyped(attribute); 
-
         }
-
-
-
     }
 }

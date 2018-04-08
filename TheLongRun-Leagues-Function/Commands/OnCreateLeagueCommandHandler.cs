@@ -8,6 +8,7 @@ using System.IO;
 using Leagues.League.commandDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
+using TheLongRun.Common.Bindings;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -36,7 +37,6 @@ namespace TheLongRunLeaguesFunction
         [FunctionName("OnCreateLeagueCommand")]
         public static async void OnCreateLeagueCommand(
             [EventGridTrigger] EventGridEvent eventGridEvent,
-            Binder commandLog,
             TraceWriter log
             )
         {
@@ -70,57 +70,27 @@ namespace TheLongRunLeaguesFunction
                     parameters);
 
 
-                // And write this command log to a new file on the command-log blob container
-                var commandLogBlogAttribute = new BlobAttribute(CommandLogRecord.MakeFullPath(
-                    CommandLogRecord.DEFAULT_CONTAINER_NAME,
-                    COMMAND_NAME,cmdRecord),
-                     FileAccess.Write);
-                
-
-                var commandLogStorageAccountAttribute = new StorageAccountAttribute(CommandLogRecord.DEFAULT_CONNECTION);
-
-                #region Logging
-                if (null != log)
+                EventStream commandEvents = new EventStream(@"Command",
+                    COMMAND_NAME,
+                    cmdRecord.CommandUniqueIdentifier.ToString());
+                if (null != commandEvents )
                 {
-                    if (null != commandLogBlogAttribute)
-                    {
-                        log.Verbose($"Created valid Blog attribute {commandLogBlogAttribute.BlobPath} using {commandLogBlogAttribute.Connection} ",
-                            source: "OnCreateLeagueCommand");
-                    }
-                    else
-                    {
-                        log.Error("Unable to initialise Blob attribute");
-                    }
-                    if (null != commandLogStorageAccountAttribute)
-                    {
-                        log.Verbose($"Created valid storage account attribute {commandLogStorageAccountAttribute.Account} ",
-                            source: "OnCreateLeagueCommand");
-                    }
-                    else
-                    {
-                        log.Error("Unable to initialise Storage Account attribute");
-                    }
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.CommandCreated(COMMAND_NAME,
+                        cmdRecord.CommandUniqueIdentifier));
+
+                    // Log the parameters
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.LeagueName), parameters.LeagueName));
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Email_Address ), parameters.Email_Address ));
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Date_Incorporated ), parameters.Date_Incorporated));
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Twitter_Handle), parameters.Twitter_Handle ));
+
+
+
+
                 }
-                #endregion
 
-                var attributes = new Attribute[]
-                {
-                    commandLogBlogAttribute,
-                    commandLogStorageAccountAttribute
-                };
+                // TODO : FIX bool success = await cmdRecord.SaveToFile();
 
-                using (var writer = await commandLog.BindAsync<TextWriter>(attributes))
-                {
-                    #region Logging
-                    if (null != log)
-                    {
-                        log.Verbose($"Saving command to {writer.ToString()}");
-                    }
-                    #endregion
-
-                    // persist the command to the blob
-                    writer.Write(Newtonsoft.Json.JsonConvert.SerializeObject(cmdRecord));
-                }
             }
             catch (Exception ex)
             {

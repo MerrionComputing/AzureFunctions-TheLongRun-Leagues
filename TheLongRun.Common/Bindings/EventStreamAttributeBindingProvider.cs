@@ -37,13 +37,13 @@ namespace TheLongRun.Common.Bindings
                 return Task.FromResult<IBinding>(null);
             }
 
-            // What data type(s) can this attribute be attached to?
-            IEnumerable<Type> supportedTypes = new Type[] { typeof(EventStream) };
+            // This can only bind to EventStream
+            IEnumerable<Type> supportedTypes = new Type[] { typeof(EventStream ) };
 
             if (!ValueBinder.MatchParameterType(context.Parameter, supportedTypes))
             {
                 throw new InvalidOperationException(
-                    $"Can't bind EventStreamAttribute to type '{parameter.ParameterType}'.");
+                        $"Can't bind EventStreamAttribute to type '{parameter.ParameterType}'.");
             }
 
             return Task.FromResult<IBinding>(new EventStreamAttributeBinding(parameter));

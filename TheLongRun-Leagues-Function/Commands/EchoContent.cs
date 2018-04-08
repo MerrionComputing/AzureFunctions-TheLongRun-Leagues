@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.WebJobs.Host;
 using TheLongRun.Common;
+using TheLongRun.Common.Bindings;
 
 namespace TheLongRunLeaguesFunction.Commands
 {
@@ -32,6 +33,20 @@ namespace TheLongRunLeaguesFunction.Commands
                         parameters);
 
                     log.Info($"Command unique identifier : {cmdRecord.CommandUniqueIdentifier} ");
+
+
+                    EventStream outputStream = new EventStream("Leagues", "League", cmdRecord.Parameters.LeagueName);
+                    if (null != outputStream)
+                    {
+                        log.Info($"Writing to event stream {outputStream.DomainName}.{outputStream.AggregateTypeName}.{outputStream.AggregateInstanceKey} ");
+
+                        // create a new "League created" event
+                        Leagues.League.eventDefinition.Formed evtFormed = new Leagues.League.eventDefinition.Formed(cmdRecord.Parameters.Date_Incorporated,
+                            cmdRecord.Parameters.Location,
+                            $"League : {cmdRecord.Parameters.LeagueName} contactable by email {cmdRecord.Parameters.Email_Address} or twitter {cmdRecord.Parameters.Twitter_Handle } ");
+
+                        outputStream.AppendEvent(evtFormed);
+                    }
                 }
                 catch (Exception ex)
                 {

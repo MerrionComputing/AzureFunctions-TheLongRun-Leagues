@@ -1,18 +1,25 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Description;
 using System;
-
-using CQRSAzure.EventSourcing;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace TheLongRun.Common.Attributes
 {
     /// <summary>
-    /// An attribute to mark an event stream to use for output for appending events to
+    /// An attribute to mark a projection to use for reading identity group membership from
     /// </summary>
+    /// <remarks>
+    /// This is not a trigger - we decide on a case by case basis what triggers a classifier
+    /// and the same classifier may have different invocations
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Parameter)]
     [Binding]
-    public sealed class EventStreamAttribute
-        : Attribute , IEventStreamUntypedIdentity
+    public class ClassifierAttribute
+        : Attribute,
+        CQRSAzure.EventSourcing.IEventStreamUntypedIdentity
     {
 
         /// <summary>
@@ -52,13 +59,27 @@ namespace TheLongRun.Common.Attributes
             }
         }
 
-        public EventStreamAttribute(string domainName,
-            string aggregateTypeName,
-            string aggregateInstanceKey)
+        /// <summary>
+        /// The specific classifier type to execute
+        /// </summary>
+        private readonly string _classifierTypeName;
+        public string ClassifierTypeName
+        {
+            get
+            {
+                return _classifierTypeName;
+            }
+        }
+
+        public ClassifierAttribute(string domainName,
+                                string aggregateTypeName,
+                                string aggregateInstanceKey,
+                                string classifierTypeName)
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
             _aggregateInstanceKey = aggregateInstanceKey;
+            _classifierTypeName = classifierTypeName;
         }
     }
 }

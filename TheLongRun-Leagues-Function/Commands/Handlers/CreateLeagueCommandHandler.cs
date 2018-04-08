@@ -33,8 +33,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         public static void CreateLeagueCommandHandler(
             [BlobTrigger("command-log/create-league/{name}", 
             Connection = "CommandStorageConnectionAppSetting")]Stream  myBlob, 
-            string name, 
-            [EventStream("Leagues", "League", "{name}")] EventStream eventOut,
+            string name,
             TraceWriter log)
         {
 
@@ -72,20 +71,16 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                     }
                     #endregion
 
-                    // Process the command - create a new league with the given name...
-                    if (null != eventOut)
+                    // Post an "League incorporated" event
+                    EventStream outputStream = new EventStream("Leagues", "League", cmdRecord.Parameters.LeagueName);
+                    if (null != outputStream)
                     {
+                        // create a new "League created" event
+                        Leagues.League.eventDefinition.Formed evtFormed = new Leagues.League.eventDefinition.Formed(cmdRecord.Parameters.Date_Incorporated,
+                            cmdRecord.Parameters.Location,
+                            $"League : {cmdRecord.Parameters.LeagueName} contactable by email {cmdRecord.Parameters.Email_Address} or twitter {cmdRecord.Parameters.Twitter_Handle } ");
 
-                    }
-                    else
-                    {
-                        #region Logging
-                        if (null != log)
-                        {
-                            log.Error ($"Unable to create event stream for 'eventOut' ",
-                                source: "CreateLeagueCommandHandler");
-                        }
-                        #endregion
+                        outputStream.AppendEvent(evtFormed); 
                     }
 
                 }

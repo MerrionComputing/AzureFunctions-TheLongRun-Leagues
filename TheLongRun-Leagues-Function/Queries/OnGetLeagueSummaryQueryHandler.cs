@@ -16,7 +16,6 @@ namespace TheLongRunLeaguesFunction.Queries
         [QueryName("Get League Summary")]
         [FunctionName("OnGetLeagueSummaryQueryHandler")]
         public static void OnGetLeagueSummaryQueryHandler([EventGridTrigger] EventGridEvent eventGridEvent,
-            Binder queryLog,
             TraceWriter log
             )
         {
@@ -42,17 +41,7 @@ namespace TheLongRunLeaguesFunction.Queries
 
             QueryLogRecord< object> qryRecord = QueryLogRecord< object>.Create(QUERY_NAME, null);
 
-            var queryLogBlogAttribute = new BlobAttribute(QueryLogRecord.DEFAULT_CONTAINER_NAME + @"/" + QUERY_NAME  + @"/" + QueryLogRecord.MakeFilename(qryRecord),
-                FileAccess.Write)
-            {
-                Connection = CommandLogRecord.DEFAULT_CONNECTION
-            };
 
-            using (var writer = queryLog.Bind<TextWriter>(queryLogBlogAttribute))
-            {
-                // persist the query to the blob
-
-            }
 
 
             // Log that this step has completed
