@@ -89,7 +89,6 @@ namespace TheLongRunLeaguesFunction
 
                 }
 
-                // TODO : FIX bool success = await cmdRecord.SaveToFile();
 
             }
             catch (Exception ex)

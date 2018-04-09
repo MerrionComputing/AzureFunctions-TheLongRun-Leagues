@@ -85,7 +85,7 @@ namespace TheLongRun.Common
         /// This does not preclude other observers also being notified that the 
         /// query has completed
         /// </remarks>
-        public QueryReturnTarget ReturnTarget { get; }
+        public QueryReturnTarget ReturnTarget { get; set; }
 
         /// <summary>
         /// Depending on the return target, this tells the query processor where 
@@ -94,7 +94,7 @@ namespace TheLongRun.Common
         /// <remarks>
         /// This could be a storeage URI or a webhook or the custom topic name, for instance
         /// </remarks>
-        public string ReturnPath { get; }
+        public string ReturnPath { get; set; }
 
         public static string MakeFilename(QueryLogRecord queryInstance)
         {
@@ -127,7 +127,9 @@ namespace TheLongRun.Common
         /// The name of the command we are going to log
         /// </param>
         public static QueryLogRecord<TQueryParameters> Create(string queryName,
-            TQueryParameters parameters)
+            TQueryParameters parameters,
+            QueryReturnTarget returnTarget,
+            string returnPath)
         {
             QueryLogRecord< TQueryParameters> ret = new QueryLogRecord<TQueryParameters>();
             ret.QueryUniqueIdentifier = System.Guid.NewGuid();
@@ -137,6 +139,8 @@ namespace TheLongRun.Common
             {
                 ret.Parameters = parameters;
             }
+            ret.ReturnTarget = returnTarget;
+            ret.ReturnPath = returnPath;
             return ret;
 
         }

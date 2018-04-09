@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandHandler.csproj" />
     <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.EventSourcing.csproj" />
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryDefinition.csproj" />
     <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryHandler.csproj" />
     <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />
   </ItemGroup>
