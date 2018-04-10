@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +18,7 @@ namespace TheLongRun.Common
         /// This does not preclude other observers also being notified that the 
         /// query has completed
         /// </remarks>
+        [JsonConverter(typeof(StringEnumConverter))]
         public QueryLogRecord.QueryReturnTarget ReturnTarget { get;  set; }
 
 
