@@ -13,7 +13,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
     public static partial class CommandHandler
     {
 
-        
+
         /// <summary>
         /// Command handler to handle the [create-league] command
         /// </summary>
@@ -29,6 +29,10 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         /// <remarks>
         /// A create league command reaching this record is assumed to be valid
         /// </remarks>
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [CommandName("Create League")]
         [FunctionName("CreateLeagueCommandHandler")]
         public static void CreateLeagueCommandHandler(
             [BlobTrigger("command-log/create-league/{name}", 

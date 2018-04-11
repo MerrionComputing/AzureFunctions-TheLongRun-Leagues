@@ -6,9 +6,11 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 
+using TheLongRun.Common.Events.Command.Projections;
+using TheLongRun.Common.Bindings;
+using System;
 using Leagues.League.commandDefinition;
 using TheLongRun.Common;
-using TheLongRun.Common.Attributes;
 
 namespace TheLongRunLeaguesFunction.Commands.Validation
 {
@@ -20,9 +22,190 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
     /// League name may not be duplicate
     /// Date_Incorporated may not be future dated
     /// </remarks>
-    public static partial class CommandValidator
+    public static partial class Command
     {
 
+        [FunctionName("CreateLeagueCommandValidation")]
+        public static async Task<HttpResponseMessage> CreateLeagueCommandValidationRun(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, 
+            TraceWriter log)
+        {
 
+            #region Logging
+            if (null != log)
+            {
+                log.Verbose("Function triggered HTTP ",
+                    source: "CreateLeagueCommandValidation");
+            }
+            #endregion
+
+            // Get the command identifier
+            string commandId = req.GetQueryNameValuePairs()
+                .FirstOrDefault(q => string.Compare(q.Key, "CommandId", true) == 0)
+                .Value;
+
+            if (commandId == null)
+            {
+                // Get request body
+                dynamic data = await req.Content.ReadAsAsync<object>();
+                commandId = data?.CommandId;
+            }
+
+            ValidateCreateLeagueCommand(commandId, log);
+
+            return commandId == null
+                ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
+                : req.CreateResponse(HttpStatusCode.OK, $"Processed command {commandId}");
+        }
+
+        /// <summary>
+        /// Perform the underlying validation on the specified command
+        /// </summary>
+        /// <param name="commandId">
+        /// The unique identifier of the command to validate
+        /// </param>
+        private static void ValidateCreateLeagueCommand(string commandId,
+            TraceWriter log = null)
+        {
+
+            const string COMMAND_NAME = @"create-league";
+
+            Guid commandGuid;
+
+            if (Guid.TryParse(commandId , out commandGuid ) )
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.Verbose($"Validating command {commandId} ",
+                        source: "ValidateCreateLeagueCommand");
+                }
+                #endregion
+
+                // Get the current state of the command...
+                Projection getCommandState = new Projection(@"Command",
+                    COMMAND_NAME,
+                    commandGuid.ToString(),
+                    nameof(Command_Summary_Projection )  );
+
+                if (null != getCommandState )
+                {
+
+                    #region Logging
+                    if (null != log)
+                    {
+                        log.Verbose($"Projection processor created",
+                            source: "ValidateCreateLeagueCommand");
+                    }
+                    #endregion
+
+                    Command_Summary_Projection cmdProjection =
+                        new Command_Summary_Projection();
+
+                    getCommandState.Process(cmdProjection);
+
+                    if (cmdProjection.CurrentSequenceNumber > 0)
+                    {
+                        if (cmdProjection.CurrentState == 
+                            Command_Summary_Projection.CommandState.Completed)
+                        {
+                            // No need to process a completed projection
+                            #region Logging
+                            if (null != log)
+                            {
+                                log.Warning($"Command {commandId} is complete so no need to validate ",
+                                    source: "ValidateCreateLeagueCommand");
+                            }
+                            #endregion
+                            return;
+                        }
+
+                        if (cmdProjection.CurrentState == 
+                            Command_Summary_Projection.CommandState.Completed)
+                        {
+                            // No need to process a completed projection
+                            #region Logging
+                            if (null != log)
+                            {
+                                log.Warning($"Command {commandId} is complete so no need to validate ",
+                                    source: "ValidateCreateLeagueCommand");
+                            }
+                            #endregion
+                            return;
+                        }
+
+                        if ((cmdProjection.CurrentState ==
+                            Command_Summary_Projection.CommandState.Created) ||
+                            (cmdProjection.CurrentState ==
+                            Command_Summary_Projection.CommandState.Invalid))
+                        {
+
+                            bool leagueNameValid = false;
+                            bool incoporatedDateValid = false;
+
+                            // New or previously invalid command can be validated
+                            if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.LeagueName)))
+                            {
+                                // League name may not be blank
+                                string leagueName = (string)cmdProjection.Parameters[nameof(Create_New_League_Definition.LeagueName)];
+                                if (string.IsNullOrWhiteSpace(leagueName))
+                                {
+                                    CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name may not be blank");
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.Warning($"Command {COMMAND_NAME } :: {commandId} has a blank league name",
+                                            source: "ValidateCreateLeagueCommand");
+                                    }
+                                    #endregion
+                                }
+                                else
+                                {
+                                    leagueNameValid = true;
+                                }
+                            }
+
+                            // The incoporation date may not be in the future
+                            if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.Date_Incorporated)))
+                            {
+                                DateTime dateIncorporated = (DateTime )cmdProjection.Parameters[nameof(Create_New_League_Definition.Date_Incorporated )];
+                                if (dateIncorporated > DateTime.UtcNow )
+                                {
+                                    CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Incorporation date is in the future");
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.Warning($"Command {COMMAND_NAME } :: {commandId} has a future dated incorporation date",
+                                            source: "ValidateCreateLeagueCommand");
+                                    }
+                                    #endregion
+                                }
+                                else
+                                {
+                                    incoporatedDateValid = true;
+                                }
+                            }
+
+                            if (incoporatedDateValid && leagueNameValid )
+                            {
+                                CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // No events were read into the projection so do nothing
+                        #region Logging
+                        if (null != log)
+                        {
+                            log.Warning($"No command events read for {commandId} ",
+                                source: "ValidateCreateLeagueCommand");
+                        }
+                        #endregion
+                    }
+                }
+            }
+
+        }
     }
 }

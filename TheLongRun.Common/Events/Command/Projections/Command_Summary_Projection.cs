@@ -25,6 +25,24 @@ namespace TheLongRun.Common.Events.Command.Projections
         private List<string> parameterNames = new List<string>();
 
         /// <summary>
+        /// Is there a value set for the named parameter?
+        /// </summary>
+        /// <param name="parameterName">
+        /// The name of the parameter
+        /// </param>
+        public bool ParameterIsSet(string parameterName)
+        {
+            if (parameterName.Contains(parameterName))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// The name of the command being executed
         /// </summary>
         public string CommandName
