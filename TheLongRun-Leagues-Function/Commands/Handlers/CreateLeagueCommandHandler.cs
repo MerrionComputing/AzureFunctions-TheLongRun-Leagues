@@ -1,12 +1,21 @@
+using System;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Linq;
 using Leagues.League.commandDefinition;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+
+
 
 using Newtonsoft.Json;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
+using TheLongRun.Common.Events.Command.Projections;
+using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace TheLongRunLeaguesFunction.Commands.Handlers
 {
@@ -14,6 +23,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
     {
 
 
+#if FILE_TRIGGER
         /// <summary>
         /// Command handler to handle the [create-league] command
         /// </summary>
@@ -41,13 +51,13 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
             TraceWriter log)
         {
 
-            #region Logging
+#region Logging
             if (null != log)
             {
                 log.Info($"Command handler for [create-league] command called\n Payload file name:{name} \n Size: {myBlob.Length} Bytes", 
                     source: "CreateLeagueCommandHandler");
             }
-            #endregion
+#endregion
 
             // Handle the command
             if (null != myBlob)
@@ -67,13 +77,13 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                 
                 if (null != cmdRecord )
                 {
-                    #region Logging
+#region Logging
                     if (null != log)
                     {
                         log.Info($"Command read from file : {cmdRecord.CommandName} , Id: {cmdRecord.CommandUniqueIdentifier } issued at {cmdRecord.When } by {cmdRecord.Who } ",
                             source: "CreateLeagueCommandHandler");
                     }
-                    #endregion
+#endregion
 
                     // Post an "League incorporated" event
                     EventStream outputStream = new EventStream("Leagues", "League", cmdRecord.Parameters.LeagueName);
@@ -91,12 +101,12 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
             }
             else
             {
-                #region Logging
+#region Logging
                 if (null != log)
                 {
                     log.Error($"Empty command log passed to [create-league] command in {name}");
                 }
-                #endregion
+#endregion
             }
 
 
@@ -109,6 +119,220 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
 
         }
-        
+
+#endif 
+
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [CommandName("Create League")]
+        [FunctionName("CreateLeagueCommandHandler")]
+        public static async Task<HttpResponseMessage> CreateLeagueCommandHandlerRun(
+    [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req,
+    TraceWriter log)
+        {
+
+
+
+#region Logging
+            if (null != log)
+            {
+                log.Verbose("Function triggered HTTP ",
+                    source: "CreateLeagueCommandHandler");
+            }
+#endregion
+
+            // Get the command identifier
+            string commandId = req.GetQueryNameValuePairs()
+                .FirstOrDefault(q => string.Compare(q.Key, "CommandId", true) == 0)
+                .Value;
+
+            if (commandId == null)
+            {
+                // Get request body
+                dynamic data = await req.Content.ReadAsAsync<object>();
+                commandId = data?.CommandId;
+            }
+
+            HandleCreateLeagueCommand(commandId, log);
+
+            return commandId == null
+                ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
+                : req.CreateResponse(HttpStatusCode.OK, $"Handled command {commandId}");
+        }
+
+        /// <summary>
+        /// Perform the underlying processing on the specified command
+        /// </summary>
+        /// <param name="commandId">
+        /// The unique identifier of the command to process
+        /// </param>
+        private static void HandleCreateLeagueCommand(string commandId,
+            TraceWriter log = null)
+        {
+
+            const string COMMAND_NAME = @"create-league";
+
+            Guid commandGuid;
+
+            // use custom assembly resolve handler
+            using (new AzureFunctionsResolveAssembly())
+            {
+                if (Guid.TryParse(commandId, out commandGuid))
+                {
+#region Logging
+                    if (null != log)
+                    {
+                        log.Verbose($"Validating command {commandId} ",
+                            source: "HandleCreateLeagueCommand");
+                    }
+#endregion
+
+                    // Get the current state of the command...
+                    Projection getCommandState = new Projection(@"Command",
+                        COMMAND_NAME,
+                        commandGuid.ToString(),
+                        nameof(Command_Summary_Projection));
+
+                    if (null != getCommandState)
+                    {
+
+#region Logging
+                        if (null != log)
+                        {
+                            log.Verbose($"Projection processor created",
+                                source: "HandleCreateLeagueCommand");
+                        }
+#endregion
+
+                        Command_Summary_Projection cmdProjection =
+                            new Command_Summary_Projection(log );
+
+                        getCommandState.Process(cmdProjection);
+
+                        if ( (cmdProjection.CurrentSequenceNumber > 0) || (cmdProjection.ProjectionValuesChanged()))
+                        {
+                            if (cmdProjection.CurrentState ==
+                                Command_Summary_Projection.CommandState.Completed)
+                            {
+                                // No need to process a completed projection
+#region Logging
+                                if (null != log)
+                                {
+                                    log.Warning($"Command {commandId} is complete so no need to process ",
+                                        source: "HandleCreateLeagueCommand");
+                                }
+#endregion
+                                return;
+                            }
+
+                            if (cmdProjection.CurrentState ==   Command_Summary_Projection.CommandState.Created )
+                            {
+                                // No need to process a completed projection
+#region Logging
+                                if (null != log)
+                                {
+                                    log.Warning($"Command {commandId} is not yet validated so cannot process ",
+                                        source: "HandleCreateLeagueCommand");
+                                }
+#endregion
+                                return;
+                            }
+
+                            if (cmdProjection.CurrentState == Command_Summary_Projection.CommandState.Invalid  )
+                            {
+                                // No need to process a completed projection
+#region Logging
+                                if (null != log)
+                                {
+                                    log.Warning($"Command {commandId} is not yet marked as invalid so cannot process ",
+                                        source: "HandleCreateLeagueCommand");
+                                }
+#endregion
+                                return;
+                            }
+
+                            if (cmdProjection.CurrentState ==
+                                Command_Summary_Projection.CommandState.Validated)
+                            {
+
+                                string leagueName = string.Empty;
+                                
+                                // New or previously invalid command can be validated
+                                if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.LeagueName)))
+                                {
+                                    // League name may not be blank
+                                    leagueName = cmdProjection.GetParameter<string>( nameof(Create_New_League_Definition.LeagueName));
+                                }
+
+                                string location = string.Empty;
+                                if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.Location)))
+                                {
+                                    location  = cmdProjection.GetParameter<string>(nameof(Create_New_League_Definition.Location ));
+                                }
+
+                                DateTime dateIncorporated = DateTime.UtcNow ;
+                                if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.Date_Incorporated)))
+                                {
+                                    dateIncorporated = cmdProjection.GetParameter<DateTime>(nameof(Create_New_League_Definition.Date_Incorporated));
+                                }
+
+                                // Create a new "League Created" event
+                                Leagues.League.eventDefinition.Formed formedEvent = new Leagues.League.eventDefinition.Formed(dateIncorporated ,
+                                    location,
+                                    $"{leagueName} created by command {commandGuid} ");
+
+                                EventStream leagueEvents = new EventStream(@"Leagues",
+                                        "League",
+                                        leagueName );
+
+                                if ((null != leagueEvents) && (null != formedEvent))
+                                {
+                                    leagueEvents.AppendEvent(formedEvent);
+                                }
+
+                                // if there is contact details, add an event for that
+                                string emailAddress = string.Empty;
+                                if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.Email_Address )))
+                                {
+                                    emailAddress = cmdProjection.GetParameter<string>(nameof(Create_New_League_Definition.Email_Address));
+                                }
+
+                                string twitterHandle = string.Empty;
+                                if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.Twitter_Handle )))
+                                {
+                                    twitterHandle = cmdProjection.GetParameter<string>(nameof(Create_New_League_Definition.Twitter_Handle));
+                                }
+
+                                if ((! string.IsNullOrWhiteSpace(emailAddress ) ) || (! string.IsNullOrWhiteSpace(twitterHandle )))
+                                {
+                                    // Create a new "Contact details changed" event
+                                    Leagues.League.eventDefinition.Contact_Details_Changed contactDetailsEvent = new Leagues.League.eventDefinition.Contact_Details_Changed(DateTime.UtcNow,
+                                        twitterHandle,
+                                        emailAddress);
+
+                                    if ((null != leagueEvents) && (null != contactDetailsEvent))
+                                    {
+                                        leagueEvents.AppendEvent(contactDetailsEvent);
+                                    }
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // No events were read into the projection so do nothing
+#region Logging
+                            if (null != log)
+                            {
+                                log.Warning($"No command events read for {commandId} ",
+                                    source: "ValidateCreateLeagueCommand");
+                            }
+#endregion
+                        }
+                    }
+                }
+            }
+        }
     }
 }

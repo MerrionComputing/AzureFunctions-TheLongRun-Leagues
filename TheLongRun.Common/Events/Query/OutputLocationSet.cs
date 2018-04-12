@@ -24,24 +24,22 @@ namespace TheLongRun.Common.Events.Query
         /// <remarks>
         /// This can be a URI or other depending on the location type
         /// </remarks>
-        private readonly string _location;
-        public string Location => _location;
+        public string Location { get; set; }
 
-        private readonly QueryLogRecord.QueryReturnTarget   _targetType;
-        public QueryLogRecord.QueryReturnTarget TargetType => _targetType;
+        public QueryLogRecord.QueryReturnTarget TargetType { get; set; }
 
         public OutputLocationSet(string locationIn,
             QueryLogRecord.QueryReturnTarget targetTypeIn)
         {
-            _location = locationIn;
-            _targetType = targetTypeIn ;
+            Location = locationIn;
+            TargetType = targetTypeIn ;
         }
 
 
         public OutputLocationSet(SerializationInfo info, StreamingContext context)
         {
-            _location = info.GetString(nameof(Location));
-            _targetType = (QueryLogRecord.QueryReturnTarget)info.GetValue (nameof(TargetType), typeof(QueryLogRecord.QueryReturnTarget));
+            Location = info.GetString(nameof(Location));
+            TargetType = (QueryLogRecord.QueryReturnTarget)info.GetValue (nameof(TargetType), typeof(QueryLogRecord.QueryReturnTarget));
         }
 
         /// <summary>
@@ -52,8 +50,8 @@ namespace TheLongRun.Common.Events.Query
         /// </remarks>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Location), _location);
-            info.AddValue(nameof(TargetType), _targetType);
+            info.AddValue(nameof(Location), Location);
+            info.AddValue(nameof(TargetType), TargetType);
         }
 
     }

@@ -16,38 +16,35 @@ namespace TheLongRun.Common.Events.Command
     {
 
         /// <summary>
-        /// The date/time the command was logged by the system
+        /// The date/time the error was logged by the system
         /// </summary>
-        private readonly DateTime _Date_Logged;
-        public DateTime Date_Logged => _Date_Logged;
+        public DateTime Date_Logged { get; set; }
 
         
         /// <summary>
         /// The validation error message
         /// </summary>
-        private readonly string _message;
-        public string Message => _message;
+        public string Message { get; set; }
 
         
         /// <summary>
         /// Is the error fatal (which should prevent any further processing until fixed)
         /// </summary>
-        private readonly bool _fatal;
-        public bool Fatal => _fatal;
+        public bool Fatal { get; set; }
 
         public ValidationErrorOccured(string messageIn,
              bool fatalIn)
         {
-            _Date_Logged = DateTime.UtcNow;
-            _message = messageIn;
-            _fatal = fatalIn;
+            Date_Logged = DateTime.UtcNow;
+            Message = messageIn;
+            Fatal = fatalIn;
         }
 
         public ValidationErrorOccured(SerializationInfo info, StreamingContext context)
         {
-            _Date_Logged = info.GetDateTime(nameof(Date_Logged));
-            _message  = info.GetString(nameof(Message ));
-            _fatal = info.GetBoolean(nameof(Fatal));
+            Date_Logged = info.GetDateTime(nameof(Date_Logged));
+            Message  = info.GetString(nameof(Message ));
+            Fatal = info.GetBoolean(nameof(Fatal));
         }
 
         /// <summary>
@@ -58,9 +55,9 @@ namespace TheLongRun.Common.Events.Command
         /// </remarks>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Date_Logged), _Date_Logged);
-            info.AddValue(nameof(Message), _message );
-            info.AddValue(nameof(Fatal ), _fatal );
+            info.AddValue(nameof(Date_Logged), Date_Logged);
+            info.AddValue(nameof(Message), Message );
+            info.AddValue(nameof(Fatal ), Fatal );
         }
     }
 }

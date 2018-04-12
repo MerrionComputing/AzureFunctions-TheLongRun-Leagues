@@ -19,7 +19,7 @@ namespace TheLongRunLeaguesFunction.Commands
 
             log.Info($"Topic : {eventGridEvent.Topic} , Subject : {eventGridEvent.Subject } , Event Type: {eventGridEvent.EventType }  ");
             log.Info($" Payload : { eventGridEvent.Data.ToString()} ");
-            log.Info($" Event time:  { eventGridEvent.EventTime}, Published: {eventGridEvent.PublishTime} ");
+            log.Info($" Event time:  { eventGridEvent.EventTime}, Published: {eventGridEvent.PublishTime} ");            
 
             log.Info("=== Complete ============================="); 
         }

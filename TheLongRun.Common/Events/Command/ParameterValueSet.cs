@@ -17,26 +17,24 @@ namespace TheLongRun.Common.Events.Command
         /// <summary>
         /// The name of the parameter
         /// </summary>
-        private readonly string _name;
-        public string Name => _name;
+        public string Name { get; set; }
 
         
 
-        private readonly object _value;
-        public object Value => _value;
+        public object Value { get; set; }
 
         public ParameterValueSet(string nameIn,
             object valueIn)
         {
-            _name = nameIn;
-            _value = valueIn;
+            Name  = nameIn;
+            Value  = valueIn;
         }
 
 
         public ParameterValueSet(SerializationInfo info, StreamingContext context)
         {
-            _name = info.GetString(nameof(Name ));
-            _value  = info.GetValue(nameof(Value ) , typeof(object));
+            Name = info.GetString(nameof(Name ));
+            Value   = info.GetValue(nameof(Value ) , typeof(object));
         }
 
         /// <summary>
@@ -47,8 +45,8 @@ namespace TheLongRun.Common.Events.Command
         /// </remarks>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Name ), _name );
-            info.AddValue(nameof(Value ), _value );
+            info.AddValue(nameof(Name ), Name  );
+            info.AddValue(nameof(Value ), Value );
         }
     }
 }

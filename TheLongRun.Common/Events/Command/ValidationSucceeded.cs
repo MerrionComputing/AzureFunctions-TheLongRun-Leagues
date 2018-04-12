@@ -19,18 +19,17 @@ namespace TheLongRun.Common.Events.Command
         /// <summary>
         /// The date/time the command was validated by the system
         /// </summary>
-        private readonly DateTime _Date_Validated;
-        public DateTime Date_Validated => _Date_Validated;
+        public DateTime Date_Validated { get; set; }
 
         public ValidationSucceeded(DateTime dateValidatedIn)
         {
-            _Date_Validated = dateValidatedIn;
+            Date_Validated = dateValidatedIn;
         }
 
 
         public ValidationSucceeded(SerializationInfo info, StreamingContext context)
         {
-            _Date_Validated = info.GetDateTime(nameof(Date_Validated ));
+            Date_Validated = info.GetDateTime(nameof(Date_Validated ));
         }
 
 
@@ -43,7 +42,7 @@ namespace TheLongRun.Common.Events.Command
         /// </remarks>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Date_Validated ), _Date_Validated );
+            info.AddValue(nameof(Date_Validated ), Date_Validated );
         }
     }
 }

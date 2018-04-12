@@ -15,31 +15,30 @@ namespace TheLongRun.Common.Events.Command
         : IEvent 
     {
 
-        private readonly string _commandName;
-        public string CommandName => _commandName;
+
+        public string CommandName { get; set; }
 
         /// <summary>
         /// The date/time the command was logged by the system
         /// </summary>
-        private readonly DateTime _Date_Logged;
-        public DateTime Date_Logged => _Date_Logged;
+        public DateTime Date_Logged { get; set; }
 
-        private readonly Guid _commandIdentifier;
-        public Guid CommandIdentifier => _commandIdentifier;
+
+        public Guid CommandIdentifier { get; set; }
 
         public CommandCreated(string commandNameIn,
             Guid commandIdentifierIn)
         {
-            _Date_Logged = DateTime.UtcNow;
-            _commandName = commandNameIn;
-            _commandIdentifier = commandIdentifierIn;
+            Date_Logged = DateTime.UtcNow;
+            CommandName = commandNameIn;
+            CommandIdentifier = commandIdentifierIn;
         }
 
         public CommandCreated(SerializationInfo info, StreamingContext context)
         {
-            _Date_Logged = info.GetDateTime(nameof(Date_Logged) );
-            _commandIdentifier = (Guid)info.GetValue(nameof(CommandIdentifier), typeof(Guid));
-            _commandName = info.GetString(nameof(CommandName));
+            Date_Logged = info.GetDateTime(nameof(Date_Logged) );
+            CommandIdentifier = (Guid)info.GetValue(nameof(CommandIdentifier), typeof(Guid));
+            CommandName = info.GetString(nameof(CommandName));
         }
 
         
@@ -52,9 +51,9 @@ namespace TheLongRun.Common.Events.Command
         /// </remarks>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Date_Logged), _Date_Logged );
-            info.AddValue(nameof(CommandIdentifier), _commandIdentifier);
-            info.AddValue(nameof(CommandName), _commandName);
+            info.AddValue(nameof(Date_Logged), Date_Logged );
+            info.AddValue(nameof(CommandIdentifier), CommandIdentifier);
+            info.AddValue(nameof(CommandName), CommandName);
         }
     }
 }
