@@ -4,7 +4,7 @@ using CQRSAzure.EventSourcing;
 namespace TheLongRun.Common.Events.Query
 {
     /// <summary>
-    /// A parameter to be used when executing the query has been set
+    /// A parameter value to be used when executing the query has been set
     /// </summary>
     [Serializable()]
     [CQRSAzure.EventSourcing.DomainNameAttribute("Query")]
@@ -16,26 +16,26 @@ namespace TheLongRun.Common.Events.Query
         /// <summary>
         /// The name of the parameter
         /// </summary>
-        private readonly string _name;
-        public string Name => _name;
+ 
+        public string Name { get; set; }
 
 
 
-        private readonly object _value;
-        public object Value => _value;
+
+        public object Value { get; set; }
 
         public QueryParameterValueSet(string nameIn,
             object valueIn)
         {
-            _name = nameIn;
-            _value = valueIn;
+            Name = nameIn;
+            Value = valueIn;
         }
 
 
         public QueryParameterValueSet(SerializationInfo info, StreamingContext context)
         {
-            _name = info.GetString(nameof(Name));
-            _value = info.GetValue(nameof(Value), typeof(object));
+            Name = info.GetString(nameof(Name));
+            Value = info.GetValue(nameof(Value), typeof(object));
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace TheLongRun.Common.Events.Query
         /// </remarks>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Name), _name);
-            info.AddValue(nameof(Value), _value);
+            info.AddValue(nameof(Name), Name);
+            info.AddValue(nameof(Value), Value);
         }
     }
 }

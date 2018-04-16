@@ -97,9 +97,13 @@ namespace TheLongRun.Common.Events.Command.Projections
             /// </summary>
             Invalid = 2,
             /// <summary>
+            /// A multi-step command can be valid but not yet complete so a status of "In progress" would indicate that
+            /// </summary>
+            InProgress = 3,
+            /// <summary>
             /// A command marked as complete
             /// </summary>
-            Completed =3
+            Completed =4
         }
 
         public CommandState CurrentState

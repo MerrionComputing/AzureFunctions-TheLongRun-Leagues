@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheLongRun.Common.Bindings;
 
 namespace TheLongRun.Common
 {
@@ -101,8 +102,78 @@ namespace TheLongRun.Common
             return queryInstance.QueryName.ToLowerInvariant().Trim() + @"-" + queryInstance.QueryUniqueIdentifier.ToString(@"N") + @".qry";
         }
 
+        /// <summary>
+        /// Log a particular parameter validation error to the given query record
+        /// </summary>
+        /// <param name="queryGuid">
+        /// Unique identifier of the query that had the error
+        /// </param>
+        /// <param name="queryName">
+        /// Name of the query that had the error
+        /// </param>
+        /// <param name="fatalError">
+        /// Is the error considered fatal
+        /// </param>
+        /// <param name="errorMessage">
+        /// Message for the validation error
+        /// param>
+        public static void LogQueryValidationError(Guid queryGuid, string queryName, bool fatalError, string errorMessage)
+        {
 
+            EventStream qryEvents = new EventStream(@"Query",
+            queryName ,
+            queryGuid.ToString());
+            if (null != qryEvents )
+            {
+                qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValidationErrorOccured (queryName , fatalError, errorMessage ));
+            }
+        }
 
+        public static void RequestProjection(Guid queryGuid,
+            string queryName,
+            string projectionName,
+            string domainName,
+            string aggregateTypeName,
+            string aggregateInstanceKey,
+            Nullable<DateTime > asOfDate )
+        {
+            EventStream qryEvents = new EventStream(@"Query",
+            queryName,
+            queryGuid.ToString());
+            if (null != qryEvents)
+            {
+                qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRequested(domainName,
+                    aggregateTypeName ,
+                    aggregateInstanceKey,
+                    projectionName,
+                    asOfDate));
+            }
+        }
+
+        public static void LogProjectionResult(Guid queryGuid, 
+            string queryName, 
+            string projectionTypeName, 
+            string domainName, 
+            string aggregateTypeName, 
+            string aggregateInstanceKey, 
+            Nullable<DateTime> asOfDate, 
+            object projectionValue,
+            uint sequenceNumber)
+        {
+            EventStream qryEvents = new EventStream(@"Query",
+            queryName,
+            queryGuid.ToString());
+            if (null != qryEvents)
+            {
+                qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionValueReturned (domainName,
+                    aggregateTypeName,
+                    aggregateInstanceKey,
+                    projectionTypeName,
+                    asOfDate.GetValueOrDefault(DateTime.UtcNow) ,
+                    projectionValue ,
+                    sequenceNumber ));
+            }
+        }
     }
 
     public class QueryLogRecord<TQueryParameters>

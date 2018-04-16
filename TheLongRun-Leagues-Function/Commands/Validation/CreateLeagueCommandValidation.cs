@@ -127,7 +127,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                             if (cmdProjection.CurrentState ==
                                 Command_Summary_Projection.CommandState.Completed)
                             {
-                                // No need to process a completed projection
+                                // No need to validate a completed command
                                 #region Logging
                                 if (null != log)
                                 {

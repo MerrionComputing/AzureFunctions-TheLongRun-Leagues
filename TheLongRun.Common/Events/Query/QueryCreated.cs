@@ -43,9 +43,6 @@ namespace TheLongRun.Common.Events.Query
         /// <summary>
         /// Populates a SerializationInfo with the data needed to serialize this event instance
         /// </summary>
-        /// <remarks>
-        /// The version number is also to be saved
-        /// </remarks>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(nameof(Date_Logged), Date_Logged);

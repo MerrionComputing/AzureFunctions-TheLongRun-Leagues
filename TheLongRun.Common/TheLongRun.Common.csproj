@@ -236,8 +236,14 @@
     <Compile Include="Events\Command\ValidationErrorOccured.cs" />
     <Compile Include="Events\Command\ValidationSucceeded.cs" />
     <Compile Include="Events\Query\OutputLocationSet.cs" />
+    <Compile Include="Events\Query\ProjectionRequested.cs" />
+    <Compile Include="Events\Query\Projections\Query_Outputs_Projection.cs" />
+    <Compile Include="Events\Query\Projections\Query_Projections_Projection.cs" />
     <Compile Include="Events\Query\Projections\Query_Summary_Projection.cs" />
+    <Compile Include="Events\Query\ProjectionValueReturned.cs" />
+    <Compile Include="Events\Query\QueryCompleted.cs" />
     <Compile Include="Events\Query\QueryCreated.cs" />
+    <Compile Include="Events\Query\QueryParameterValidationErrorOccured.cs" />
     <Compile Include="Events\Query\QueryParameterValueSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryLogRecord.cs" />

@@ -41,6 +41,5 @@
   <ItemGroup>
     <Folder Include="Classifiers\" />
     <Folder Include="Identifier Groups\" />
-    <Folder Include="Queries\Handlers\" />
   </ItemGroup>
 </Project>
