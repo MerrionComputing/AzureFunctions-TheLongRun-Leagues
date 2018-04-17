@@ -66,10 +66,104 @@ namespace TheLongRunLeaguesFunction.Queries
         /// <param name="log">
         /// Trace target for logging the outcomes of this operation
         /// </param>
-        private static void OutputResultsGetLeagueSummaryQuery(string queryId, 
+        private static void OutputResultsGetLeagueSummaryQuery(string queryId,
             TraceWriter log = null)
         {
-            throw new NotImplementedException();
+
+            const string QUERY_NAME = @"get-league-summary";
+            Guid queryGuid;
+
+            if (Guid.TryParse(queryId, out queryGuid))
+            {
+                // Get the current state of the query...
+                Projection getQueryState = new Projection(@"Query",
+                    QUERY_NAME,
+                    queryGuid.ToString(),
+                    nameof(Query_Summary_Projection));
+
+                if (null != getQueryState)
+                {
+
+                    #region Logging
+                    if (null != log)
+                    {
+                        log.Verbose($"Projection processor created",
+                            source: "OutputResultsGetLeagueSummaryQuery");
+                    }
+                    #endregion
+
+                    // Run the query summary projection
+                    Query_Summary_Projection qryProjection =
+                            new Query_Summary_Projection(log);
+
+                    getQueryState.Process(qryProjection);
+
+                    if ((qryProjection.CurrentSequenceNumber > 0) || (qryProjection.ProjectionValuesChanged()))
+                    {
+                        // Process the query state as is now...
+                        #region Logging
+                        if (null != log)
+                        {
+                            log.Verbose($"Query { qryProjection.QueryName } projection run for {queryGuid } ",
+                                source: "OutputResultsGetLeagueSummaryQuery");
+                        }
+                        #endregion
+
+                        // Ignore queries in an invalid state or not yet validated...
+                        if ((qryProjection.CurrentState == Query_Summary_Projection.QueryState.Created) ||
+                             (qryProjection.CurrentState == Query_Summary_Projection.QueryState.Invalid))
+                        {
+                            // No need to validate a completed query
+                            #region Logging
+                            if (null != log)
+                            {
+                                log.Warning($"Query {queryGuid} state is {qryProjection.CurrentState} so no output processed ",
+                                    source: "OutputResultsGetLeagueSummaryQuery");
+                            }
+                            #endregion
+                            return;
+                        }
+
+                        // Check all the projections have been run..
+                        Query_Projections_Projection qryProjectionState = new Query_Projections_Projection( log );
+                        getQueryState.Process(qryProjectionState);
+
+                        if ((qryProjectionState.CurrentSequenceNumber > 0) || (qryProjectionState.ProjectionValuesChanged()))
+                        {
+
+                            if (qryProjectionState.UnprocessedRequests.Count == 0)
+                            {
+                                if (qryProjectionState.ProcessedRequests.Count > 0)
+                                {
+                                    // Turn the projections into a query return (This could include a collate step)
+                                    Get_League_Summary_Definition_Return ret = new Get_League_Summary_Definition_Return(queryGuid,
+                                        qryProjectionState.ProcessedRequests[0].AggregateInstanceKey);
+
+                                    if (qryProjectionState.ProcessedRequests[0].ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information ).Name  )
+                                    {
+                                        ret.Location = ((Leagues.League.projection.League_Summary_Information)qryProjectionState.ProcessedRequests[0].ReturnedValue).Location;
+                                        ret.Date_Incorporated = ((Leagues.League.projection.League_Summary_Information)qryProjectionState.ProcessedRequests[0].ReturnedValue).Date_Incorporated ;
+                                        ret.Twitter_Handle  = ((Leagues.League.projection.League_Summary_Information)qryProjectionState.ProcessedRequests[0].ReturnedValue).Twitter_Handle ;
+                                    }
+
+                                    // Get all the output targets
+                                    Query_Outputs_Projection qryOutputs = new Query_Outputs_Projection(log);
+                                    getQueryState.Process(qryOutputs);
+
+                                    if ((qryOutputs.CurrentSequenceNumber > 0) || (qryOutputs.ProjectionValuesChanged()))
+                                    {
+                                        foreach (string location in qryOutputs.Targets.Keys )
+                                        {
+                                            // Send the output to the location...
+                                            QueryLogRecord.SendOutput(location, qryOutputs.Targets[location], ret);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

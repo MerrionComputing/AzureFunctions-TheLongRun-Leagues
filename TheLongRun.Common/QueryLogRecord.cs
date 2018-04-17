@@ -174,6 +174,83 @@ namespace TheLongRun.Common
                     sequenceNumber ));
             }
         }
+
+        /// <summary>
+        /// Send the output to the specified target
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="queryReturnTarget"></param>
+        /// <param name="value"></param>
+        public static void SendOutput(string location, 
+            QueryReturnTarget queryReturnTarget, 
+            object value)
+        {
+            if (null != value )
+            {
+                string valueAsJson = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+                switch (queryReturnTarget )
+                {
+                    case QueryReturnTarget.AzureBlobStorage:
+                        {
+                            SendOutputToBlob(location, valueAsJson);
+                            break;
+                        }
+                    case QueryReturnTarget.CustomEventGridTopic:
+                        {
+                            SendOutputToCustomTopic(location, valueAsJson);
+                            break;
+                        }
+                    case QueryReturnTarget.WebHook:
+                        {
+                            SendOutputToWebhook(location, valueAsJson);
+                            break;
+                        }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Send the output as JSON to the supplied webhook
+        /// </summary>
+        /// <param name="location">
+        /// The URI of the webhook to send the value to
+        /// </param>
+        /// <param name="valueAsJson">
+        /// The query result as JSON
+        /// </param>
+        private static void SendOutputToWebhook(string location, string valueAsJson)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Send the value as JSON to the event grid custom topic 
+        /// </summary>
+        /// <param name="location">
+        /// The identifier of the event grid location to send the value to
+        /// </param>
+        /// <param name="valueAsJson">
+        /// The query result encoded as JSON
+        /// </param>
+        private static void SendOutputToCustomTopic(string location, string valueAsJson)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Write the value as JSON to the named Azure blob
+        /// </summary>
+        /// <param name="location">
+        /// The target to write the JSON value to
+        /// </param>
+        /// <param name="valueAsJson">
+        /// The query results encoded as JSON
+        /// </param>
+        private static void SendOutputToBlob(string location, 
+            string valueAsJson)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class QueryLogRecord<TQueryParameters>

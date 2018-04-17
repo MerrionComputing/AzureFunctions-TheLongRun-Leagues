@@ -180,5 +180,13 @@ namespace TheLongRun.Common.Events.Query.Projections
                 processedRequests.Add(eventHandled);
             }
         }
+
+        public Query_Projections_Projection(TraceWriter logIn = null)
+        {
+            if (null != logIn )
+            {
+                log = logIn;
+            }
+        }
     }
 }
