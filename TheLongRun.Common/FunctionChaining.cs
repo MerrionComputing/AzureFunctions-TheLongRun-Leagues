@@ -35,6 +35,8 @@ namespace TheLongRun.Common
             functionKeys.Add(@"GetLeagueSummaryQueryProjectionProcess", @"8HwcWX82LPnh9m79XbjZ4oDcLRUsIASaduEZylOogfapSyoZXOOpXg==");
             functionKeys.Add(@"GetLeagueSummaryQueryProjectionsRequest", @"E5iEPUEXHsIT8NxlDNS5Msz2GcaAa7Py/EWbiLtFuaSljR8t9Ms7xA==");
             functionKeys.Add(@"GetLeagueSummaryQueryValidation", @"aMbIotn5dSDuaOGBINNdpsk51hTRXn4rCZtSYwK8kc4gzIIMHUR8NA==");
+            functionKeys.Add(@"SetLeagueEmailAddressCommandHandler", @"ieeNm5IkoK3yUScYyoHRiCakMw/fQfoD/S4zmLHwqdEyGAMlpxXrOA==");
+            functionKeys.Add(@"SetLeagueEmailAddressCommandValidation", @"86yrJaKdwoNgZIQ2uGAVPLrG9RQewBdVb/TfHeg5zkqpIF6Re4JSPg==");
         }
         #endregion
 

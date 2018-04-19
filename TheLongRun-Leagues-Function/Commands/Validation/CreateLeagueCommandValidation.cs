@@ -35,8 +35,6 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
             TraceWriter log)
         {
 
- 
-
                 #region Logging
                 if (null != log)
                 {
