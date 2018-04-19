@@ -110,8 +110,7 @@ namespace TheLongRunLeaguesFunction.Queries
                         #endregion
 
                         // Ignore queries in an invalid state or not yet validated...
-                        if ((qryProjection.CurrentState == Query_Summary_Projection.QueryState.Created) ||
-                             (qryProjection.CurrentState == Query_Summary_Projection.QueryState.Invalid))
+                        if (qryProjection.CurrentState == Query_Summary_Projection.QueryState.Invalid)
                         {
                             // No need to validate a completed query
                             #region Logging
@@ -139,11 +138,25 @@ namespace TheLongRunLeaguesFunction.Queries
                                     Get_League_Summary_Definition_Return ret = new Get_League_Summary_Definition_Return(queryGuid,
                                         qryProjectionState.ProcessedRequests[0].AggregateInstanceKey);
 
-                                    if (qryProjectionState.ProcessedRequests[0].ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information ).Name  )
+                                    if (qryProjectionState.ProcessedRequests[0].ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information).Name)
                                     {
-                                        ret.Location = ((Leagues.League.projection.League_Summary_Information)qryProjectionState.ProcessedRequests[0].ReturnedValue).Location;
-                                        ret.Date_Incorporated = ((Leagues.League.projection.League_Summary_Information)qryProjectionState.ProcessedRequests[0].ReturnedValue).Date_Incorporated ;
-                                        ret.Twitter_Handle  = ((Leagues.League.projection.League_Summary_Information)qryProjectionState.ProcessedRequests[0].ReturnedValue).Twitter_Handle ;
+                                        Leagues.League.projection.League_Summary_Information projectionResult = ((Newtonsoft.Json.Linq.JObject)qryProjectionState.ProcessedRequests[0].ReturnedValue).ToObject<Leagues.League.projection.League_Summary_Information>();
+                                        if (null != projectionResult)
+                                        {
+                                            ret.Location = projectionResult.Location;
+                                            ret.Date_Incorporated = projectionResult.Date_Incorporated;
+                                            ret.Twitter_Handle = projectionResult.Twitter_Handle;
+                                        }
+                                        else
+                                        {
+                                            #region Logging
+                                            if (null != log)
+                                            {
+                                                log.Error ($"Unable to convert {qryProjectionState.ProcessedRequests[0].ReturnedValue} to {nameof(Leagues.League.projection.League_Summary_Information)}  ",
+                                                    source: "OutputResultsGetLeagueSummaryQuery");
+                                            }
+                                            #endregion
+                                        }
                                     }
 
                                     // Get all the output targets
@@ -152,13 +165,48 @@ namespace TheLongRunLeaguesFunction.Queries
 
                                     if ((qryOutputs.CurrentSequenceNumber > 0) || (qryOutputs.ProjectionValuesChanged()))
                                     {
+                                        #region Logging
+                                        if (null != log)
+                                        {
+                                            log.Verbose($"Sending results to output targets {ret} ",
+                                                source: "OutputResultsGetLeagueSummaryQuery");
+                                        }
+                                        #endregion
                                         foreach (string location in qryOutputs.Targets.Keys )
                                         {
+                                            #region Logging
+                                            if (null != log)
+                                            {
+                                                log.Verbose($"Target : { location} - type {qryOutputs.Targets[location]} ",
+                                                    source: "OutputResultsGetLeagueSummaryQuery");
+                                            }
+                                            #endregion
                                             // Send the output to the location...
                                             QueryLogRecord.SendOutput(location, qryOutputs.Targets[location], ret);
                                         }
                                     }
                                 }
+                                else
+                                {
+                                    // No processed projections found
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.Warning($"Query {queryGuid} state is has no processed projections so no output processed ",
+                                            source: "OutputResultsGetLeagueSummaryQuery");
+                                    }
+                                    #endregion
+                                }
+                            }
+                            else
+                            {
+                                #region Logging
+                                if (null != log)
+                                {
+                                    log.Warning($"Query {queryGuid} still has unprocessed projections so no output processed ",
+                                        source: "OutputResultsGetLeagueSummaryQuery");
+                                }
+                                #endregion
                             }
                         }
                     }

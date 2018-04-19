@@ -100,6 +100,11 @@ namespace TheLongRunLeaguesFunction.Queries
                             queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.OutputLocationSet 
                                 ( qryRecord.ReturnPath , qryRecord.ReturnTarget ));
 
+                            // Call the next query in the command chain
+                            FunctionChaining funcChain = new FunctionChaining(log);
+                            var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
+                            queryParams.Add (new Tuple<string, string>("queryId" , qryRecord.QueryUniqueIdentifier.ToString()) );
+                            funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryQueryValidation", queryParams, null );  
                         }
 
                     }

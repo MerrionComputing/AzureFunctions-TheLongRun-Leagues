@@ -19,8 +19,6 @@ namespace TheLongRun.Common.Events.Query.Projections
         CQRSAzure.EventSourcing.IHandleEvent<QueryCreated>,
         CQRSAzure.EventSourcing.IHandleEvent<QueryParameterValueSet>,
         CQRSAzure.EventSourcing.IHandleEvent<QueryParameterValidationErrorOccured>,
-        CQRSAzure.EventSourcing.IHandleEvent<ProjectionRequested>,
-        CQRSAzure.EventSourcing.IHandleEvent<ProjectionValueReturned>,
         IProjectionUntyped
     {
 
@@ -193,15 +191,6 @@ namespace TheLongRun.Common.Events.Query.Projections
                 HandleEvent(eventToHandle as QueryCompleted );
             }
 
-            if (eventToHandle.GetType() == typeof(ProjectionValueReturned ))
-            {
-                HandleEvent(eventToHandle as ProjectionValueReturned );
-            }
-
-            if (eventToHandle.GetType() == typeof(ProjectionRequested ))
-            {
-                HandleEvent(eventToHandle as ProjectionRequested );
-            }
 
         }
 
@@ -240,16 +229,6 @@ namespace TheLongRun.Common.Events.Query.Projections
                 HandleEvent<QueryCompleted>(eventToHandle.ToObject<QueryCompleted>());
             }
 
-            if (eventFullName == typeof(ProjectionValueReturned).FullName)
-            {
-                HandleEvent<ProjectionValueReturned>(eventToHandle.ToObject<ProjectionValueReturned>());
-            }
-
-            if (eventFullName == typeof(ProjectionRequested ).FullName)
-            {
-                HandleEvent<ProjectionRequested>(eventToHandle.ToObject<ProjectionRequested>());
-            }
-
 
         }
 
@@ -280,16 +259,6 @@ namespace TheLongRun.Common.Events.Query.Projections
             }
 
             if (eventTypeFullName == typeof(QueryCompleted ).FullName)
-            {
-                return true;
-            }
-
-            if (eventTypeFullName == typeof(ProjectionValueReturned ).FullName)
-            {
-                return true;
-            }
-
-            if (eventTypeFullName == typeof(ProjectionRequested ).FullName)
             {
                 return true;
             }
@@ -335,9 +304,64 @@ namespace TheLongRun.Common.Events.Query.Projections
             }
         }
 
-        public  void HandleEvent(QueryParameterValueSet eventHandled)
+        public void HandleEvent(QueryParameterValueSet eventHandled)
         {
-            throw new NotImplementedException();
+
+            #region Logging
+            if (null != log)
+            {
+                log.Verbose($"HandleEvent( ParameterValueSet )",
+                    nameof(Query_Summary_Projection));
+            }
+            #endregion
+
+            if (null != eventHandled)
+            {
+                // add or update the parameter value
+                string parameterName = @"Parameter." + eventHandled.Name;
+                #region Logging
+                if (null != log)
+                {
+                    log.Verbose($" Parameter set {parameterName}",
+                        nameof(Query_Summary_Projection));
+                }
+                #endregion
+                if (null != eventHandled.Value)
+                {
+                    base.AddOrUpdateValue(parameterName, 0, eventHandled.Value);
+
+                    if (!parameterNames.Contains(eventHandled.Name))
+                    {
+                        parameterNames.Add(eventHandled.Name);
+                    }
+
+                    #region Logging
+                    if (null != log)
+                    {
+                        log.Verbose($" {eventHandled.Name} set to {eventHandled.Value}  ",
+                            nameof(Query_Summary_Projection));
+                    }
+                    #endregion
+                }
+                else
+                {
+                    // parameter is being cleared
+                    if (parameterNames.Contains(eventHandled.Name))
+                    {
+                        parameterNames.Remove(eventHandled.Name);
+                    }
+                }
+            }
+            else
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.Warning($"HandleEvent( ParameterValueSet ) - parameter was null",
+                        nameof(Query_Summary_Projection ));
+                }
+                #endregion
+            }
         }
 
         public  void HandleEvent(QueryParameterValidationErrorOccured eventHandled)
@@ -378,15 +402,6 @@ namespace TheLongRun.Common.Events.Query.Projections
         }
 
 
-        public  void HandleEvent(ProjectionRequested eventHandled)
-        {
-            throw new NotImplementedException();
-        }
-
-        public  void HandleEvent(ProjectionValueReturned eventHandled)
-        {
-            throw new NotImplementedException();
-        }
 
         public Query_Summary_Projection(TraceWriter logIn = null)
         {

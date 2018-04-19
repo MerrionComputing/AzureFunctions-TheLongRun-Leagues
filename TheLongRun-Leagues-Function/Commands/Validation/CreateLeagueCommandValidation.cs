@@ -207,6 +207,12 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 if (incoporatedDateValid && leagueNameValid)
                                 {
                                     CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
+
+                                    // Call the next command in the command chain to process the valid command
+                                    FunctionChaining funcChain = new FunctionChaining(log);
+                                    var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
+                                    queryParams.Add(new Tuple<string, string>("commandId", commandGuid.ToString()));
+                                    funcChain.TriggerCommandByHTTPS(@"Leagues", "CreateLeagueCommandHandler", queryParams, null);
                                 }
                             }
                         }

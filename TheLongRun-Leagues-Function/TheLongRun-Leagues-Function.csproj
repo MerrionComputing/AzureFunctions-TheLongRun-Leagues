@@ -22,11 +22,26 @@
     <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="CQRSAzure.CommandDefinition">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.CommandHandler\CQRSAzure.CommandHandler\bin\Debug\CQRSAzure.CommandDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.CommandHandler">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.CommandHandler\CQRSAzure.CommandHandler\bin\Debug\CQRSAzure.CommandHandler.dll</HintPath>
+    </Reference>
     <Reference Include="CQRSAzure.EventSourcing">
       <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.EventSourcing\bin\Debug\CQRSAzure.EventSourcing.dll</HintPath>
     </Reference>
     <Reference Include="CQRSAzure.EventSourcing.Implementation">
       <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRS.EventSourcing.Implementation\bin\Debug\CQRSAzure.EventSourcing.Implementation.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.IdentifierGroup">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.IdentifierGroup\bin\Debug\CQRSAzure.IdentifierGroup.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.QueryDefinition">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.CommandHandler\CQRSAzure.CommandHandler\bin\Debug\CQRSAzure.QueryDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.QueryHandler">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.QueryHandler\QueryHandler\bin\Debug\CQRSAzure.QueryHandler.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

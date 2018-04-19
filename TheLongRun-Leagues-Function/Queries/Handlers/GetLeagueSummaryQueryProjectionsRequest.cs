@@ -160,7 +160,13 @@ namespace TheLongRunLeaguesFunction.Queries
                                             "Leagues",
                                             "League",
                                             leagueNameParam,
-                                            null); 
+                                            null);
+
+                                        // Call the next query in the command chain to process projections
+                                        FunctionChaining funcChain = new FunctionChaining(log);
+                                        var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
+                                        queryParams.Add(new Tuple<string, string>("queryId", queryGuid.ToString()));
+                                        funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryQueryProjectionProcess", queryParams, null);
                                     }
                                     else
                                     {

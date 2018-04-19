@@ -158,7 +158,7 @@ namespace TheLongRunLeaguesFunction.Queries
                                             leagueEvents.Process(prjLeagueInfo);
                                             if (null != prjLeagueInfo )
                                             {
-                                                if ((prjLeagueInfo.CurrentSequenceNumber > 0 ) &&  (prjLeagueInfo.ProjectionValuesChanged()))
+                                                if ((prjLeagueInfo.CurrentSequenceNumber > 0 ) ||  (prjLeagueInfo.ProjectionValuesChanged()))
                                                 {
                                                     // append the projection result to the query
                                                     QueryLogRecord.LogProjectionResult(queryGuid,
@@ -175,6 +175,22 @@ namespace TheLongRunLeaguesFunction.Queries
                                                     if (null != log)
                                                     {
                                                         log.Verbose ($"Query {QUERY_NAME} projection {nextProjectionRequest.ProjectionTypeName } key {nextProjectionRequest.AggregateInstanceKey } run to sequence number {prjLeagueInfo.CurrentSequenceNumber } ",
+                                                            source: "ProcessProjectionsGetLeagueSummaryQuery");
+                                                    }
+                                                    #endregion
+
+                                                    // Call the next query in the command chain to send output
+                                                    FunctionChaining funcChain = new FunctionChaining(log);
+                                                    var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
+                                                    queryParams.Add(new Tuple<string, string>("queryId", queryGuid.ToString()));
+                                                    funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryOutputResults", queryParams, null);
+                                                }
+                                                else
+                                                {
+                                                    #region Logging
+                                                    if (null != log)
+                                                    {
+                                                        log.Warning ($"Query {QUERY_NAME} running projection {nextProjectionRequest.ProjectionTypeName } for {queryGuid } returned no data",
                                                             source: "ProcessProjectionsGetLeagueSummaryQuery");
                                                     }
                                                     #endregion

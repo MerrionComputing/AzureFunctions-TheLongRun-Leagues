@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Host;
+
 using TheLongRun.Common.Bindings;
 
 namespace TheLongRun.Common
@@ -218,9 +217,20 @@ namespace TheLongRun.Common
         /// <param name="valueAsJson">
         /// The query result as JSON
         /// </param>
-        private static void SendOutputToWebhook(string location, string valueAsJson)
+        private static void SendOutputToWebhook(string location, 
+            string valueAsJson,
+            TraceWriter log = null)
         {
-            throw new NotImplementedException();
+
+            #region Logging
+            if (null != log)
+            {
+                log.Verbose($"Sending query results to webhook {location} ");
+            }
+            #endregion
+
+            FunctionChaining outputWebhook = new FunctionChaining(log);
+            outputWebhook.SendQueryResultsByWebhook(location, valueAsJson); 
         }
 
         /// <summary>
