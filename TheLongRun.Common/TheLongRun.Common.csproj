@@ -231,7 +231,9 @@
     <Compile Include="CQRSAzureBindings.cs" />
     <Compile Include="Events\Command\CommandCreated.cs" />
     <Compile Include="Events\Command\ParameterValueSet.cs" />
+    <Compile Include="Events\Command\ProjectionRequested.cs" />
     <Compile Include="Events\Command\Projections\Command_Summary_Projection.cs" />
+    <Compile Include="Events\Command\ProjectionValueReturned.cs" />
     <Compile Include="Events\Command\ValidationErrorOccured.cs" />
     <Compile Include="Events\Command\ValidationSucceeded.cs" />
     <Compile Include="Events\Query\OutputLocationSet.cs" />

@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using CQRSAzure.EventSourcing;
-namespace TheLongRun.Common.Events.Query
+
+namespace TheLongRun.Common.Events.Command
 {
     /// <summary>
-    /// A projection requested by this query has been run and values returned
+    /// A projection requested by this command has been run and values returned
     /// </summary>
     /// <remarks
     /// A projection is identified by domain, aggregate, instance and projection type
     /// </remarks>
     [Serializable()]
-    [CQRSAzure.EventSourcing.DomainNameAttribute("Query")]
-    [CQRSAzure.EventSourcing.Category("Query")]
+    [CQRSAzure.EventSourcing.DomainNameAttribute("Command")]
+    [CQRSAzure.EventSourcing.Category("Command")]
     public class ProjectionValueReturned
-        : IEvent 
+: IEvent
     {
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace TheLongRun.Common.Events.Query
             AggregateInstanceKey = aggregateKeyIn;
             ProjectionTypeName = projectionTypeNameIn;
             AsOfDate = asOfDateIn;
-            if (null != returnedValueIn )
+            if (null != returnedValueIn)
             {
                 ReturnedValue = returnedValueIn;
             }
