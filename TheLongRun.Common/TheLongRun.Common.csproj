@@ -236,6 +236,7 @@
     <Compile Include="Events\Command\ProjectionValueReturned.cs" />
     <Compile Include="Events\Command\ValidationErrorOccured.cs" />
     <Compile Include="Events\Command\ValidationSucceeded.cs" />
+    <Compile Include="Events\Query\ClassificationRequested.cs" />
     <Compile Include="Events\Query\OutputLocationSet.cs" />
     <Compile Include="Events\Query\ProjectionRequested.cs" />
     <Compile Include="Events\Query\Projections\Query_Outputs_Projection.cs" />

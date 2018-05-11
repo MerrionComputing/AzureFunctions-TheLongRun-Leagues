@@ -9,12 +9,14 @@ namespace TheLongRun.Common.Events.Command
     /// </summary>
     /// <remarks
     /// A projection is identified by domain, aggregate, instance and projection type
+    /// This could be required in order to get identifier group members or for a conditional execution
+    /// command
     /// </remarks>
     [Serializable()]
     [CQRSAzure.EventSourcing.DomainNameAttribute("Command")]
     [CQRSAzure.EventSourcing.Category("Command")]
     public class ProjectionValueReturned
-: IEvent
+        : IEvent
     {
 
         /// <summary>
