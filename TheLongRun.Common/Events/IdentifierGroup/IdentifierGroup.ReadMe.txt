@@ -1,0 +1,15 @@
+﻿Identifier Groups
+=================
+
+An identifier group is an attempt to bring some of the set logic familiar to RDBMS based systems to
+the "Event Sourcing" space.
+
+It consists of applying a special form of projection, known as a "classifier" to each instance of a
+particular aggregate and thereby deriving which are members of the particular group defined by that
+classifier function.
+
+As each event stream is independent the classifiers can be run in parallel to improve performance of this
+process.
+
+This is not a standard event sourcing paradigm - it is more of an experiment - so I have kept all of the 
+code pertaining to it in a separate project called "CQRSAzure.EventSourcing.IdentifierGroups".
