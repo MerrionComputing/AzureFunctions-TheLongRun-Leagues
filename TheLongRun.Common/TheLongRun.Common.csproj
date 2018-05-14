@@ -238,6 +238,7 @@
     <Compile Include="Events\Command\ValidationSucceeded.cs" />
     <Compile Include="Events\Query\ClassificationRequested.cs" />
     <Compile Include="Events\Query\ClassificationResultReturned.cs" />
+    <Compile Include="Events\Query\ClassificationRunStarted.cs" />
     <Compile Include="Events\Query\OutputLocationSet.cs" />
     <Compile Include="Events\Query\ProjectionRequested.cs" />
     <Compile Include="Events\Query\Projections\Query_Outputs_Projection.cs" />
@@ -258,6 +259,8 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Events\IdentifierGroup\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
