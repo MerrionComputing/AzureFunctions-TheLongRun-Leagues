@@ -20,6 +20,7 @@ namespace TheLongRun.Common.Events.Command.Projections
         CQRSAzure.EventSourcing.IHandleEvent<ParameterValueSet >,
         CQRSAzure.EventSourcing.IHandleEvent<ValidationErrorOccured >,
         CQRSAzure.EventSourcing.IHandleEvent<ValidationSucceeded >,
+        CQRSAzure.EventSourcing.IHandleEvent<ProcessingCompleted >,
         IProjectionUntyped
     {
 
@@ -184,6 +185,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             if (eventToHandle.GetType() == typeof(ValidationErrorOccured ))
             {
                 HandleEvent(eventToHandle as ValidationErrorOccured);
+            }
+
+            if (eventToHandle.GetType() == typeof(ProcessingCompleted ))
+            {
+                HandleEvent(eventToHandle as ProcessingCompleted);
             }
 
         }
@@ -364,6 +370,33 @@ namespace TheLongRun.Common.Events.Command.Projections
             }
         }
 
+        public void HandleEvent(ProcessingCompleted  eventHandled)
+        {
+            #region Logging
+            if (null != log)
+            {
+                log.Verbose($"HandleEvent( ProcessingCompleted )",
+                    nameof(Command_Summary_Projection));
+            }
+            #endregion
+
+            if (null != eventHandled)
+            {
+                // Set the status as "Validated"
+                base.AddOrUpdateValue<CommandState>(nameof(CurrentState), 0, CommandState.Completed);
+            }
+            else
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.Warning($"HandleEvent( ProcessingCompleted ) - parameter was null",
+                        nameof(Command_Summary_Projection));
+                }
+                #endregion
+            }
+        }
+
         public override void HandleEventJSon(string eventFullName, JObject eventToHandle)
         {
             #region Logging
@@ -392,6 +425,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             if (eventFullName == typeof(ValidationSucceeded).FullName)
             {
                 HandleEvent<ValidationSucceeded>(eventToHandle.ToObject<ValidationSucceeded>());
+            }
+
+            if (eventFullName == typeof(ProcessingCompleted ).FullName)
+            {
+                HandleEvent<ProcessingCompleted>(eventToHandle.ToObject<ProcessingCompleted>());
             }
         }
 
@@ -422,6 +460,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             }
 
             if (eventTypeFullName == typeof(ValidationSucceeded).FullName )
+            {
+                return true;
+            }
+
+            if (eventTypeFullName == typeof(ProcessingCompleted ).FullName)
             {
                 return true;
             }

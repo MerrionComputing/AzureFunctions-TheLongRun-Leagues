@@ -100,10 +100,14 @@ namespace TheLongRunLeaguesFunction
                             source: "OnCreateLeagueCommand");
                     }
                     #endregion
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.LeagueName), parameters.LeagueName));
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Email_Address ), parameters.Email_Address ));
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Date_Incorporated ), parameters.Date_Incorporated));
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Twitter_Handle), parameters.Twitter_Handle ));
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.LeagueName),
+                        parameters.LeagueName));
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Email_Address ),
+                        parameters.Email_Address ));
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Date_Incorporated ),
+                        parameters.Date_Incorporated));
+                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Twitter_Handle), 
+                        parameters.Twitter_Handle ));
 
                     // Call the next command in the command chain to validate the command
                     FunctionChaining funcChain = new FunctionChaining(log);
