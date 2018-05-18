@@ -242,6 +242,7 @@
     <Compile Include="Events\Query\ClassificationRunStarted.cs" />
     <Compile Include="Events\Query\OutputLocationSet.cs" />
     <Compile Include="Events\Query\ProjectionRequested.cs" />
+    <Compile Include="Events\Query\ProjectionRunStarted.cs" />
     <Compile Include="Events\Query\Projections\Query_Outputs_Projection.cs" />
     <Compile Include="Events\Query\Projections\Query_Projections_Projection.cs" />
     <Compile Include="Events\Query\Projections\Query_Summary_Projection.cs" />
