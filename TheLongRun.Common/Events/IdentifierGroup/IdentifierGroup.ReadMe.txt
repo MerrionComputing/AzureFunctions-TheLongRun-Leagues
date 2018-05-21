@@ -13,3 +13,6 @@ process.
 
 This is not a standard event sourcing paradigm - it is more of an experiment - so I have kept all of the 
 code pertaining to it in a separate project called "CQRSAzure.EventSourcing.IdentifierGroups".
+
+The event stream for each identifier group contains just the events for members being added to or removed from a group
+so that the group can be independently evaluated (for example in the processing of a command or a query).
