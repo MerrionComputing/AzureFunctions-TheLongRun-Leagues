@@ -242,6 +242,7 @@
     <Compile Include="Events\Command\ValidationSucceeded.cs" />
     <Compile Include="Events\IdentifierGroup\MemberExcluded.cs" />
     <Compile Include="Events\IdentifierGroup\MemberIncluded.cs" />
+    <Compile Include="Events\IdentifierGroup\Projections\Membership_Projection.cs" />
     <Compile Include="Events\Query\ClassificationRequested.cs" />
     <Compile Include="Events\Query\ClassificationResultReturned.cs" />
     <Compile Include="Events\Query\ClassificationRunStarted.cs" />
