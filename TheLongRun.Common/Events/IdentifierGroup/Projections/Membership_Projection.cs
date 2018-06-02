@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent; 
+using System.Linq;
 
 using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
@@ -22,7 +24,8 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
     {
 
         #region private members
-        private List<string> members = new List<string>();
+        private Dictionary < string, uint > members = new Dictionary<string, uint> ();
+        private Nullable<DateTime> asOfDateLimit; 
         private TraceWriter log = null;
         #endregion
 
@@ -30,6 +33,17 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
         /// This projection does not currently support snapshots 
         /// </summary>
         public override bool SupportsSnapshots => false ;
+
+        /// <summary>
+        /// The set of members in the given group
+        /// </summary>
+        public IEnumerable <string > GroupMembership
+        {
+            get
+            {
+                return members.Keys.AsEnumerable();
+            }
+        }
 
         public override void HandleEvent<TEvent>(TEvent eventToHandle)
         {
@@ -129,7 +143,34 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
                     nameof(Membership_Projection));
             }
             #endregion
-            members.Remove (eventHandled.AggregateInstanceKey);
+
+            if (asOfDateLimit.HasValue )
+            {
+                if (eventHandled.AsOfDate.HasValue  )
+                {
+                    if (asOfDateLimit.Value < eventHandled.AsOfDate.Value )
+                    {
+                        #region Logging
+                        if (null != log)
+                        {
+                            log.Verbose($"Skipped MemberExcluded event as it is after the as of date limit : {eventHandled.AggregateInstanceKey} at {eventHandled.AsOfDate}  ",
+                                nameof(Membership_Projection));
+                        }
+                        #endregion
+                        // we should not process this event as it occured after our target date/time
+                        return;
+                    }
+                }
+            }
+
+            if (members.ContainsKey(eventHandled.AggregateInstanceKey))
+            {
+                if (eventHandled.AsOfSequenceNumber > members[eventHandled.AggregateInstanceKey])
+                {
+                    // Remove the member if this "member excluded" occured after the last member added event sequence
+                    members.Remove(eventHandled.AggregateInstanceKey);
+                }
+            }
         }
 
         /// <summary>
@@ -147,7 +188,38 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
                     nameof(Membership_Projection));
             }
             #endregion
-            members.Add(eventHandled.AggregateInstanceKey);
+
+            if (asOfDateLimit.HasValue)
+            {
+                if (eventHandled.AsOfDate.HasValue)
+                {
+                    if (asOfDateLimit.Value < eventHandled.AsOfDate.Value)
+                    {
+                        #region Logging
+                        if (null != log)
+                        {
+                            log.Verbose($"Skipped MemberIncluded event as it is after the as of date limit : {eventHandled.AggregateInstanceKey} at {eventHandled.AsOfDate}  ",
+                                nameof(Membership_Projection));
+                        }
+                        #endregion
+                        // we should not process this event as it occured after our target date/time
+                        return;
+                    }
+                }
+            }
+
+            if (members.ContainsKey(eventHandled.AggregateInstanceKey))
+            {
+                if (eventHandled.AsOfSequenceNumber > members[eventHandled.AggregateInstanceKey])
+                {
+                    // Update the last sequence number if the "member included" occured after the last member added event sequence
+                    members[eventHandled.AggregateInstanceKey] = eventHandled.AsOfSequenceNumber;
+                }
+            }
+            else
+            {
+                members.Add(eventHandled.AggregateInstanceKey, eventHandled.AsOfSequenceNumber);
+            }
         }
 
 
