@@ -40,6 +40,9 @@
     <Reference Include="CQRSAzure.EventSourcing.Implementation">
       <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRS.EventSourcing.Implementation\bin\Debug\CQRSAzure.EventSourcing.Implementation.dll</HintPath>
     </Reference>
+    <Reference Include="CQRSAzure.IdentifierGroup">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.IdentifierGroup\bin\Debug\CQRSAzure.IdentifierGroup.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Azure.KeyVault.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Azure.KeyVault.Core.3.0.0-alpha\lib\net452\Microsoft.Azure.KeyVault.Core.dll</HintPath>
     </Reference>
@@ -232,6 +235,7 @@
     <Compile Include="Events\Command\ClassificationRequested.cs" />
     <Compile Include="Events\Command\ClassificationResultReturned.cs" />
     <Compile Include="Events\Command\ClassificationRunStarted.cs" />
+    <Compile Include="Events\Command\Classifiers\Command_Complete_Classifier.cs" />
     <Compile Include="Events\Command\CommandCreated.cs" />
     <Compile Include="Events\Command\ParameterValueSet.cs" />
     <Compile Include="Events\Command\ProcessingCompleted.cs" />

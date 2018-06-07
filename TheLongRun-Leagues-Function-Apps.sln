@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Leagues.QueryHandler", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Leagues.QueryDefinition", "..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryDefinition.csproj", "{52617312-6A26-4A6E-A2A6-10661955DDED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheLogRun.UnitTestProject", "TheLogRun.UnitTestProject\TheLogRun.UnitTestProject.csproj", "{B95CB29A-86A5-45A2-9D8C-101F3B12C370}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{52617312-6A26-4A6E-A2A6-10661955DDED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52617312-6A26-4A6E-A2A6-10661955DDED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52617312-6A26-4A6E-A2A6-10661955DDED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B95CB29A-86A5-45A2-9D8C-101F3B12C370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B95CB29A-86A5-45A2-9D8C-101F3B12C370}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B95CB29A-86A5-45A2-9D8C-101F3B12C370}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B95CB29A-86A5-45A2-9D8C-101F3B12C370}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
