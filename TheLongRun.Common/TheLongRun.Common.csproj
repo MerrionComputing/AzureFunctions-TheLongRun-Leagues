@@ -235,7 +235,9 @@
     <Compile Include="Events\Command\ClassificationRequested.cs" />
     <Compile Include="Events\Command\ClassificationResultReturned.cs" />
     <Compile Include="Events\Command\ClassificationRunStarted.cs" />
+    <Compile Include="Events\Command\Classifiers\Command_BeingProcessed_Classifier.cs" />
     <Compile Include="Events\Command\Classifiers\Command_Complete_Classifier.cs" />
+    <Compile Include="Events\Command\Classifiers\Command_Failed_Classifier.cs" />
     <Compile Include="Events\Command\CommandCreated.cs" />
     <Compile Include="Events\Command\ParameterValueSet.cs" />
     <Compile Include="Events\Command\ProcessingCompleted.cs" />

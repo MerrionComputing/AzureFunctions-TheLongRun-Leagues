@@ -12,38 +12,42 @@ using TheLongRun.Common.Events.Command;
 namespace TheLongRun.Common.Events.Command.Classifiers
 {
     /// <summary>
-    /// A classifier to determine whether a command is complete or not
+    /// A classifier to determine whether a command is currently being processed
     /// </summary>
     [CQRSAzure.EventSourcing.DomainNameAttribute("Command")]
     [CQRSAzure.EventSourcing.Category("Command")]
-    public sealed class Command_Complete_Classifier
+    public sealed class Command_BeingProcessed_Classifier
         : IClassifierUntyped,
-        IClassifierEventHandler<ProcessingCompleted >
+          IClassifierEventHandler<ProcessingCompleted>,
+          IClassifierEventHandler<CommandCreated>,
+          IClassifierEventHandler<ValidationErrorOccured>
     {
 
         /// <summary>
         /// This classifier does not support snapshots as the number of events in a command is typically too small
         /// to make that worthwhile
         /// </summary>
-        public bool SupportsSnapshots => false  ;
+        public bool SupportsSnapshots => false;
 
         /// <summary>
         /// This classifier gets its setting from reading the event stream 
         /// </summary>
         public IClassifier.ClassifierDataSourceType ClassifierDataSource => IClassifier.ClassifierDataSourceType.EventHandler;
 
-        /// <summary>
-        /// If we encounter a "ProcessingCompleted" event then this command is in the completed set
-        /// </summary>
-        /// <param name="eventClassName">
-        /// Name of the event being handled
-        /// </param>
-        /// <param name="eventToHandle">
-        /// Event data of the event being handled
-        /// </param>
+
         public IClassifierDataSourceHandler.EvaluationResult EvaluateEvent(string eventClassName, 
             JObject eventToHandle)
         {
+            if (eventClassName == typeof(CommandCreated).Name)
+            {
+                return EvaluateEvent(eventToHandle.ToObject<CommandCreated>());
+            }
+
+            if (eventClassName == typeof(ValidationErrorOccured).Name)
+            {
+                return EvaluateEvent(eventToHandle.ToObject<ValidationErrorOccured>());
+            }
+
             if (eventClassName == typeof(ProcessingCompleted).Name)
             {
                 return EvaluateEvent(eventToHandle.ToObject<ProcessingCompleted>());
@@ -54,12 +58,22 @@ namespace TheLongRun.Common.Events.Command.Classifiers
 
         public IClassifierDataSourceHandler.EvaluationResult EvaluateEvent(ProcessingCompleted eventToEvaluate)
         {
-            return  IClassifierDataSourceHandler.EvaluationResult.Include;
+            // Completed commands are not "being processed"
+            return IClassifierDataSourceHandler.EvaluationResult.Exclude;
         }
 
-        /// <summary>
-        /// This classifier does not get its data from a projection 
-        /// </summary>
+        public IClassifierDataSourceHandler.EvaluationResult EvaluateEvent(CommandCreated eventToEvaluate)
+        {
+            // Created commands are in process
+            return IClassifierDataSourceHandler.EvaluationResult.Include;
+        }
+
+        public IClassifierDataSourceHandler.EvaluationResult EvaluateEvent(ValidationErrorOccured eventToEvaluate)
+        {
+            // Commands that have validation errors are not "being processed"
+            return IClassifierDataSourceHandler.EvaluationResult.Exclude;
+        }
+
         public IClassifierDataSourceHandler.EvaluationResult EvaluateProjection<TProjection>(TProjection projection) where TProjection : IProjectionUntyped
         {
             throw new NotImplementedException();
@@ -67,7 +81,15 @@ namespace TheLongRun.Common.Events.Command.Classifiers
 
         public bool HandlesEventType(string eventTypeName)
         {
-            if (eventTypeName == typeof(ProcessingCompleted).Name )
+            if (eventTypeName == typeof(CommandCreated).Name)
+            {
+                return true;
+            }
+            if (eventTypeName == typeof(ValidationErrorOccured).Name)
+            {
+                return true;
+            }
+            if (eventTypeName == typeof(ProcessingCompleted).Name)
             {
                 return true;
             }
@@ -85,6 +107,5 @@ namespace TheLongRun.Common.Events.Command.Classifiers
             throw new NotImplementedException();
         }
         #endregion
-
     }
 }
