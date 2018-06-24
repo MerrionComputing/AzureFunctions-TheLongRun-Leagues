@@ -252,7 +252,9 @@
     <Compile Include="Events\Query\ClassificationRequested.cs" />
     <Compile Include="Events\Query\ClassificationResultReturned.cs" />
     <Compile Include="Events\Query\ClassificationRunStarted.cs" />
+    <Compile Include="Events\Query\Classifiers\Query_BeingProcessed_Classifier.cs" />
     <Compile Include="Events\Query\Classifiers\Query_Complete_Classifier.cs" />
+    <Compile Include="Events\Query\Classifiers\Query_InError_Classifier.cs" />
     <Compile Include="Events\Query\OutputLocationSet.cs" />
     <Compile Include="Events\Query\ProjectionRequested.cs" />
     <Compile Include="Events\Query\ProjectionRunStarted.cs" />
