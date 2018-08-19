@@ -30,7 +30,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
         #endregion
 
         /// <summary>
-        /// This projection does not currently support snapshots 
+        /// This projection should not support snapshots 
         /// </summary>
         public override bool SupportsSnapshots => false ;
 

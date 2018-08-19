@@ -21,6 +21,7 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Description = Demo for the CQRS on Azure project
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{645A8DA3-54B6-4944-AB42-A824E5F925FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
