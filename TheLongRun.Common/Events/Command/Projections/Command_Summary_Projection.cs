@@ -122,6 +122,40 @@ namespace TheLongRun.Common.Events.Command.Projections
             }
         }
 
+        /// <summary>
+        /// For commands that rely on authorisation this is the token passed in to test
+        /// for the authorisation process
+        /// </summary>
+        public string AuthorisationToken
+        {
+            get
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.Verbose($"AuthorisationToken - Get ",
+                        nameof(Command_Summary_Projection ));
+                }
+                #endregion
+                return base.GetPropertyValue<string>(nameof(AuthorisationToken));
+            }
+        }
+
+        public string CorrelationIdentifier
+        {
+            get
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.Verbose($"CorrelationIdentifier - Get ",
+                        nameof(Command_Summary_Projection));
+                }
+                #endregion
+                return base.GetPropertyValue<string>(nameof(CorrelationIdentifier ));
+            }
+        }
+
         private  IDictionary<string , object > Parameters
         {
             get
@@ -208,6 +242,8 @@ namespace TheLongRun.Common.Events.Command.Projections
             {
                 // Set the properties from this event
                 base.AddOrUpdateValue<string>(nameof(CommandName), 0, eventHandled.CommandName);
+                base.AddOrUpdateValue<string>(nameof(AuthorisationToken), 0, eventHandled.AuthorisationToken);
+                base.AddOrUpdateValue<string>(nameof(CorrelationIdentifier  ), 0, eventHandled.CorrelationIdentifier  );
                 // Set the status as "Created"
                 base.AddOrUpdateValue<CommandState>(nameof(CurrentState), 0, CommandState.Created);
                 #region Logging

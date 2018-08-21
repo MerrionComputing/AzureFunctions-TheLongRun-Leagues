@@ -23,12 +23,20 @@ namespace TheLongRun.Common.Events.Query
 
         public Guid QueryIdentifier { get; set; }
 
+        /// <summary>
+        /// For queries that rely on authorisation this is the token passed in to test
+        /// for the authorisation process
+        /// </summary>
+        public string AuthorisationToken { get; set; }
+
         public QueryCreated(string queryNameIn,
-            Guid queryIdentifierIn)
+            Guid queryIdentifierIn,
+            string aurhorisationTokenIn = @"")
         {
             Date_Logged = DateTime.UtcNow;
             QueryName = queryNameIn;
             QueryIdentifier = queryIdentifierIn;
+            AuthorisationToken = aurhorisationTokenIn;
         }
 
         public QueryCreated(SerializationInfo info, StreamingContext context)
@@ -36,6 +44,7 @@ namespace TheLongRun.Common.Events.Query
             Date_Logged = info.GetDateTime(nameof(Date_Logged));
             QueryIdentifier = (Guid)info.GetValue(nameof(QueryIdentifier), typeof(Guid));
             QueryName = info.GetString(nameof(QueryName));
+            AuthorisationToken = info.GetString(nameof(AuthorisationToken));
         }
 
 
@@ -48,6 +57,7 @@ namespace TheLongRun.Common.Events.Query
             info.AddValue(nameof(Date_Logged), Date_Logged);
             info.AddValue(nameof(QueryIdentifier), QueryIdentifier);
             info.AddValue(nameof(QueryName), QueryName);
+            info.AddValue(nameof(AuthorisationToken), AuthorisationToken);
         }
     }
 }

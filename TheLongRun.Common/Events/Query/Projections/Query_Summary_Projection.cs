@@ -158,6 +158,25 @@ namespace TheLongRun.Common.Events.Query.Projections
             }
         }
 
+        /// <summary>
+        /// For queries that rely on authorisation this is the token passed in to test
+        /// for the authorisation process
+        /// </summary>
+        public string AuthorisationToken
+        {
+            get
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.Verbose($"AuthorisationToken - Get ",
+                        nameof(Query_Summary_Projection));
+                }
+                #endregion
+                return base.GetPropertyValue<string >(nameof(AuthorisationToken));
+            }
+        }
+
         #endregion
 
         public override void HandleEvent<TEvent>(TEvent eventToHandle)
@@ -282,6 +301,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 // Set the properties from this event
                 base.AddOrUpdateValue<string>(nameof(QueryName ), 0, eventHandled.QueryName );
+                base.AddOrUpdateValue<string>(nameof(AuthorisationToken ), 0, eventHandled.AuthorisationToken );
                 // Set the status as "Created"
                 base.AddOrUpdateValue<QueryState >(nameof(CurrentState), 0, QueryState.Created);
                 #region Logging

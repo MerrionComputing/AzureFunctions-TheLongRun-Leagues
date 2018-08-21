@@ -26,12 +26,32 @@ namespace TheLongRun.Common.Events.Command
 
         public Guid CommandIdentifier { get; set; }
 
+        /// <summary>
+        /// The correlation identifier to be used to link the operations of an individual
+        /// command together.  
+        /// </summary>
+        /// <remarks>
+        /// This may be set by an external system or command caller and used by it to track
+        /// progress
+        /// </remarks>
+        public string CorrelationIdentifier { get; set; }
+
+        /// <summary>
+        /// For commands that rely on authorisation this is the token passed in to test
+        /// for the authorisation process
+        /// </summary>
+        public string AuthorisationToken { get; set; }
+
         public CommandCreated(string commandNameIn,
-            Guid commandIdentifierIn)
+            Guid commandIdentifierIn,
+            string correlationIdentifierIn = @"",
+            string aurhorisationTokenIn = @"")
         {
             Date_Logged = DateTime.UtcNow;
             CommandName = commandNameIn;
             CommandIdentifier = commandIdentifierIn;
+            CorrelationIdentifier = correlationIdentifierIn;
+            AuthorisationToken = aurhorisationTokenIn;
         }
 
         public CommandCreated(SerializationInfo info, StreamingContext context)
@@ -39,6 +59,8 @@ namespace TheLongRun.Common.Events.Command
             Date_Logged = info.GetDateTime(nameof(Date_Logged) );
             CommandIdentifier = (Guid)info.GetValue(nameof(CommandIdentifier), typeof(Guid));
             CommandName = info.GetString(nameof(CommandName));
+            CorrelationIdentifier = info.GetString(nameof(CorrelationIdentifier));
+            AuthorisationToken = info.GetString(nameof(AuthorisationToken));
         }
 
         
@@ -54,6 +76,8 @@ namespace TheLongRun.Common.Events.Command
             info.AddValue(nameof(Date_Logged), Date_Logged );
             info.AddValue(nameof(CommandIdentifier), CommandIdentifier);
             info.AddValue(nameof(CommandName), CommandName);
+            info.AddValue(nameof(CorrelationIdentifier), CorrelationIdentifier);
+            info.AddValue(nameof(AuthorisationToken), AuthorisationToken);
         }
     }
 }

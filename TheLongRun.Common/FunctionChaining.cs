@@ -10,6 +10,7 @@ namespace TheLongRun.Common
     /// <remarks>
     /// These can be used to allow one azure function to call one (or many) others
     /// </remarks>
+    [Obsolete("Use Azure durable functions instead")]
     public class FunctionChaining
     {
 
