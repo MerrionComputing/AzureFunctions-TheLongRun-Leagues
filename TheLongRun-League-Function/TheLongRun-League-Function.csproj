@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.WebJobs" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="1.5.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="1.0.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.14" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandHandler.csproj" />
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.EventSourcing.csproj" />
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryDefinition.csproj" />
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryHandler.csproj" />
+    <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CQRSAzure.CommandDefinition">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.QueryHandler\QueryHandler\bin\Release\CQRSAzure.CommandDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.EventSourcing">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.QueryHandler\QueryHandler\bin\Release\CQRSAzure.EventSourcing.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.EventSourcing.Implementation">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.QueryHandler\QueryHandler\bin\Release\CQRSAzure.EventSourcing.Implementation.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.Hosting">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.QueryHandler\QueryHandler\bin\Release\CQRSAzure.Hosting.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.IdentifierGroup">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.QueryHandler\QueryHandler\bin\Release\CQRSAzure.IdentifierGroup.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.QueryDefinition">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.QueryHandler\QueryHandler\bin\Release\CQRSAzure.QueryDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.QueryHandler">
+      <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRSAzure.QueryHandler\QueryHandler\bin\Release\CQRSAzure.QueryHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="host.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

@@ -70,8 +70,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Workspaces\CQRS on Azure\Framework\CQRS.EventSourcing.Implementation\bin\Debug\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -99,6 +99,10 @@
     <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryHandler.csproj">
       <Project>{e437018f-166a-4fa5-8565-ab7b8062b4e7}</Project>
       <Name>Leagues.QueryHandler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TheLongRun-League-Function\TheLongRun-League-Function.csproj">
+      <Project>{645a8da3-54b6-4944-ab42-a824e5f925fb}</Project>
+      <Name>TheLongRun-League-Function</Name>
     </ProjectReference>
     <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj">
       <Project>{877028d0-dded-4967-a699-8bb129ec0c6a}</Project>
