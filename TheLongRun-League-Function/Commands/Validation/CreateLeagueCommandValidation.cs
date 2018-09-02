@@ -41,12 +41,10 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                     log.Verbose("Function triggered HTTP ",
                         source: "CreateLeagueCommandValidation");
                 }
-                #endregion
+            #endregion
 
-                // Get the command identifier
-                string commandId = req.GetQueryNameValuePairs()
-                    .FirstOrDefault(q => string.Compare(q.Key, "CommandId", true) == 0)
-                    .Value;
+            // Get the command identifier
+            string commandId = req.GetQueryNameValuePairs()[@"CommandId"];
 
                 if (commandId == null)
                 {

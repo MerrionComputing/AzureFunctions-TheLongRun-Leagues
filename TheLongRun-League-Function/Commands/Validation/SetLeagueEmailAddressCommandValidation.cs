@@ -36,9 +36,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
             #endregion
 
             // Get the command identifier
-            string commandId = req.GetQueryNameValuePairs()
-                .FirstOrDefault(q => string.Compare(q.Key, "CommandId", true) == 0)
-                .Value;
+            string commandId = req.GetQueryNameValuePairs()[@"CommandId"];
 
             if (commandId == null)
             {
@@ -47,12 +45,58 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                 commandId = data?.CommandId;
             }
 
-            ValidateSetLeagueEmailAddressCommand(commandId, log);
+            bool valid = false;
+            if (ValidateSetLeagueEmailAddressCommand(commandId, log))
+            {
+                valid = true;
 
-            return commandId == null
-                ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
-                : req.CreateResponse(HttpStatusCode.OK, $"Validated command {commandId}");
+                // Call the next command in the command chain to process the valid command
+                FunctionChaining funcChain = new FunctionChaining(log);
+                var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
+                queryParams.Add(new Tuple<string, string>("commandId", commandId.ToString()));
+                funcChain.TriggerCommandByHTTPS(@"Leagues", "SetLeagueEmailAddressCommandHandler", queryParams, null);
+            }
+
+            if (null == commandId )
+            {
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body");
+            }
+            else
+            {
+                if (valid )
+                {
+                    return req.CreateResponse(HttpStatusCode.OK, $"Validation for command {commandId} succeeded");
+                }
+                else
+                {
+                    return req.CreateResponse(HttpStatusCode.Forbidden , $"Validation for command {commandId} failed");
+                }
+            }
+
         }
+
+
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [CommandName("Set League Email Address")]
+        [FunctionName("SetLeagueEmailAddressCommandValidationActivity")]
+        public static bool SetLeagueEmailAddressCommandValidationActivity(
+            [ActivityTrigger] DurableActivityContext setLeagueEmailAddressCommandContect,
+            TraceWriter log)
+        {
+
+            // Return the validation result
+            string commandId = setLeagueEmailAddressCommandContect.GetInput<string>();
+            if (! string.IsNullOrWhiteSpace(commandId ) )
+            {
+                return ValidateSetLeagueEmailAddressCommand(commandId, log);
+            }
+
+            return false;
+        }
+
+
 
         /// <summary>
         /// Perform the underlying validation on the specified command
@@ -60,7 +104,10 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         /// <param name="commandId">
         /// The unique identifier of the command to validate
         /// </param>
-        private static void ValidateSetLeagueEmailAddressCommand(string commandId, 
+        /// <remarks>
+        /// This is common functionality, whether called by function chaining or by duarble functions
+        /// </remarks>
+        private static bool  ValidateSetLeagueEmailAddressCommand(string commandId, 
             TraceWriter log)
         {
 
@@ -122,13 +169,13 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                     source: "ValidateSetLeagueEmailAddressCommand");
                             }
                             #endregion
-                            return;
+                            return true ;
                         }
 
                         if (cmdProjection.CurrentState ==
                             Command_Summary_Projection.CommandState.Validated)
                         {
-                            // No need to process a completed projection
+                            // No need to process ana lready validated command
                             #region Logging
                             if (null != log)
                             {
@@ -136,7 +183,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                     source: "ValidateSetLeagueEmailAddressCommand");
                             }
                             #endregion
-                            return;
+                            return true;
                         }
 
                         if ((cmdProjection.CurrentState ==
@@ -194,12 +241,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                             if (emailAddressValid && leagueNameValid)
                             {
                                 CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
-
-                                // Call the next command in the command chain to process the valid command
-                                FunctionChaining funcChain = new FunctionChaining(log);
-                                var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
-                                queryParams.Add(new Tuple<string, string>("commandId", commandGuid.ToString()));
-                                funcChain.TriggerCommandByHTTPS(@"Leagues", "SetLeagueEmailAddressCommandHandler", queryParams, null);
+                                return true;
                             }
                         }
                     }
@@ -216,6 +258,9 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                     }
                 }
             }
+
+            // If, for any reason, we can't validate the command the default is to return false
+            return false;
         }
     }
 }

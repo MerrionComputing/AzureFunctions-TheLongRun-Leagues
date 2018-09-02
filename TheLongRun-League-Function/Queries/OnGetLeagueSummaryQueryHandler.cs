@@ -9,7 +9,7 @@ using Leagues.League.queryDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
-
+using Microsoft.Azure.EventGrid.Models;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
@@ -63,7 +63,7 @@ namespace TheLongRunLeaguesFunction.Queries
                 #endregion
                 // Get the query parameters : [League Name]
 
-                QueryRequest<Get_League_Summary_Definition> queryRequest = eventGridEvent.Data.ToObject<QueryRequest<Get_League_Summary_Definition>>();
+                QueryRequest<Get_League_Summary_Definition> queryRequest = eventGridEvent.Data as QueryRequest<Get_League_Summary_Definition>;
                 if (null != queryRequest)
                 {
                     QueryLogRecord<Get_League_Summary_Definition> qryRecord = QueryLogRecord<Get_League_Summary_Definition>.Create(

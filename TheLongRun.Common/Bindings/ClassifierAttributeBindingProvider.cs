@@ -33,7 +33,7 @@ namespace TheLongRun.Common.Bindings
             // What data type(s) can this attribute be attached to?
             IEnumerable<Type> supportedTypes = new Type[] { typeof(Classifier) };
 
-            if (!ValueBinder.MatchParameterType(context.Parameter, supportedTypes))
+            if (!(parameter.ParameterType == typeof(Classifier)))
             {
                 throw new InvalidOperationException(
                     $"Can't bind ClassifierAttribute to type '{parameter.ParameterType}'.");

@@ -22,6 +22,10 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
     public static partial class CommandHandler
     {
 
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [CommandName("Set League Email Address")]
         [FunctionName("SetLeagueEmailAddressCommandHandler")]
         public static async Task<HttpResponseMessage> SetLeagueEmailAddressCommandHandlerRun(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req,
@@ -37,9 +41,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
             #endregion
 
             // Get the command identifier
-            string commandId = req.GetQueryNameValuePairs()
-                .FirstOrDefault(q => string.Compare(q.Key, "CommandId", true) == 0)
-                .Value;
+            string commandId = req.GetQueryNameValuePairs()[@"CommandId"];
 
             if (commandId == null)
             {
@@ -55,6 +57,25 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                 : req.CreateResponse(HttpStatusCode.OK, $"Handled command {commandId}");
         }
 
+
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [CommandName("Set League Email Address")]
+        [FunctionName("SetLeagueEmailAddressCommandHandlerActivity")]
+        public static  void SetLeagueEmailAddressCommandHandlerActivity(
+            [ActivityTrigger] DurableActivityContext setLeagueEmailAddressCommandContect,
+            TraceWriter log)
+        {
+
+            string commandId = setLeagueEmailAddressCommandContect.GetInput<string>();
+            if (!string.IsNullOrWhiteSpace(commandId))
+            {
+                 HandleSetLeagueEmailAddressCommand(commandId, log);
+            }
+
+            return;
+        }
 
         /// <summary>
         /// Perform the underlying processing on the specified command

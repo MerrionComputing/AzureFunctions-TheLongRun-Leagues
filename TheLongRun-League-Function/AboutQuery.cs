@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using TheLongRun.Common;
 using Microsoft.Azure.WebJobs.Host;
 
 namespace TheLongRunLeaguesFunction
@@ -24,9 +25,7 @@ namespace TheLongRunLeaguesFunction
             log.Info("C# HTTP trigger function processed a request.");
 
             // parse query parameter
-            string name = req.GetQueryNameValuePairs()
-                .FirstOrDefault(q => string.Compare(q.Key, "name", true) == 0)
-                .Value;
+            string name = req.GetQueryNameValuePairs()[@"name"];
 
             // Get request body
             dynamic data = await req.Content.ReadAsAsync<object>();

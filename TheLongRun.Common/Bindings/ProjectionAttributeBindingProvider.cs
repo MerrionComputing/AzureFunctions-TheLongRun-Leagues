@@ -37,7 +37,7 @@ namespace TheLongRun.Common.Bindings
             // What data type(s) can this attribute be attached to?
             IEnumerable<Type> supportedTypes = new Type[] { typeof(Projection ) };
 
-            if (!ValueBinder.MatchParameterType(context.Parameter, supportedTypes))
+            if (!(parameter.ParameterType == typeof(Projection)))
             {
                 throw new InvalidOperationException(
                     $"Can't bind ProjectionAttribute to type '{parameter.ParameterType}'.");

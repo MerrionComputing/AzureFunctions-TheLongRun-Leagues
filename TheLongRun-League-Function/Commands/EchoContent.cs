@@ -1,6 +1,6 @@
 using System;
 using Leagues.League.commandDefinition;
-
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.WebJobs.Host;
@@ -19,7 +19,7 @@ namespace TheLongRunLeaguesFunction.Commands
 
             log.Info($"Topic : {eventGridEvent.Topic} , Subject : {eventGridEvent.Subject } , Event Type: {eventGridEvent.EventType }  ");
             log.Info($" Payload : { eventGridEvent.Data.ToString()} ");
-            log.Info($" Event time:  { eventGridEvent.EventTime}, Published: {eventGridEvent.PublishTime} ");            
+            log.Info($" Event time:  { eventGridEvent.EventTime}, Published: {eventGridEvent.EventTime} ");            
 
             log.Info("=== Complete ============================="); 
         }

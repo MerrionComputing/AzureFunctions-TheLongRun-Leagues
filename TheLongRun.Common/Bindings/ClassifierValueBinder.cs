@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
+using Microsoft.Azure.WebJobs.Extensions.Bindings;
 using System;
 using System.Reflection;
 using System.Threading;
@@ -8,7 +9,7 @@ using TheLongRun.Common.Attributes;
 namespace TheLongRun.Common.Bindings
 {
     public sealed class ClassifierValueBinder
-        : IValueBinder 
+        :  IValueBinder 
     {
         private readonly ParameterInfo _parameter;
 

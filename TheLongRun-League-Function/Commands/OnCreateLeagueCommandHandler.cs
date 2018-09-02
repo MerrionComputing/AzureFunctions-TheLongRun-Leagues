@@ -9,6 +9,7 @@ using Leagues.League.commandDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
+using Microsoft.Azure.EventGrid.Models;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -65,7 +66,7 @@ namespace TheLongRunLeaguesFunction
             try
             {
                 // Get the parameters etc out of the trigger and put them in the log record
-                Create_New_League_Definition parameters = eventGridEvent.Data.ToObject<Create_New_League_Definition>();
+                Create_New_League_Definition parameters = eventGridEvent.Data as Create_New_League_Definition;
 
                 // Log the parameters
                 #region Logging

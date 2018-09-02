@@ -37,9 +37,7 @@ namespace TheLongRunLeaguesFunction.Queries
             #endregion
 
             // Get the query identifier
-            string queryId = req.GetQueryNameValuePairs()
-                .FirstOrDefault(q => string.Compare(q.Key, "QueryId", true) == 0)
-                .Value;
+            string queryId = req.GetQueryNameValuePairs()[@"QueryId"];
 
             if (queryId == null)
             {

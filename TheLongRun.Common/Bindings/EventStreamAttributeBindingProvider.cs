@@ -38,9 +38,7 @@ namespace TheLongRun.Common.Bindings
             }
 
             // This can only bind to EventStream
-            IEnumerable<Type> supportedTypes = new Type[] { typeof(EventStream ) };
-
-            if (!ValueBinder.MatchParameterType(context.Parameter, supportedTypes))
+            if (! (parameter.ParameterType == typeof(EventStream)))
             {
                 throw new InvalidOperationException(
                         $"Can't bind EventStreamAttribute to type '{parameter.ParameterType}'.");
