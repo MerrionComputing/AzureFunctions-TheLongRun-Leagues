@@ -1,0 +1,14 @@
+﻿Orchestration overview
+======================
+
+Command and query handlers are implemented as a sequence of steps which are backed by
+an event stream of the events they log while being processed.
+
+Each handler instance is identified by a GUID and the event stream is backed by an
+append-blob named with that GUID and in a folder indicating the specific command
+or query type.
+
+A handler does not lock the event stream as it may spawn tasks which will return their
+results asynchronously (such as getting the membership of an identifier group or running
+a projection).
+

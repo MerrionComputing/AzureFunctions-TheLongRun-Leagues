@@ -126,6 +126,11 @@
     <Compile Include="Events\Query\QueryParameterValidationErrorOccured.cs" />
     <Compile Include="Events\Query\QueryParameterValueSet.cs" />
     <Compile Include="HttpExtensions.cs" />
+    <Compile Include="Orchestration\EventStreamBackedCommandOrchestrator.cs" />
+    <Compile Include="Orchestration\EventStreamBackedQueryOrchestrator.cs" />
+    <Compile Include="Orchestration\IEventStreamBackedOrchestrator.cs" />
+    <Compile Include="Orchestration\IEventStreamBackedOrchestratorClassification.cs" />
+    <Compile Include="Orchestration\IEventStreamBackedOrchestratorContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryLogRecord.cs" />
     <Compile Include="QueryRequest.cs" />
@@ -391,6 +396,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Events\IdentifierGroup\IdentifierGroup.ReadMe.txt" />
+    <Content Include="Orchestration\Orchestration.Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
