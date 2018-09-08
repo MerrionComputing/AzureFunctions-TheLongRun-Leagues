@@ -36,11 +36,26 @@ namespace TheLongRun.Common.Orchestration
                 return _uniqueIdentifier;
             }
         }
+
+        private readonly string _instanceIdentifier;
+        /// <summary>
+        /// The unique key of the (entity) event stream over which the classifier
+        /// will be run
+        /// </summary>
+        public string InstanceIdentifier
+        {
+            get
+            {
+                return _instanceIdentifier;
+            }
+        }
+
         public abstract IEventStreamBackedOrchestratorContext Context { get; set; }
 
         public abstract void RunNextStep();
 
-        protected internal EventStreamBackedClassifierOrchestrator(Guid uniqueIdentifier)
+        protected internal EventStreamBackedClassifierOrchestrator(Guid uniqueIdentifier,
+            string instanceIdentifierKey)
         {
             if (uniqueIdentifier.Equals(Guid.Empty))
             {
@@ -50,6 +65,7 @@ namespace TheLongRun.Common.Orchestration
             {
                 _uniqueIdentifier = uniqueIdentifier;
             }
+            _instanceIdentifier = instanceIdentifierKey;
         }
     }
 }

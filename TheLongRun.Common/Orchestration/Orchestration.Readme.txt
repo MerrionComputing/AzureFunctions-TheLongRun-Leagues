@@ -12,3 +12,7 @@ A handler does not lock the event stream as it may spawn tasks which will return
 results asynchronously (such as getting the membership of an identifier group or running
 a projection).
 
+Each orchestrator is responsible for being able to work out what the next step is and being
+able to trigger the function that performs that next step.  The parameters passed to the 
+function will indicate the unique identifier of the command or query instance to which the 
+response event(s) should be posted.
