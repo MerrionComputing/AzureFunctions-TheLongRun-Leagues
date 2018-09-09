@@ -10,7 +10,8 @@ namespace TheLongRun.Common.Orchestration
     /// A base class for any QUERY orchestrator functions
     /// </summary>
     public abstract class EventStreamBackedQueryOrchestrator
-        : IEventStreamBackedOrchestrator
+        : EventStreamBackedOrchestratorBase,
+          IEventStreamBackedOrchestrator
     {
         public abstract bool IsComplete { get; }
 
@@ -37,6 +38,21 @@ namespace TheLongRun.Common.Orchestration
             }
         }
         public abstract IEventStreamBackedOrchestratorContext Context { get; set; }
+
+        /// <summary>
+        /// The identity by which any called orchestrations can call back with the 
+        /// results (a return address style identity)
+        /// </summary>
+        public OrchestrationCallbackIdentity CallbackIdentity
+        {
+            get
+            {
+                return OrchestrationCallbackIdentity.Create(
+                    OrchestrationCallbackIdentity.OrchestrationClassifications.Query ,
+                    ClassificationInstanceName,
+                    UniqueIdentifier);
+            }
+        }
 
         public abstract void RunNextStep();
 

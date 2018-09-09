@@ -32,6 +32,11 @@ namespace TheLongRun.Common.Orchestration
         void RunNextStep();
 
 
+        /// <summary>
+        /// The identity by which any called orchestrations can call back with the 
+        /// results (a return address style identity)
+        /// </summary>
+        OrchestrationCallbackIdentity CallbackIdentity { get; }
 
     }
 }

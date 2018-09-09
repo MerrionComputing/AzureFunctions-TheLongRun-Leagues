@@ -52,6 +52,21 @@ namespace TheLongRun.Common.Orchestration
 
         public abstract IEventStreamBackedOrchestratorContext Context { get; set; }
 
+        /// <summary>
+        /// The identity by which any called orchestrations can call back with the 
+        /// results (a return address style identity)
+        /// </summary>
+        public OrchestrationCallbackIdentity CallbackIdentity
+        {
+            get
+            {
+                return OrchestrationCallbackIdentity.Create(
+                    OrchestrationCallbackIdentity.OrchestrationClassifications.Classifier,
+                    ClassificationInstanceName,
+                    UniqueIdentifier);
+            }
+        }
+
         public abstract void RunNextStep();
 
         protected internal EventStreamBackedClassifierOrchestrator(Guid uniqueIdentifier,

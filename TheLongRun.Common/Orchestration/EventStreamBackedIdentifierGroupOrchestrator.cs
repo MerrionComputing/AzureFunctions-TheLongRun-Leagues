@@ -14,7 +14,8 @@ namespace TheLongRun.Common.Orchestration
     /// by either a classifier or some rule over a projection
     /// </remarks>
     public abstract class EventStreamBackedIdentifierGroupOrchestrator
-        : IEventStreamBackedOrchestrator
+        : EventStreamBackedOrchestratorBase,
+        IEventStreamBackedOrchestrator
     {
         public abstract bool IsComplete { get; }
 
@@ -41,6 +42,21 @@ namespace TheLongRun.Common.Orchestration
             }
         }
         public abstract IEventStreamBackedOrchestratorContext Context { get; set; }
+
+        /// <summary>
+        /// The identity by which any called orchestrations can call back with the 
+        /// results (a return address style identity)
+        /// </summary>
+        public OrchestrationCallbackIdentity CallbackIdentity
+        {
+            get
+            {
+                return OrchestrationCallbackIdentity.Create(
+                    OrchestrationCallbackIdentity.OrchestrationClassifications.IdentifierGroup ,
+                    ClassificationInstanceName,
+                    UniqueIdentifier);
+            }
+        }
 
         public abstract void RunNextStep();
 

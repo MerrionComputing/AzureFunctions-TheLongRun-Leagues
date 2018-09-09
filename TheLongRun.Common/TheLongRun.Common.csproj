@@ -129,6 +129,7 @@
     <Compile Include="Orchestration\EventStreamBackedClassifierOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedCommandOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedIdentifierGroupOrchestrator.cs" />
+    <Compile Include="Orchestration\EventStreamBackedOrchestratorBase.cs" />
     <Compile Include="Orchestration\EventStreamBackedProjectionOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedQueryOrchestrator.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestrator.cs" />
