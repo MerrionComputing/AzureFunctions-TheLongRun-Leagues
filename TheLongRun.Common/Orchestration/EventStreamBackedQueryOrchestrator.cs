@@ -22,7 +22,7 @@ namespace TheLongRun.Common.Orchestration
         {
             get
             {
-                return @"QUERY";
+                return EventStreamBackedQueryOrchestrator.ClassifierTypeName;
             }
         }
 
@@ -68,5 +68,13 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
+
+        public static string ClassifierTypeName
+        {
+            get
+            {
+                return @"QUERY";
+            }
+        }
     }
 }

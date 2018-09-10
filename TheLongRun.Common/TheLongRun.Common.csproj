@@ -126,9 +126,16 @@
     <Compile Include="Events\Query\QueryParameterValidationErrorOccured.cs" />
     <Compile Include="Events\Query\QueryParameterValueSet.cs" />
     <Compile Include="HttpExtensions.cs" />
+    <Compile Include="Orchestration\Attributes\EventStreamBackedClassifierOrchestrationTriggerAttribute.cs" />
+    <Compile Include="Orchestration\Attributes\EventStreamBackedCommandOrchestrationTriggerAttribute.cs" />
+    <Compile Include="Orchestration\Attributes\EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute.cs" />
+    <Compile Include="Orchestration\Attributes\EventStreamBackedProjectionOrchestrationTriggerAttribute.cs" />
+    <Compile Include="Orchestration\Attributes\EventStreamBackedQueryOrchestrationTriggerAttribute.cs" />
+    <Compile Include="Orchestration\Bindings\EventStreamBackedClassifierOrchestratorTriggerBindingProvider.cs" />
     <Compile Include="Orchestration\EventStreamBackedClassifierOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedCommandOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedIdentifierGroupOrchestrator.cs" />
+    <Compile Include="Orchestration\Attributes\EventStreamBackedOrchestrationTriggerAttribute.cs" />
     <Compile Include="Orchestration\EventStreamBackedOrchestratorBase.cs" />
     <Compile Include="Orchestration\EventStreamBackedProjectionOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedQueryOrchestrator.cs" />
@@ -402,6 +409,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Events\IdentifierGroup\IdentifierGroup.ReadMe.txt" />
+    <Content Include="Orchestration\Bindings\Orchestration.Bindings.Readme.txt" />
     <Content Include="Orchestration\Orchestration.Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

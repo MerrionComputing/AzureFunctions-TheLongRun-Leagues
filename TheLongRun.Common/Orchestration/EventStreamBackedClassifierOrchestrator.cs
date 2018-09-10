@@ -21,7 +21,7 @@ namespace TheLongRun.Common.Orchestration
         {
             get
             {
-                return @"CLASSIFIER";
+                return EventStreamBackedClassifierOrchestrator.ClassifierTypeName ;
             }
         }
 
@@ -81,6 +81,14 @@ namespace TheLongRun.Common.Orchestration
                 _uniqueIdentifier = uniqueIdentifier;
             }
             _instanceIdentifier = instanceIdentifierKey;
+        }
+
+        public static string ClassifierTypeName
+        {
+            get
+            {
+                return @"CLASSIFIER";
+            }
         }
     }
 }

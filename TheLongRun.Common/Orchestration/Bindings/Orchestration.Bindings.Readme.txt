@@ -1,0 +1,29 @@
+﻿Orchestration Bindings
+======================
+
+These bindings allow for event stream backed orchestrations to call out to each other
+and receive a call back accress to which results should be posted.
+
+e.g. 
+  [ Query ] ---> [ Identifier Group ] ---> [ Classifier ]
+      ^                 ^       |                    |
+      |                 |       |                    |
+	  |                 \_______|____________________/
+	  |                         |
+	  \_________________________/
+
+For an example of how this sort of thing is done, look at the DurableTask orchestration
+(https://github.com/Azure/azure-functions-durable-extension/blob/master/src/WebJobs.Extensions.DurableTask/Bindings/OrchestrationTriggerAttributeBindingProvider.cs)
+
+For information about the constituent parts of bindings, use this documentation:
+https://github.com/Azure/azure-webjobs-sdk-extensions/wiki/Binding-Extensions
+
+Routing
+-------
+Each orchestrator has routing in the form:
+Domain/Type/Name/Instance
+Where type is [Group|Projection|Query|Command|Classifier]
+
+e.g.
+TheLongRun-Leagues/Command/Add-League/{1234-ABCD1-0A098A123E1F}
+

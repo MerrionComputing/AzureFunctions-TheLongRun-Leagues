@@ -28,7 +28,7 @@ namespace TheLongRun.Common.Orchestration
         {
             get
             {
-                return @"PROJECTION";
+                return EventStreamBackedProjectionOrchestrator.ClassifierTypeName;
             }
         }
 
@@ -90,5 +90,13 @@ namespace TheLongRun.Common.Orchestration
             _instanceIdentifier = instanceIdentifierKey;
         }
 
+
+        public static string ClassifierTypeName
+        {
+            get
+            {
+                return @"PROJECTION";
+            }
+        }
     }
 }

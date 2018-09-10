@@ -26,7 +26,7 @@ namespace TheLongRun.Common.Orchestration
         {
             get
             {
-                return @"GROUP";
+                return EventStreamBackedIdentifierGroupOrchestrator.ClassifierTypeName ;
             }
         }
 
@@ -69,6 +69,14 @@ namespace TheLongRun.Common.Orchestration
             else
             {
                 _uniqueIdentifier = uniqueIdentifier;
+            }
+        }
+
+        public static string ClassifierTypeName
+        {
+            get
+            {
+                return @"GROUP";
             }
         }
     }
