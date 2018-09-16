@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -102,6 +103,111 @@ namespace TheLongRun.Common.Orchestration
             // Any validations or enrichment can happen here
             return new OrchestrationCallbackIdentity(Classification, Name, Identity);
         }
+
+        /// <summary>
+        /// Create a callback identity from a path 
+        /// </summary>
+        /// <param name="callbackIdentityPath">
+        /// Domain/Type/Name/Instance
+        /// e.g.
+        /// TheLongRun-Leagues/Command/Add-League/{1234-ABCD1-0A098A123E1F}
+        /// </param>
+        /// <remarks>
+        /// Can be inclusive of or exclusive of the domain name - in the latter
+        /// </remarks>
+        public static OrchestrationCallbackIdentity CreateFromPath(string callbackIdentityPath)
+        {
+            if (string.IsNullOrWhiteSpace(callbackIdentityPath ))
+            {
+                return null;
+            }
+
+            string[] components = callbackIdentityPath.Split('/');
+            string _name = string.Empty ;
+            OrchestrationClassifications _classification = OrchestrationClassifications.NotSet;
+            Guid _identity = Guid.Empty;
+            if (components.Length == 4)
+            {
+                _classification = ClassificationFromString(components[1]);
+                _name = components[2];
+                Guid.TryParse(components[3], out _identity);
+            }
+            else
+            {
+                if (components.Length == 3)
+                {
+                    _classification = ClassificationFromString(components[0]);
+                    _name = components[1];
+                    Guid.TryParse(components[2], out _identity);
+                }
+                else
+                {
+                    // Not a valid path
+                    return null;
+                }
+            }
+
+            if (_classification == OrchestrationClassifications.NotSet )
+            {
+                return null;
+            }
+
+            return OrchestrationCallbackIdentity.Create(_classification,
+                _name,
+                _identity); 
+        }
+
+
+        /// <summary>
+        /// Get the classification type from its string representation
+        /// </summary>
+        /// <param name="classificationName">
+        /// The string representation of the classification type e.g. "Command", "Query" etc.
+        /// </param>
+        public static OrchestrationClassifications ClassificationFromString(string classificationName)
+        {
+            if (! string.IsNullOrWhiteSpace(classificationName )  )
+            {
+                // Command
+                if (classificationName.Equals(Orchestration.EventStreamBackedCommandOrchestrator.ClassifierTypeName,
+                    StringComparison.OrdinalIgnoreCase ))
+                {
+                    return OrchestrationClassifications.Command;
+                }
+
+                // Query
+                if (classificationName.Equals(Orchestration.EventStreamBackedQueryOrchestrator.ClassifierTypeName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    return OrchestrationClassifications.Query ;
+                }
+
+                // Identifier group
+                if (classificationName.Equals(Orchestration.EventStreamBackedIdentifierGroupOrchestrator.ClassifierTypeName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    return OrchestrationClassifications.IdentifierGroup ;
+                }
+
+                // Classifier
+                if (classificationName.Equals(Orchestration.EventStreamBackedClassifierOrchestrator.ClassifierTypeName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    return OrchestrationClassifications.Classifier ;
+                }
+
+                // Projection
+                if (classificationName.Equals(Orchestration.EventStreamBackedProjectionOrchestrator.ClassifierTypeName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    return OrchestrationClassifications.Projection ;
+                }
+            }
+
+            return OrchestrationClassifications.NotSet;
+        }
+
+
 
     }
 }

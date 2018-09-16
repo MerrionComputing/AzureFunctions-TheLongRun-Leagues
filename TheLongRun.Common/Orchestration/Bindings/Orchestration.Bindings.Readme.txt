@@ -5,7 +5,7 @@ These bindings allow for event stream backed orchestrations to call out to each 
 and receive a call back accress to which results should be posted.
 
 e.g. 
-  [ Query ] ---> [ Identifier Group ] ---> [ Classifier ]
+  [ Query ] ---> [ Identifier Group ] ---> [ Classifier * ]
       ^                 ^       |                    |
       |                 |       |                    |
 	  |                 \_______|____________________/
@@ -27,3 +27,17 @@ Where type is [Group|Projection|Query|Command|Classifier]
 e.g.
 TheLongRun-Leagues/Command/Add-League/{1234-ABCD1-0A098A123E1F}
 
+This can be passed to the serverless function either as a string or as a JObject.
+If it is passed as a string it can be the routing as JSOn in the string or a From::To::Extra formatted string.
+
+Process flow
+------------
+The higher level orchestration triggers the level below it and passes it a call-back reference to tell it what event stream to 
+use to write results to.  When the lower level orchestration completes its work it writes to the higher level orchestration
+with the results before calling back to it.
+
+At each level the orchestration is in charge of deriving its own state before running - state is NOT passed between orchestrations
+as that would reduce the resiliency that we need.
+
+In addition a [Command] can post aggregate events as a result of its postings.  A seperate aggregate orchestration process is 
+used for that.

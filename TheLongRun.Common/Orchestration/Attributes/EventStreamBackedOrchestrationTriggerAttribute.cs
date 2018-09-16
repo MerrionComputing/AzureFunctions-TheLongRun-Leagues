@@ -16,6 +16,7 @@ namespace TheLongRun.Common.Orchestration
     /// Domain/Type/Name/Instance
     /// e.g.
     /// TheLongRun-Leagues/Command/Add-League/{1234-ABCD1-0A098A123E1F}
+    /// The domain, instance name and instance identity can auto-resolve
     /// </remarks>
     [AttributeUsage(AttributeTargets.Parameter)]
     [Binding(TriggerHandlesReturnValue =false  )]
@@ -23,14 +24,9 @@ namespace TheLongRun.Common.Orchestration
         : Attribute
     {
 
-        readonly string _domainName;
-        public string DomainName
-        {
-            get
-            {
-                return _domainName;
-            }
-        }
+        [AutoResolve]
+        public string DomainName { get; set; }
+
 
         readonly string _classificationTypeName;
         public string ClassificationTypeName
@@ -41,23 +37,13 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        private readonly string _instanceName;
-        public string InstanceName
-        {
-            get
-            {
-                return _instanceName;
-            }
-        }
+        [AutoResolve ]
+        public string InstanceName { get; set; }
 
-        private readonly Guid _instanceIdentity;
-        public Guid InstanceIdentity
-        {
-            get
-            {
-                return _instanceIdentity;
-            }
-        }
+
+        [AutoResolve ]
+        public Guid InstanceIdentity { get; set; }
+
 
         protected internal EventStreamBackedOrchestrationTriggerAttribute(
             string domainName,
@@ -65,10 +51,10 @@ namespace TheLongRun.Common.Orchestration
             string instanceName,
             Guid instanceIdentity)
         {
-            _domainName = domainName;
+            DomainName = domainName;
             _classificationTypeName = classificationTypeName;
-            _instanceName = instanceName;
-            _instanceIdentity = instanceIdentity;
+            InstanceName = instanceName;
+            InstanceIdentity = instanceIdentity;
         }
 
         public override string ToString()

@@ -19,6 +19,12 @@ namespace TheLongRun.Common.Orchestration.Bindings
     internal class EventStreamBackedClassifierOrchestratorTriggerBindingProvider
         : ITriggerBindingProvider
     {
+        public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+
 
     }
 
@@ -26,7 +32,7 @@ namespace TheLongRun.Common.Orchestration.Bindings
     /// <summary>
     /// The trigger binding for an event stream backed orchestration for a "Classifier"
     /// </summary>
-    private class EventStreamBackedClassifierOrchestrationTriggerBinding 
+    public class EventStreamBackedClassifierOrchestrationTriggerBinding 
         : ITriggerBinding
     {
 
@@ -40,8 +46,18 @@ namespace TheLongRun.Common.Orchestration.Bindings
         /// <summary>
         /// The trigger for this binding is an EventStreamBackedClassifierOrchestrator
         /// </summary>
-        public Type TriggerValueType => typeof(EventStreamBackedClassifierOrchestrator);
+        public Type TriggerValueType => typeof(EventStreamBackedClassifierTriggerValue);
 
+
+        /// <summary>
+        /// Constructor to create this binding
+        /// </summary>
+        /// <param name="parameterInfo">
+        /// The parameter the trigger is bound to
+        /// </param>
+        /// <param name="orchestratorName">
+        /// The name of the orchestrator
+        /// </param>
         public EventStreamBackedClassifierOrchestrationTriggerBinding(
             ParameterInfo parameterInfo,
             string orchestratorName)
@@ -54,18 +70,23 @@ namespace TheLongRun.Common.Orchestration.Bindings
 
         }
 
-
+        private IReadOnlyDictionary<string, Type> GetBindingDataContract(ParameterInfo parameterInfo)
+        {
+            Dictionary<string, Type> contract = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+            contract.Add("EventStreamBackedClassifierTrigger", typeof(EventStreamBackedClassifierTriggerValue));
+            return contract;
+        }
 
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            var orchestrationContext = (EventStreamBackedClassifierOrchestrator)value;
+            var orchestrationContext = (EventStreamBackedClassifierTriggerValue)value;
             Type destinationType = this.parameterInfo.ParameterType;
 
 
 
             object convertedValue = null;
 
-            if (destinationType == typeof(EventStreamBackedClassifierOrchestrator))
+            if (destinationType == typeof(EventStreamBackedClassifierTriggerValue))
             {
                 convertedValue = orchestrationContext;
             }
@@ -74,10 +95,11 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 convertedValue = EventStreamBackedClassifierOrchestrationToString(orchestrationContext);
             }
 
-            ObjectValueProvider inputValueProvider = new ObjectValueProvider(
-                convertedValue ?? value,
-                this.parameterInfo.ParameterType);
+            return Task.FromException<ITriggerData>(new NotImplementedException());
 
+#if TODO
+
+            // Need to work out how to return the binding ??
 
             var bindingData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             bindingData[this.parameterInfo.Name] = convertedValue;
@@ -85,13 +107,14 @@ namespace TheLongRun.Common.Orchestration.Bindings
             // We don't specify any return value binding 
             var triggerData = new TriggerData(inputValueProvider, bindingData);
             return Task.FromResult<ITriggerData>(triggerData);
+#endif
         }
 
         /// <summary>
         /// Returns a ParameterDescriptor describing the parameter.
         /// </summary>
         /// <remarks>
-        /// Tthe ParameterDescriptor is the mechanism used to integrate with the WebJobs SDK 
+        /// The ParameterDescriptor is the mechanism used to integrate with the WebJobs SDK 
         /// Dashboard - it can return ParameterDisplayHints which dictate how the parameter 
         /// is shown in the Dashboard.
         /// </remarks>
@@ -104,7 +127,8 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 Prompt = "Trigger for the specified classifier"
             };
 
-            return new ParameterDescriptor { Name = this.parameterInfo.Name ,
+            return new EventStreamBackedClassifierParameterDescriptor
+            { Name = this.parameterInfo.Name ,
                 Type = nameof(EventStreamBackedClassifierOrchestrator),
                 DisplayHints =displayHints  };
         }
@@ -115,7 +139,7 @@ namespace TheLongRun.Common.Orchestration.Bindings
         /// </summary>
         /// <param name="orchestrationContext"></param>
         /// <returns></returns>
-        private static string EventStreamBackedClassifierOrchestrationToString(EventStreamBackedClassifierOrchestrator orchestrationContext)
+        private static string EventStreamBackedClassifierOrchestrationToString(EventStreamBackedClassifierTriggerValue orchestrationContext)
         {
             var contextObject = new JObject(
                 new JProperty("input", orchestrationContext));
@@ -123,6 +147,82 @@ namespace TheLongRun.Common.Orchestration.Bindings
             return contextObject.ToString();
         }
 
+        /// <summary>
+        /// Creates a listener to trigger the classifier orchestration
+        /// </summary>
+        /// <param name="context"></param>
+        /// <remarks>
+        /// The runtime will call this method to create the listener for the trigger event source. 
+        /// A ListenerFactoryContext object is passed to the method. 
+        /// It contains a ITriggeredFunctionExecutor instance, which is what the listener uses to call 
+        /// back into the runtime when an event is triggered. When the listener fires it calls back into 
+        /// the runtime with a trigger value. The runtime will then flow that value back through BindAsync 
+        /// during the bind process when the function is invoked.
+        /// </remarks>
+        public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public class EventStreamBackedClassifierTriggerValue
+    {
+
+        public string Result { get; set; }
+    }
+
+    public class EventStreamBackedClassifierTriggerValueProvider
+        : IValueProvider
+    {
+        public Type Type => throw new NotImplementedException();
+
+        public Task<object> GetValueAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ToInvokeString()
+        {
+            throw new NotImplementedException();
+        }
+
 
     }
+
+    /// <summary>
+    /// Class to describe the event stream backed classifier parameter in 
+    /// any Azure function with such a parameter designated with the attribute
+    /// </summary>
+    public class EventStreamBackedClassifierParameterDescriptor 
+        : TriggerParameterDescriptor
+    {
+        public override string GetTriggerReason(IDictionary<string, string> arguments)
+
+        {
+
+            string argumentString = @"";
+            if (null != arguments )
+            {
+                foreach (var argument in arguments )
+                {
+                    argumentString += $"{argument.Key} = {argument.Value} ";
+                }
+            }
+
+            return $"Event Stream Backed Classifier trigger fired at { DateTime.Now.ToString("o")}  {argumentString}";
+
+        }
+
+        public EventStreamBackedClassifierParameterDescriptor()
+        {
+            DisplayHints = new ParameterDisplayHints()
+            {
+                Description = "Trigger for an event stream backed classifier orchestration",
+                Prompt = "Trigger for the specified classifier"
+            };
+        }
+
+    }
+
 }

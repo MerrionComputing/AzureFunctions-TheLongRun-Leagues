@@ -77,6 +77,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Orchestration\OrchestrationCallbackIdentity_UnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -110,9 +111,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Aggregate\" />
+    <Folder Include="Classifier\" />
     <Folder Include="Command\" />
     <Folder Include="Identifier Group\" />
+    <Folder Include="Projection\" />
     <Folder Include="Query\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Orchestration\Orchestration.UnitTest.ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
