@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheLongRun.Common.Orchestration.Attributes;
 
 namespace TheLongRun.Common.Orchestration
 {
     /// <summary>
     /// A base class for any QUERY orchestrator functions
     /// </summary>
-    public abstract class EventStreamBackedQueryOrchestrator
+    public  class EventStreamBackedQueryOrchestrator
         : EventStreamBackedOrchestratorBase,
           IEventStreamBackedOrchestrator
     {
-        public abstract bool IsComplete { get; }
+        public  bool IsComplete { get; }
 
         /// <summary>
         /// Orchestrator classification type is a QUERY
@@ -27,7 +28,15 @@ namespace TheLongRun.Common.Orchestration
         }
 
 
-        public abstract string ClassificationInstanceName { get; }
+        private readonly string _queryName;
+        public string Name
+        {
+            get
+            {
+                return _queryName;
+            }
+        }
+
 
         private readonly Guid _uniqueIdentifier;
         public Guid UniqueIdentifier
@@ -37,7 +46,7 @@ namespace TheLongRun.Common.Orchestration
                 return _uniqueIdentifier;
             }
         }
-        public abstract IEventStreamBackedOrchestratorContext Context { get; set; }
+        public  IEventStreamBackedOrchestratorContext Context { get; set; }
 
         /// <summary>
         /// The identity by which any called orchestrations can call back with the 
@@ -49,14 +58,18 @@ namespace TheLongRun.Common.Orchestration
             {
                 return OrchestrationCallbackIdentity.Create(
                     OrchestrationCallbackIdentity.OrchestrationClassifications.Query ,
-                    ClassificationInstanceName,
+                    Name ,
                     UniqueIdentifier);
             }
         }
 
-        public abstract void RunNextStep();
+        public  void RunNextStep()
+        {
+            // TODO Run whatever is the next step of the orchestration
+        }
 
-        protected internal EventStreamBackedQueryOrchestrator(Guid uniqueIdentifier)
+        protected internal EventStreamBackedQueryOrchestrator(Guid uniqueIdentifier,
+            string instanceName = null)
         {
             if (uniqueIdentifier.Equals(Guid.Empty))
             {
@@ -66,6 +79,7 @@ namespace TheLongRun.Common.Orchestration
             {
                 _uniqueIdentifier = uniqueIdentifier;
             }
+            _queryName = instanceName ;
         }
 
 
@@ -75,6 +89,16 @@ namespace TheLongRun.Common.Orchestration
             {
                 return @"QUERY";
             }
+        }
+
+
+        public static EventStreamBackedQueryOrchestrator CreateFromAttribute(EventStreamBackedQueryOrchestrationTriggerAttribute attr)
+        {
+            if (attr.InstanceIdentity.Equals(Guid.Empty))
+            {
+                attr.InstanceIdentity = Guid.NewGuid();
+            }
+            return new EventStreamBackedQueryOrchestrator(attr.InstanceIdentity, attr.InstanceName);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace TheLongRun.Common.Orchestration
     public abstract class EventStreamBackedClassifierOrchestrator
         : IEventStreamBackedOrchestrator
     {
-        public abstract bool IsComplete { get; }
+        public  bool IsComplete { get; }
 
         /// <summary>
         /// Orchestrator classification type is a CLASSIFIER
@@ -26,7 +26,7 @@ namespace TheLongRun.Common.Orchestration
         }
 
 
-        public abstract string ClassificationInstanceName { get; }
+        public  string Name { get; }
 
         private readonly Guid _uniqueIdentifier;
         public Guid UniqueIdentifier
@@ -62,7 +62,7 @@ namespace TheLongRun.Common.Orchestration
             {
                 return OrchestrationCallbackIdentity.Create(
                     OrchestrationCallbackIdentity.OrchestrationClassifications.Classifier,
-                    ClassificationInstanceName,
+                    Name,
                     UniqueIdentifier);
             }
         }

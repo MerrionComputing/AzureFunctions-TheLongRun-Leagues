@@ -15,11 +15,11 @@ namespace TheLongRun.Common.Orchestration
     /// will have a call-back to identify the name, type and unique 
     /// identifier of the results should be passed back to
     /// </remarks>
-    public abstract class EventStreamBackedProjectionOrchestrator
+    public  class EventStreamBackedProjectionOrchestrator
        : EventStreamBackedOrchestratorBase,
         IEventStreamBackedOrchestrator
     {
-        public abstract bool IsComplete { get; }
+        public  bool IsComplete { get; }
 
         /// <summary>
         /// Orchestrator classification type is a PROJECTION
@@ -33,7 +33,7 @@ namespace TheLongRun.Common.Orchestration
         }
 
 
-        public abstract string ClassificationInstanceName { get; }
+        public  string Name { get; }
 
         private readonly Guid _uniqueIdentifier;
         public Guid UniqueIdentifier
@@ -57,7 +57,7 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        public abstract IEventStreamBackedOrchestratorContext Context { get; set; }
+        public  IEventStreamBackedOrchestratorContext Context { get; set; }
 
         /// <summary>
         /// The identity by which any called orchestrations can call back with the 
@@ -69,12 +69,15 @@ namespace TheLongRun.Common.Orchestration
             {
                 return OrchestrationCallbackIdentity.Create(
                     OrchestrationCallbackIdentity.OrchestrationClassifications.Projection ,
-                    ClassificationInstanceName,
+                    Name,
                     UniqueIdentifier);
             }
         }
 
-        public abstract void RunNextStep();
+        public  void RunNextStep()
+        {
+
+        }
 
         protected internal EventStreamBackedProjectionOrchestrator(Guid uniqueIdentifier,
             string instanceIdentifierKey)

@@ -28,7 +28,7 @@ namespace TheLongRun.Common.Orchestration
         /// <remarks>
         /// For a command this is the command name e.g. "set-user-password"
         /// </remarks>
-        string ClassificationInstanceName { get; }
+        string Name { get; }
 
         /// <summary>
         /// The unique identifier of this orchestration instance

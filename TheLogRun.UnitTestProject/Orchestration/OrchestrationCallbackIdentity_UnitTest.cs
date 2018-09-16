@@ -339,5 +339,20 @@ namespace TheLogRun.UnitTestProject.Orchestration
             Assert.AreEqual(expected, actual);
 
         }
+
+        [TestMethod]
+        public void CreateFromPath_ValidPath_Domain_Identity_TestMethod()
+        {
+            Guid expected = new Guid("02d96365-0fbe-43e6-9517-e7c22427bde7");
+            Guid actual = Guid.Empty;
+
+            string TestPath = "Domain/Query/The-Query/02d96365-0fbe-43e6-9517-e7c22427bde7";
+
+            OrchestrationCallbackIdentity testIdentity = OrchestrationCallbackIdentity.CreateFromPath(TestPath);
+
+            actual = testIdentity.InstanceIdentity ;
+
+            Assert.AreEqual(expected, actual);
+        }
     }
 }

@@ -131,6 +131,7 @@
     <Compile Include="Orchestration\Attributes\EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute.cs" />
     <Compile Include="Orchestration\Attributes\EventStreamBackedProjectionOrchestrationTriggerAttribute.cs" />
     <Compile Include="Orchestration\Attributes\EventStreamBackedQueryOrchestrationTriggerAttribute.cs" />
+    <Compile Include="Orchestration\Bindings\BindingHelper.cs" />
     <Compile Include="Orchestration\Bindings\EventStreamBackedClassifierOrchestratorTriggerBindingProvider.cs" />
     <Compile Include="Orchestration\Bindings\EventStreamBackedOrchestrationExtensions.cs" />
     <Compile Include="Orchestration\EventStreamBackedClassifierOrchestrator.cs" />
@@ -145,6 +146,11 @@
     <Compile Include="Orchestration\IEventStreamBackedOrchestratorContext.cs" />
     <Compile Include="Orchestration\OrchestrationCallbackIdentity.cs" />
     <Compile Include="Orchestration\OrchestrationCalloutIdentity.cs" />
+    <Compile Include="Orchestration\StartClassifierOrchestrationArgs.cs" />
+    <Compile Include="Orchestration\StartCommandOrchestrationArgs.cs" />
+    <Compile Include="Orchestration\StartIdentifierGroupOrchestrationArgs.cs" />
+    <Compile Include="Orchestration\StartProjectionOrchestrationArgs.cs" />
+    <Compile Include="Orchestration\StartQueryOrchestrationArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryLogRecord.cs" />
     <Compile Include="QueryRequest.cs" />

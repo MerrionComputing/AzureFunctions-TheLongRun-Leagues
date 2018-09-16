@@ -13,11 +13,11 @@ namespace TheLongRun.Common.Orchestration
     /// This is a business meaninful collection of entities that have been selected
     /// by either a classifier or some rule over a projection
     /// </remarks>
-    public abstract class EventStreamBackedIdentifierGroupOrchestrator
+    public  class EventStreamBackedIdentifierGroupOrchestrator
         : EventStreamBackedOrchestratorBase,
         IEventStreamBackedOrchestrator
     {
-        public abstract bool IsComplete { get; }
+        public  bool IsComplete { get; }
 
         /// <summary>
         /// Orchestrator classification type is a GROUP
@@ -31,7 +31,7 @@ namespace TheLongRun.Common.Orchestration
         }
 
 
-        public abstract string ClassificationInstanceName { get; }
+        public  string Name { get; }
 
         private readonly Guid _uniqueIdentifier;
         public Guid UniqueIdentifier
@@ -41,7 +41,7 @@ namespace TheLongRun.Common.Orchestration
                 return _uniqueIdentifier;
             }
         }
-        public abstract IEventStreamBackedOrchestratorContext Context { get; set; }
+        public  IEventStreamBackedOrchestratorContext Context { get; set; }
 
         /// <summary>
         /// The identity by which any called orchestrations can call back with the 
@@ -53,12 +53,15 @@ namespace TheLongRun.Common.Orchestration
             {
                 return OrchestrationCallbackIdentity.Create(
                     OrchestrationCallbackIdentity.OrchestrationClassifications.IdentifierGroup ,
-                    ClassificationInstanceName,
+                    Name,
                     UniqueIdentifier);
             }
         }
 
-        public abstract void RunNextStep();
+        public  void RunNextStep()
+        {
+
+        }
 
         protected internal EventStreamBackedIdentifierGroupOrchestrator(Guid uniqueIdentifier)
         {
