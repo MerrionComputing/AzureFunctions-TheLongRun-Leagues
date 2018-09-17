@@ -26,7 +26,6 @@ namespace TheLongRun.Common.Orchestration.Bindings
         {
 
 
-
             // TODO : Add converters...
             // context.AddConverter<SampleItem, string>(ConvertToString);
             // [Command]
@@ -45,12 +44,19 @@ namespace TheLongRun.Common.Orchestration.Bindings
 
             // [Query]
             var queryRule = context.AddBindingRule<EventStreamBackedQueryOrchestrationTriggerAttribute>();
-            queryRule.BindToInput<EventStreamBackedQueryOrchestrator>(this.GetQueryOrchestration); 
+            queryRule.BindToInput<EventStreamBackedQueryOrchestrator>(this.GetQueryOrchestration);
 
             // [Idetifier Group]
+            var identifierGroupRule = context.AddBindingRule<EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute>();
+            identifierGroupRule.BindToInput<EventStreamBackedIdentifierGroupOrchestrator>(this.GetGroupOrchestration);
 
             // [Classifier]
+            var classifierRule = context.AddBindingRule<EventStreamBackedClassifierOrchestrationTriggerAttribute>();
+            classifierRule.BindToInput<EventStreamBackedClassifierOrchestrator>(this.GetClassifierOrchestration);
+
             // [Projection]
+            var projectionRule = context.AddBindingRule<EventStreamBackedProjectionOrchestrationTriggerAttribute>();
+            projectionRule.BindToInput<EventStreamBackedProjectionOrchestrator>(this.GetProjectionOrchestration); 
 
             // (2) Orchestrations that can bind to outputs by IAsyncCollector
             //    var rule = context.AddBindingRule<TableAttribute>();
@@ -104,6 +110,72 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 });
 
             return queryOrchestration;
+        }
+        #endregion
+
+        #region Identifier Group
+        /// <summary>
+        /// A cache of the identifier group handlers that have been created in this session (to avoid the overhead of creating new each time)
+        /// </summary>
+        private readonly ConcurrentDictionary<EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute, EventStreamBackedIdentifierGroupOrchestrator> cachedGroupOrchestrators =
+            new ConcurrentDictionary<EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute, EventStreamBackedIdentifierGroupOrchestrator>();
+
+
+        protected internal virtual EventStreamBackedIdentifierGroupOrchestrator GetGroupOrchestration(EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute attribute)
+        {
+            EventStreamBackedIdentifierGroupOrchestrator groupOrchestration = this.cachedGroupOrchestrators.GetOrAdd(
+                attribute,
+                attr =>
+                {
+                    // TODO :: Need to get the domain context to go along with the command
+                    return EventStreamBackedIdentifierGroupOrchestrator.CreateFromAttribute(attribute);
+                });
+
+            return groupOrchestration;
+        }
+        #endregion
+
+        #region Classifier
+        /// <summary>
+        /// A cache of the identifier group handlers that have been created in this session (to avoid the overhead of creating new each time)
+        /// </summary>
+        private readonly ConcurrentDictionary<EventStreamBackedClassifierOrchestrationTriggerAttribute, EventStreamBackedClassifierOrchestrator> cachedClassifierOrchestrators =
+            new ConcurrentDictionary<EventStreamBackedClassifierOrchestrationTriggerAttribute, EventStreamBackedClassifierOrchestrator>();
+
+
+        protected internal virtual EventStreamBackedClassifierOrchestrator GetClassifierOrchestration(EventStreamBackedClassifierOrchestrationTriggerAttribute attribute)
+        {
+            EventStreamBackedClassifierOrchestrator classifierOrchestration = this.cachedClassifierOrchestrators.GetOrAdd(
+                attribute,
+                attr =>
+                {
+                    // TODO :: Need to get the domain context to go along with the command
+                    return EventStreamBackedClassifierOrchestrator.CreateFromAttribute(attribute);
+                });
+
+            return classifierOrchestration;
+        }
+        #endregion
+
+        #region Projection
+        //
+        /// <summary>
+        /// A cache of the identifier group handlers that have been created in this session (to avoid the overhead of creating new each time)
+        /// </summary>
+        private readonly ConcurrentDictionary<EventStreamBackedProjectionOrchestrationTriggerAttribute, EventStreamBackedProjectionOrchestrator> cachedProjectionOrchestrators =
+            new ConcurrentDictionary<EventStreamBackedProjectionOrchestrationTriggerAttribute, EventStreamBackedProjectionOrchestrator>();
+
+        protected internal virtual EventStreamBackedProjectionOrchestrator GetProjectionOrchestration(EventStreamBackedProjectionOrchestrationTriggerAttribute attribute)
+        {
+            EventStreamBackedProjectionOrchestrator projectionOrchestration = this.cachedProjectionOrchestrators.GetOrAdd(
+                attribute,
+                attr =>
+                {
+                    // TODO :: Need to get the domain context to go along with the command
+                    return EventStreamBackedProjectionOrchestrator.CreateFromAttribute(attribute);
+                });
+
+            return projectionOrchestration;
         }
         #endregion
     }

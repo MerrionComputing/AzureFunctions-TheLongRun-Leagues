@@ -22,15 +22,6 @@ namespace TheLongRun.Common.Orchestration
         bool IsComplete { get; }
 
 
-        /// <summary>
-        /// Trigger whatever the next step to run is
-        /// </summary>
-        /// <remarks>
-        /// The orchestrator does not expose what the next step is as we don't want to bake-in
-        /// dependencies on the specific implementation
-        /// </remarks>
-        void RunNextStep();
-
 
         /// <summary>
         /// The identity by which any called orchestrations can call back with the 

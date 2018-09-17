@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheLongRun.Common.Orchestration.Attributes;
 
 namespace TheLongRun.Common.Orchestration
 {
@@ -31,7 +32,14 @@ namespace TheLongRun.Common.Orchestration
         }
 
 
-        public  string Name { get; }
+        private readonly string _groupName;
+        public string Name
+        {
+            get
+            {
+                return _groupName;
+            }
+        }
 
         private readonly Guid _uniqueIdentifier;
         public Guid UniqueIdentifier
@@ -58,12 +66,9 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        public  void RunNextStep()
-        {
 
-        }
-
-        protected internal EventStreamBackedIdentifierGroupOrchestrator(Guid uniqueIdentifier)
+        protected internal EventStreamBackedIdentifierGroupOrchestrator(Guid uniqueIdentifier,
+            string groupName = null)
         {
             if (uniqueIdentifier.Equals(Guid.Empty))
             {
@@ -73,6 +78,7 @@ namespace TheLongRun.Common.Orchestration
             {
                 _uniqueIdentifier = uniqueIdentifier;
             }
+            _groupName = groupName;
         }
 
         public static string ClassifierTypeName
@@ -81,6 +87,15 @@ namespace TheLongRun.Common.Orchestration
             {
                 return @"GROUP";
             }
+        }
+
+        public static EventStreamBackedIdentifierGroupOrchestrator CreateFromAttribute(EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute attr)
+        {
+            if (attr.InstanceIdentity.Equals(Guid.Empty))
+            {
+                attr.InstanceIdentity = Guid.NewGuid();
+            }
+            return new EventStreamBackedIdentifierGroupOrchestrator(attr.InstanceIdentity, attr.InstanceName);
         }
     }
 }

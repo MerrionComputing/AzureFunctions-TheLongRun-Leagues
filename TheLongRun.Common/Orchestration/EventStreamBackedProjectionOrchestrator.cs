@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheLongRun.Common.Orchestration.Attributes;
 
 namespace TheLongRun.Common.Orchestration
 {
@@ -32,8 +33,14 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-
-        public  string Name { get; }
+        private readonly string _projectionName;
+        public string Name
+        {
+            get
+            {
+                return _projectionName;
+            }
+        }
 
         private readonly Guid _uniqueIdentifier;
         public Guid UniqueIdentifier
@@ -44,18 +51,13 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        private readonly string _instanceIdentifier;
+
         /// <summary>
         /// The unique key of the (entity) event stream over which the projection
         /// will be run
         /// </summary>
-        public string InstanceIdentifier
-        {
-            get
-            {
-                return _instanceIdentifier;
-            }
-        }
+        public string InstanceIdentifier { get; set; }
+
 
         public  IEventStreamBackedOrchestratorContext Context { get; set; }
 
@@ -74,13 +76,10 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        public  void RunNextStep()
-        {
 
-        }
 
         protected internal EventStreamBackedProjectionOrchestrator(Guid uniqueIdentifier,
-            string instanceIdentifierKey)
+            string projectionName)
         {
             if (uniqueIdentifier.Equals(Guid.Empty))
             {
@@ -90,7 +89,7 @@ namespace TheLongRun.Common.Orchestration
             {
                 _uniqueIdentifier = uniqueIdentifier;
             }
-            _instanceIdentifier = instanceIdentifierKey;
+            _projectionName = projectionName;
         }
 
 
@@ -100,6 +99,16 @@ namespace TheLongRun.Common.Orchestration
             {
                 return @"PROJECTION";
             }
+        }
+
+        //CreateFromAttribute
+        public static EventStreamBackedProjectionOrchestrator CreateFromAttribute(EventStreamBackedProjectionOrchestrationTriggerAttribute attr)
+        {
+            if (attr.InstanceIdentity.Equals(Guid.Empty))
+            {
+                attr.InstanceIdentity = Guid.NewGuid();
+            }
+            return new EventStreamBackedProjectionOrchestrator(attr.InstanceIdentity, attr.InstanceName);
         }
     }
 }

@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheLongRun.Common.Orchestration.Attributes;
 
 namespace TheLongRun.Common.Orchestration
 {
     /// <summary>
     /// A base class for any CLASSIFIER orchestrator functions
     /// </summary>
-    public abstract class EventStreamBackedClassifierOrchestrator
-        : IEventStreamBackedOrchestrator
+    public  class EventStreamBackedClassifierOrchestrator
+        : EventStreamBackedOrchestratorBase,
+          IEventStreamBackedOrchestrator
     {
         public  bool IsComplete { get; }
 
@@ -25,8 +27,14 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-
-        public  string Name { get; }
+        private readonly string _classifierName;
+        public string Name
+        {
+            get
+            {
+                return _classifierName;
+            }
+        }
 
         private readonly Guid _uniqueIdentifier;
         public Guid UniqueIdentifier
@@ -37,20 +45,13 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        private readonly string _instanceIdentifier;
         /// <summary>
         /// The unique key of the (entity) event stream over which the classifier
         /// will be run
         /// </summary>
-        public string InstanceIdentifier
-        {
-            get
-            {
-                return _instanceIdentifier;
-            }
-        }
+        public string InstanceIdentifier { get; set; }
 
-        public abstract IEventStreamBackedOrchestratorContext Context { get; set; }
+        public  IEventStreamBackedOrchestratorContext Context { get; set; }
 
         /// <summary>
         /// The identity by which any called orchestrations can call back with the 
@@ -67,10 +68,9 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        public abstract void RunNextStep();
 
         protected internal EventStreamBackedClassifierOrchestrator(Guid uniqueIdentifier,
-            string instanceIdentifierKey)
+            string classifierName)
         {
             if (uniqueIdentifier.Equals(Guid.Empty))
             {
@@ -80,7 +80,7 @@ namespace TheLongRun.Common.Orchestration
             {
                 _uniqueIdentifier = uniqueIdentifier;
             }
-            _instanceIdentifier = instanceIdentifierKey;
+            _classifierName = classifierName;
         }
 
         public static string ClassifierTypeName
@@ -89,6 +89,15 @@ namespace TheLongRun.Common.Orchestration
             {
                 return @"CLASSIFIER";
             }
+        }
+
+        public static EventStreamBackedClassifierOrchestrator CreateFromAttribute(EventStreamBackedClassifierOrchestrationTriggerAttribute attr)
+        {
+            if (attr.InstanceIdentity.Equals(Guid.Empty))
+            {
+                attr.InstanceIdentity = Guid.NewGuid();
+            }
+            return new EventStreamBackedClassifierOrchestrator(attr.InstanceIdentity,  attr.InstanceName);
         }
     }
 }
