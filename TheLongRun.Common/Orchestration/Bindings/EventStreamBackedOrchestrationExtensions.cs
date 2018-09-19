@@ -1,5 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Azure.WebJobs.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using TheLongRun.Common.Orchestration.Attributes;
@@ -26,21 +28,17 @@ namespace TheLongRun.Common.Orchestration.Bindings
         {
 
 
-            // TODO : Add converters...
-            // context.AddConverter<SampleItem, string>(ConvertToString);
-            // [Command]
-            // [Query]
-            // [Idetifier Group]
-            // [Classifier]
-            // [Projection]
 
-            // TODO : Add binding rules ...
-            // (1) Orhestrations that can bind to inputs
-            //    var rule = context.AddBindingRule<SampleAttribute>();
-            //    rule.BindToInput<SampleItem>(BuildItemFromAttr);
+            // Add binding rules ... with converters
             // [Command]
-            var commandRule = context.AddBindingRule<EventStreamBackedCommandOrchestrationTriggerAttribute>();
+            var commandRule = context.AddBindingRule<EventStreamBackedCommandOrchestrationTriggerAttribute>()
+                .AddConverter<string, StartCommandOrchestrationArgs>(this.StringToStartCommandArgs)
+                .AddConverter<JObject, StartCommandOrchestrationArgs>(this.JObjectToStartCommandArgs); ;
+
             commandRule.BindToInput<EventStreamBackedCommandOrchestrator>(this.GetCommandOrchestration);
+
+            // (2) Orchestrations that can bind to outputs by IAsyncCollector
+            //commandRule.BindToCollector<ITableEntity>(builder);
 
             // [Query]
             var queryRule = context.AddBindingRule<EventStreamBackedQueryOrchestrationTriggerAttribute>();
@@ -58,16 +56,14 @@ namespace TheLongRun.Common.Orchestration.Bindings
             var projectionRule = context.AddBindingRule<EventStreamBackedProjectionOrchestrationTriggerAttribute>();
             projectionRule.BindToInput<EventStreamBackedProjectionOrchestrator>(this.GetProjectionOrchestration); 
 
-            // (2) Orchestrations that can bind to outputs by IAsyncCollector
-            //    var rule = context.AddBindingRule<TableAttribute>();
-            //    rule.BindToCollector<ITableEntity>(builder);
-            // [Command]
-            // [Query]
-            // [Idetifier Group]
-            // [Classifier]
-            // [Projection]
+            
+
 
         }
+
+
+
+
 
         #region Command
         /// <summary>
@@ -88,6 +84,23 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 });
 
             return commandOrchestration;
+        }
+
+        protected internal virtual StartCommandOrchestrationArgs StringToStartCommandArgs(string arg)
+        {
+            if (string.IsNullOrEmpty(arg))
+            {
+                return null;
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<StartCommandOrchestrationArgs>(arg);
+            }
+        }
+
+        protected internal virtual StartCommandOrchestrationArgs JObjectToStartCommandArgs(JObject input)
+        {
+            return input?.ToObject<StartCommandOrchestrationArgs>();
         }
         #endregion
 

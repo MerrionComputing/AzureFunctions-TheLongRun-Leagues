@@ -144,6 +144,7 @@
     <Compile Include="Orchestration\IEventStreamBackedOrchestrator.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestratorClassification.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestratorContext.cs" />
+    <Compile Include="Orchestration\IProjectionRunner.cs" />
     <Compile Include="Orchestration\OrchestrationCallbackIdentity.cs" />
     <Compile Include="Orchestration\OrchestrationCalloutIdentity.cs" />
     <Compile Include="Orchestration\StartClassifierOrchestrationArgs.cs" />

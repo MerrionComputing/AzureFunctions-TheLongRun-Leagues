@@ -12,7 +12,8 @@ namespace TheLongRun.Common.Orchestration
     /// </summary>
     public  class EventStreamBackedCommandOrchestrator
         : EventStreamBackedOrchestratorBase,
-          IEventStreamBackedOrchestrator
+          IEventStreamBackedOrchestrator,
+          IProjectionRunner
     {
         public  bool IsComplete { get; }
 
@@ -59,10 +60,6 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        public void RunNextStep()
-        {
-            // TODO : Work out how to run the next step in the orchestration
-        }
 
         protected internal EventStreamBackedCommandOrchestrator(Guid uniqueIdentifier,
             string instanceName = null)
@@ -97,6 +94,31 @@ namespace TheLongRun.Common.Orchestration
                 attr.InstanceIdentity = Guid.NewGuid();
             }
             return new EventStreamBackedCommandOrchestrator(attr.InstanceIdentity, attr.InstanceName);
+        }
+
+        public async Task<object> RunProjectionAsync(string projectionName, 
+            string instanceId, 
+            string aggregateKey, 
+            DateTime? asOfDate = null, 
+            int? asOfSequence = null)
+        {
+            // Validate the inputs...
+            if (string.IsNullOrWhiteSpace(projectionName ))
+            {
+                throw new ArgumentException($"Projection name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            if (string.IsNullOrWhiteSpace(aggregateKey ) )
+            {
+                throw new ArgumentException($"Projection requires a valid aggregate key");
+            }
+
+            return await Task.FromException<object>(new NotImplementedException()); 
         }
     }
 }
