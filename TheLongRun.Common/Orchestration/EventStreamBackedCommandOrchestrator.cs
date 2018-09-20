@@ -96,7 +96,7 @@ namespace TheLongRun.Common.Orchestration
             return new EventStreamBackedCommandOrchestrator(attr.InstanceIdentity, attr.InstanceName);
         }
 
-        public async Task<object> RunProjectionAsync(string projectionName, 
+        public async Task<IProjectionResponse > RunProjectionAsync(string projectionName, 
             string instanceId, 
             string aggregateKey, 
             DateTime? asOfDate = null, 
@@ -118,7 +118,10 @@ namespace TheLongRun.Common.Orchestration
                 throw new ArgumentException($"Projection requires a valid aggregate key");
             }
 
-            return await Task.FromException<object>(new NotImplementedException()); 
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IProjectionResponse>(new NotImplementedException()); 
         }
     }
 }

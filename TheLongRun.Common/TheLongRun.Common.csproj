@@ -141,10 +141,14 @@
     <Compile Include="Orchestration\EventStreamBackedOrchestratorBase.cs" />
     <Compile Include="Orchestration\EventStreamBackedProjectionOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedQueryOrchestrator.cs" />
+    <Compile Include="Orchestration\IClassifierRunner.cs" />
+    <Compile Include="Orchestration\ICommandRunner.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestrator.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestratorClassification.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestratorContext.cs" />
+    <Compile Include="Orchestration\IIdentifierGroupRunner.cs" />
     <Compile Include="Orchestration\IProjectionRunner.cs" />
+    <Compile Include="Orchestration\IQueryRunner.cs" />
     <Compile Include="Orchestration\OrchestrationCallbackIdentity.cs" />
     <Compile Include="Orchestration\OrchestrationCalloutIdentity.cs" />
     <Compile Include="Orchestration\StartClassifierOrchestrationArgs.cs" />
