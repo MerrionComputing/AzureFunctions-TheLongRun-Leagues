@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CQRSAzure.EventSourcing;
 using Newtonsoft.Json.Linq;
+using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Orchestration.Attributes;
 
 namespace TheLongRun.Common.Orchestration
@@ -230,6 +232,62 @@ namespace TheLongRun.Common.Orchestration
 
             // TODO: Spawn the projection
             return await Task.FromException<IClassifierResponse>(new NotImplementedException());
+        }
+        #endregion
+
+        #region Domain Entity Events
+        /// <summary>
+        /// Append an event onto the event stream of the domain entity (aka aggregate)
+        /// </summary>
+        /// <param name="domainName">
+        /// The top level domain name
+        /// </param>
+        /// <param name="entityTypeName">
+        /// The name of the type (class) of the entity to append the event to
+        /// </param>
+        /// <param name="entityInstanceKey">
+        /// The unique identifier of the entity onto which we are appending the event
+        /// </param>
+        /// <param name="eventToAppend">
+        /// The event we are appending to the entity instance event stream
+        /// </param>
+        public void AppendDomainEntityEvent(string domainName,
+            string entityTypeName,
+            string entityInstanceKey,
+            IEvent eventToAppend)
+        {
+
+            // Validate the parameters
+            if (string.IsNullOrWhiteSpace(domainName ) )
+            {
+                throw new ArgumentException("Domain name must be specified");
+            }
+
+            if (string.IsNullOrWhiteSpace(entityTypeName ) )
+            {
+                throw new ArgumentException("Entity type must be specified");
+            }
+
+            if (string.IsNullOrWhiteSpace(entityInstanceKey ) )
+            {
+                throw new ArgumentException("Entity instance unique identifier must be specified");
+            }
+
+            if (null == eventToAppend )
+            {
+                throw new ArgumentException("No event specified to append to the entity event stream");
+            }
+
+            EventStream targetStream = new EventStream(domainName,
+                entityTypeName,
+                entityInstanceKey);
+
+            if (null != targetStream )
+            {
+                targetStream.AppendEvent(eventToAppend); 
+            }
+
+
         }
         #endregion
     }
