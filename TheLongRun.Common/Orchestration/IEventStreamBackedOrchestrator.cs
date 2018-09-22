@@ -29,5 +29,12 @@ namespace TheLongRun.Common.Orchestration
         /// </summary>
         OrchestrationCallbackIdentity CallbackIdentity { get; }
 
+
+        /// <summary>
+        /// The identity of the orchestration that called this one, and to which any response
+        /// should be returned
+        /// </summary>
+        OrchestrationCallbackIdentity CalledBy { set; }
+
     }
 }

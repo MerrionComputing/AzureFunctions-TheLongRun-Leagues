@@ -19,13 +19,22 @@ namespace TheLongRun.Common.Orchestration
         /// <param name="instanceId">
         /// The global identifier of the command instance if we are re-using an existing one 
         /// </param>
-        Task<IQueryResponse> RunCommandAsync(string commandName,
+        /// <param name="commandParameters">
+        /// Parameters to be passed into the command 
+        /// (The specific class of this will depend on the command itself)
+        /// </param>
+        /// <param name="calledBy">
+        /// The orchestration that called this command and to which the results should be returned
+        /// (This may be null for a top-level orchestration)
+        /// </param>
+        Task<ICommandResponse> RunCommandAsync(string commandName,
             string instanceId,
-            JObject commandParameters);
+            JObject commandParameters = null);
 
     }
 
     public interface ICommandResponse
+        : IOrchestrationResponse 
     {
 
     }

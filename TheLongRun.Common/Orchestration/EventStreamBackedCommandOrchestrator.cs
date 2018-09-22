@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using TheLongRun.Common.Orchestration.Attributes;
 
 namespace TheLongRun.Common.Orchestration
@@ -13,7 +14,11 @@ namespace TheLongRun.Common.Orchestration
     public  class EventStreamBackedCommandOrchestrator
         : EventStreamBackedOrchestratorBase,
           IEventStreamBackedOrchestrator,
-          IProjectionRunner
+          ICommandRunner,
+          IQueryRunner,
+          IIdentifierGroupRunner,
+          IProjectionRunner,
+          IClassifierRunner 
     {
         public  bool IsComplete { get; }
 
@@ -96,6 +101,56 @@ namespace TheLongRun.Common.Orchestration
             return new EventStreamBackedCommandOrchestrator(attr.InstanceIdentity, attr.InstanceName);
         }
 
+
+        #region Command Runner
+        public async Task<ICommandResponse> RunCommandAsync(string commandName,
+            string instanceId,
+            JObject commandParameters = null)
+        {
+
+            // Validate the inputs...
+            if (string.IsNullOrWhiteSpace(commandName))
+            {
+                throw new ArgumentException($"Projection name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the command
+            return await Task.FromException<ICommandResponse>(new NotImplementedException());
+        }
+        #endregion
+
+        #region Query Runner
+        public async Task<IQueryResponse> RunQueryAsync(string queryName, 
+            string instanceId, 
+            JObject queryParameters, 
+            DateTime? asOfDate = null)
+        {
+            if (string.IsNullOrWhiteSpace(queryName))
+            {
+                throw new ArgumentException($"Query name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IQueryResponse>(new NotImplementedException());
+        }
+        #endregion
+
+        #region Projection Runner
+
         public async Task<IProjectionResponse > RunProjectionAsync(string projectionName, 
             string instanceId, 
             string aggregateKey, 
@@ -123,5 +178,59 @@ namespace TheLongRun.Common.Orchestration
             // TODO: Spawn the projection
             return await Task.FromException<IProjectionResponse>(new NotImplementedException()); 
         }
+        #endregion
+
+        #region Identifier Group Runner
+        public async Task<IEnumerable<IIdentifierGroupMemberResponse>> GetIdentifierGroupMembersAsync(string groupName, 
+            string instanceId, 
+            DateTime? asOfDate = null)
+        {
+            if (string.IsNullOrWhiteSpace(groupName))
+            {
+                throw new ArgumentException($"Group name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IEnumerable<IIdentifierGroupMemberResponse>>(new NotImplementedException());
+        }
+        #endregion
+
+        #region Classifier Runner
+        public async Task<IClassifierResponse> RunClassifierAsync(string classifierName, 
+            string instanceId, 
+            string aggregateKey, 
+            DateTime? asOfDate = null, 
+            int? asOfSequence = null)
+        {
+
+            // Validate the inputs...
+            if (string.IsNullOrWhiteSpace(classifierName))
+            {
+                throw new ArgumentException($"Classifier name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            if (string.IsNullOrWhiteSpace(aggregateKey))
+            {
+                throw new ArgumentException($"Classifier requires a valid aggregate key");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IClassifierResponse>(new NotImplementedException());
+        }
+        #endregion
     }
 }

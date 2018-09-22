@@ -16,7 +16,9 @@ namespace TheLongRun.Common.Orchestration
     /// </remarks>
     public  class EventStreamBackedIdentifierGroupOrchestrator
         : EventStreamBackedOrchestratorBase,
-        IEventStreamBackedOrchestrator
+          IEventStreamBackedOrchestrator,
+          IProjectionRunner,
+          IClassifierRunner
     {
         public  bool IsComplete { get; }
 
@@ -97,5 +99,67 @@ namespace TheLongRun.Common.Orchestration
             }
             return new EventStreamBackedIdentifierGroupOrchestrator(attr.InstanceIdentity, attr.InstanceName);
         }
+
+        #region Projection Runner
+
+        public async Task<IProjectionResponse> RunProjectionAsync(string projectionName,
+            string instanceId,
+            string aggregateKey,
+            DateTime? asOfDate = null,
+            int? asOfSequence = null)
+        {
+            // Validate the inputs...
+            if (string.IsNullOrWhiteSpace(projectionName))
+            {
+                throw new ArgumentException($"Projection name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            if (string.IsNullOrWhiteSpace(aggregateKey))
+            {
+                throw new ArgumentException($"Projection requires a valid aggregate key");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IProjectionResponse>(new NotImplementedException());
+        }
+        #endregion
+
+        #region Classifier Runner
+        public async Task<IClassifierResponse> RunClassifierAsync(string classifierName,
+            string instanceId,
+            string aggregateKey,
+            DateTime? asOfDate = null,
+            int? asOfSequence = null)
+        {
+
+            // Validate the inputs...
+            if (string.IsNullOrWhiteSpace(classifierName))
+            {
+                throw new ArgumentException($"Classifier name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            if (string.IsNullOrWhiteSpace(aggregateKey))
+            {
+                throw new ArgumentException($"Classifier requires a valid aggregate key");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IClassifierResponse>(new NotImplementedException());
+        }
+        #endregion
     }
 }

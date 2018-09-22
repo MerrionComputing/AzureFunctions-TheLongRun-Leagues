@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,10 @@ namespace TheLongRun.Common.Orchestration
     /// </summary>
     public  class EventStreamBackedQueryOrchestrator
         : EventStreamBackedOrchestratorBase,
-          IEventStreamBackedOrchestrator
+          IEventStreamBackedOrchestrator,
+          IQueryRunner,
+          IIdentifierGroupRunner,
+          IProjectionRunner
     {
         public  bool IsComplete { get; }
 
@@ -63,10 +67,6 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        public  void RunNextStep()
-        {
-            // TODO Run whatever is the next step of the orchestration
-        }
 
         protected internal EventStreamBackedQueryOrchestrator(Guid uniqueIdentifier,
             string instanceName = null)
@@ -100,5 +100,81 @@ namespace TheLongRun.Common.Orchestration
             }
             return new EventStreamBackedQueryOrchestrator(attr.InstanceIdentity, attr.InstanceName);
         }
+
+        #region Query Runner
+        public async Task<IQueryResponse> RunQueryAsync(string queryName,
+            string instanceId,
+            JObject queryParameters,
+            DateTime? asOfDate = null)
+        {
+            if (string.IsNullOrWhiteSpace(queryName))
+            {
+                throw new ArgumentException($"Query name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IQueryResponse>(new NotImplementedException());
+        }
+        #endregion
+
+        #region Projection Runner
+
+        public async Task<IProjectionResponse> RunProjectionAsync(string projectionName,
+            string instanceId,
+            string aggregateKey,
+            DateTime? asOfDate = null,
+            int? asOfSequence = null)
+        {
+            // Validate the inputs...
+            if (string.IsNullOrWhiteSpace(projectionName))
+            {
+                throw new ArgumentException($"Projection name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            if (string.IsNullOrWhiteSpace(aggregateKey))
+            {
+                throw new ArgumentException($"Projection requires a valid aggregate key");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IProjectionResponse>(new NotImplementedException());
+        }
+        #endregion
+
+        #region Identifier Group Runner
+        public async Task<IEnumerable<IIdentifierGroupMemberResponse>> GetIdentifierGroupMembersAsync(string groupName,
+            string instanceId,
+            DateTime? asOfDate = null)
+        {
+            if (string.IsNullOrWhiteSpace(groupName))
+            {
+                throw new ArgumentException($"Group name not set");
+            }
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                instanceId = Guid.NewGuid().ToString("N");
+            }
+
+            // TODO: Build a callout/callback definition
+
+            // TODO: Spawn the projection
+            return await Task.FromException<IEnumerable<IIdentifierGroupMemberResponse>>(new NotImplementedException());
+        }
+        #endregion
     }
 }

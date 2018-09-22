@@ -24,7 +24,7 @@ namespace TheLongRun.Common.Orchestration
         /// <remarks>
         /// If the as-of-date is not supplied, the classifier is run to the latest event
         /// </remarks>
-        Task<IEnumerable<IIdentifierGroupMembeResponse>> GetIdentifierGroupMembersAsync(string groupName, 
+        Task<IEnumerable<IIdentifierGroupMemberResponse>> GetIdentifierGroupMembersAsync(string groupName, 
             string instanceId, 
             DateTime? asOfDate = null);
     }
@@ -33,7 +33,8 @@ namespace TheLongRun.Common.Orchestration
     /// <summary>
     /// The response indicating that the given member IS in the identifier group as at the requested time
     /// </summary>
-    public interface IIdentifierGroupMembeResponse
+    public interface IIdentifierGroupMemberResponse:
+        IAsOfDateOrchestrationResponse 
     {
 
     }

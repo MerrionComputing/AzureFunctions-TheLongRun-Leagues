@@ -44,7 +44,9 @@ namespace TheLongRun.Common.Orchestration
     /// <summary>
     /// The response we get back from a classifier
     /// </summary>
-    public interface IClassifierResponse
+    public interface IClassifierResponse:
+        IAsOfDateOrchestrationResponse ,
+        IAsOfSequenceOrchestrationResponse 
     {
 
     }

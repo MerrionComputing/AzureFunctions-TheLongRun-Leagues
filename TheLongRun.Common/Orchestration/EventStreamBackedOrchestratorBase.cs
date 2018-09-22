@@ -12,5 +12,13 @@ namespace TheLongRun.Common.Orchestration
     public abstract class EventStreamBackedOrchestratorBase
     {
 
+        private OrchestrationCallbackIdentity _calledBy;
+        public OrchestrationCallbackIdentity CalledBy
+        {
+            set
+            {
+                _calledBy = value ;
+            }
+        }
     }
 }

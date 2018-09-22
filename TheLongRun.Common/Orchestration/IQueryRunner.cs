@@ -31,8 +31,7 @@ namespace TheLongRun.Common.Orchestration
         Task<IQueryResponse> RunQueryAsync(string queryName, 
             string instanceId,
             JObject queryParameters,
-            DateTime? asOfDate = null
-            );
+            DateTime? asOfDate = null);
 
     }
 
@@ -40,6 +39,7 @@ namespace TheLongRun.Common.Orchestration
     /// A response from running a query
     /// </summary>
     public interface IQueryResponse
+        : IAsOfDateOrchestrationResponse
     {
 
     }
