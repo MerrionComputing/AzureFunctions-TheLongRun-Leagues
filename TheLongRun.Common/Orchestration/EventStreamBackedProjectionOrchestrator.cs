@@ -79,7 +79,8 @@ namespace TheLongRun.Common.Orchestration
 
 
         protected internal EventStreamBackedProjectionOrchestrator(Guid uniqueIdentifier,
-            string projectionName)
+            string projectionName,
+            OrchestrationCallbackIdentity calledBy = null)
         {
             if (uniqueIdentifier.Equals(Guid.Empty))
             {
@@ -90,6 +91,10 @@ namespace TheLongRun.Common.Orchestration
                 _uniqueIdentifier = uniqueIdentifier;
             }
             _projectionName = projectionName;
+            if (null != calledBy)
+            {
+                base.CalledBy = calledBy;
+            }
         }
 
 

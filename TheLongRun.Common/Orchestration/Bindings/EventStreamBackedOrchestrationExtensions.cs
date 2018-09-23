@@ -33,7 +33,7 @@ namespace TheLongRun.Common.Orchestration.Bindings
             // [Command]
             var commandRule = context.AddBindingRule<EventStreamBackedCommandOrchestrationTriggerAttribute>()
                 .AddConverter<string, StartCommandOrchestrationArgs>(this.StringToStartCommandArgs)
-                .AddConverter<JObject, StartCommandOrchestrationArgs>(this.JObjectToStartCommandArgs); ;
+                .AddConverter<JObject, StartCommandOrchestrationArgs>(this.JObjectToStartCommandArgs); 
 
             commandRule.BindToInput<EventStreamBackedCommandOrchestrator>(this.GetCommandOrchestration);
 
@@ -41,23 +41,35 @@ namespace TheLongRun.Common.Orchestration.Bindings
             //commandRule.BindToCollector<ITableEntity>(builder);
 
             // [Query]
-            var queryRule = context.AddBindingRule<EventStreamBackedQueryOrchestrationTriggerAttribute>();
+            var queryRule = context.AddBindingRule<EventStreamBackedQueryOrchestrationTriggerAttribute>()
+                .AddConverter<string, StartQueryOrchestrationArgs>(this.StringToStartQueryArgs)
+                .AddConverter<JObject, StartQueryOrchestrationArgs>(this.JObjectToStartQueryArgs); 
+
             queryRule.BindToInput<EventStreamBackedQueryOrchestrator>(this.GetQueryOrchestration);
 
             // [Idetifier Group]
-            var identifierGroupRule = context.AddBindingRule<EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute>();
+            var identifierGroupRule = context.AddBindingRule<EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute>()
+                .AddConverter<string, StartIdentifierGroupOrchestrationArgs>(this.StringToStartIdentifierGroupArgs)
+                .AddConverter<JObject, StartIdentifierGroupOrchestrationArgs>(this.JObjectToStartIdentifierGroupArgs);
+
             identifierGroupRule.BindToInput<EventStreamBackedIdentifierGroupOrchestrator>(this.GetGroupOrchestration);
 
             // [Classifier]
-            var classifierRule = context.AddBindingRule<EventStreamBackedClassifierOrchestrationTriggerAttribute>();
+            var classifierRule = context.AddBindingRule<EventStreamBackedClassifierOrchestrationTriggerAttribute>()
+                .AddConverter<string, StartClassifierOrchestrationArgs>(this.StringToStartClassifierArgs)
+                .AddConverter<JObject, StartClassifierOrchestrationArgs>(this.JObjectToStartClassifierArgs);
+
             classifierRule.BindToInput<EventStreamBackedClassifierOrchestrator>(this.GetClassifierOrchestration);
 
             // [Projection]
-            var projectionRule = context.AddBindingRule<EventStreamBackedProjectionOrchestrationTriggerAttribute>();
-            projectionRule.BindToInput<EventStreamBackedProjectionOrchestrator>(this.GetProjectionOrchestration); 
+            var projectionRule = context.AddBindingRule<EventStreamBackedProjectionOrchestrationTriggerAttribute>()
+                .AddConverter<string, StartProjectionOrchestrationArgs>(this.StringToStartProjectionArgs)
+                .AddConverter<JObject, StartProjectionOrchestrationArgs>(this.JObjectToStartProjectionArgs);
 
-            
+            projectionRule.BindToInput<EventStreamBackedProjectionOrchestrator>(this.GetProjectionOrchestration);
 
+
+            // TODO: IAsyncCollector code to 
 
         }
 
@@ -124,6 +136,24 @@ namespace TheLongRun.Common.Orchestration.Bindings
 
             return queryOrchestration;
         }
+
+        protected internal virtual StartQueryOrchestrationArgs StringToStartQueryArgs(string arg)
+        {
+            if (string.IsNullOrEmpty(arg))
+            {
+                return null;
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<StartQueryOrchestrationArgs>(arg);
+            }
+        }
+
+        protected internal virtual StartQueryOrchestrationArgs JObjectToStartQueryArgs(JObject input)
+        {
+            return input?.ToObject<StartQueryOrchestrationArgs>();
+        }
+
         #endregion
 
         #region Identifier Group
@@ -145,6 +175,23 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 });
 
             return groupOrchestration;
+        }
+
+        protected internal virtual StartIdentifierGroupOrchestrationArgs StringToStartIdentifierGroupArgs(string arg)
+        {
+            if (string.IsNullOrEmpty(arg))
+            {
+                return null;
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<StartIdentifierGroupOrchestrationArgs>(arg);
+            }
+        }
+
+        protected internal virtual StartIdentifierGroupOrchestrationArgs JObjectToStartIdentifierGroupArgs(JObject input)
+        {
+            return input?.ToObject<StartIdentifierGroupOrchestrationArgs>();
         }
         #endregion
 
@@ -168,6 +215,23 @@ namespace TheLongRun.Common.Orchestration.Bindings
 
             return classifierOrchestration;
         }
+
+        protected internal virtual StartClassifierOrchestrationArgs StringToStartClassifierArgs(string arg)
+        {
+            if (string.IsNullOrEmpty(arg))
+            {
+                return null;
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<StartClassifierOrchestrationArgs>(arg);
+            }
+        }
+
+        protected internal virtual StartClassifierOrchestrationArgs JObjectToStartClassifierArgs(JObject input)
+        {
+            return input?.ToObject<StartClassifierOrchestrationArgs>();
+        }
         #endregion
 
         #region Projection
@@ -189,6 +253,24 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 });
 
             return projectionOrchestration;
+        }
+
+
+        protected internal virtual StartProjectionOrchestrationArgs StringToStartProjectionArgs(string arg)
+        {
+            if (string.IsNullOrEmpty(arg))
+            {
+                return null;
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<StartProjectionOrchestrationArgs>(arg);
+            }
+        }
+
+        protected internal virtual StartProjectionOrchestrationArgs JObjectToStartProjectionArgs(JObject input)
+        {
+            return input?.ToObject<StartProjectionOrchestrationArgs>();
         }
         #endregion
     }

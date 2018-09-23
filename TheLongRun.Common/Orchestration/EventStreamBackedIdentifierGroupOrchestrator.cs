@@ -70,7 +70,8 @@ namespace TheLongRun.Common.Orchestration
 
 
         protected internal EventStreamBackedIdentifierGroupOrchestrator(Guid uniqueIdentifier,
-            string groupName = null)
+            string groupName = null,
+            OrchestrationCallbackIdentity calledBy = null)
         {
             if (uniqueIdentifier.Equals(Guid.Empty))
             {
@@ -81,6 +82,10 @@ namespace TheLongRun.Common.Orchestration
                 _uniqueIdentifier = uniqueIdentifier;
             }
             _groupName = groupName;
+            if (null != calledBy)
+            {
+                base.CalledBy = calledBy;
+            }
         }
 
         public static string ClassifierTypeName

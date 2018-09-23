@@ -69,7 +69,8 @@ namespace TheLongRun.Common.Orchestration
 
 
         protected internal EventStreamBackedCommandOrchestrator(Guid uniqueIdentifier,
-            string instanceName = null)
+            string instanceName,
+            OrchestrationCallbackIdentity calledBy = null)
         {
             if (uniqueIdentifier.Equals(Guid.Empty ) )
             {
@@ -82,6 +83,10 @@ namespace TheLongRun.Common.Orchestration
             if (! string.IsNullOrWhiteSpace(instanceName) )
             {
                 _commandName = instanceName;
+            }
+            if (null != calledBy )
+            {
+                base.CalledBy = calledBy;
             }
         }
 
