@@ -1,9 +1,12 @@
-﻿using Microsoft.Azure.WebJobs.Host.Config;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Azure.WebJobs.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 using TheLongRun.Common.Orchestration.Attributes;
 
 namespace TheLongRun.Common.Orchestration.Bindings
@@ -68,8 +71,10 @@ namespace TheLongRun.Common.Orchestration.Bindings
 
             projectionRule.BindToInput<EventStreamBackedProjectionOrchestrator>(this.GetProjectionOrchestration);
 
+            // TODO: IAsyncCollector code to pass on the called orchestrators through...(somehow)
+            //projectionRule.BindToCollector<>
 
-            // TODO: IAsyncCollector code to 
+
 
         }
 
@@ -114,6 +119,30 @@ namespace TheLongRun.Common.Orchestration.Bindings
         {
             return input?.ToObject<StartCommandOrchestrationArgs>();
         }
+
+        public class CommandOrchestrationClientAsyncCollector
+            : IAsyncCollector<StartCommandOrchestrationArgs>
+        {
+            public Task AddAsync(StartCommandOrchestrationArgs args,
+                CancellationToken cancellationToken = default(CancellationToken))
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Task.CompletedTask;
+                }
+
+                // TODO : Run the appropriate command from args. values
+
+
+                throw new NotImplementedException();
+            }
+
+
+            public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.CompletedTask;
+            }
+        }
         #endregion
 
         #region Query
@@ -154,6 +183,30 @@ namespace TheLongRun.Common.Orchestration.Bindings
             return input?.ToObject<StartQueryOrchestrationArgs>();
         }
 
+
+        public class QueryOrchestrationClientAsyncCollector
+            : IAsyncCollector<StartQueryOrchestrationArgs>
+        {
+            public Task AddAsync(StartQueryOrchestrationArgs args,
+                CancellationToken cancellationToken = default(CancellationToken))
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Task.CompletedTask;
+                }
+
+                // TODO : Run the appropriate query from args. values
+
+
+                throw new NotImplementedException();
+            }
+
+
+            public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.CompletedTask;
+            }
+        }
         #endregion
 
         #region Identifier Group
@@ -192,6 +245,30 @@ namespace TheLongRun.Common.Orchestration.Bindings
         protected internal virtual StartIdentifierGroupOrchestrationArgs JObjectToStartIdentifierGroupArgs(JObject input)
         {
             return input?.ToObject<StartIdentifierGroupOrchestrationArgs>();
+        }
+
+        public class IdentifierGroupOrchestrationClientAsyncCollector
+            : IAsyncCollector<StartIdentifierGroupOrchestrationArgs>
+        {
+            public Task AddAsync(StartIdentifierGroupOrchestrationArgs args,
+                CancellationToken cancellationToken = default(CancellationToken))
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Task.CompletedTask;
+                }
+
+                // TODO : Run the appropriate identifier group from args. values
+
+
+                throw new NotImplementedException();
+            }
+
+
+            public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.CompletedTask;
+            }
         }
         #endregion
 
@@ -232,6 +309,30 @@ namespace TheLongRun.Common.Orchestration.Bindings
         {
             return input?.ToObject<StartClassifierOrchestrationArgs>();
         }
+
+        public class ClassifierOrchestrationClientAsyncCollector
+           : IAsyncCollector<StartClassifierOrchestrationArgs>
+        {
+            public Task AddAsync(StartClassifierOrchestrationArgs args,
+                CancellationToken cancellationToken = default(CancellationToken))
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Task.CompletedTask;
+                }
+
+                // TODO : Run the appropriate classifier from args. values
+
+
+                throw new NotImplementedException();
+            }
+
+
+            public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.CompletedTask;
+            }
+        }
         #endregion
 
         #region Projection
@@ -271,6 +372,30 @@ namespace TheLongRun.Common.Orchestration.Bindings
         protected internal virtual StartProjectionOrchestrationArgs JObjectToStartProjectionArgs(JObject input)
         {
             return input?.ToObject<StartProjectionOrchestrationArgs>();
+        }
+
+        public class ProjectionOrchestrationClientAsyncCollector
+            : IAsyncCollector<StartProjectionOrchestrationArgs>
+        {
+            public Task AddAsync(StartProjectionOrchestrationArgs args, 
+                CancellationToken cancellationToken = default(CancellationToken))
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Task.CompletedTask;
+                }
+
+                // TODO : Run the appropriate projection from args. values
+
+
+                throw new NotImplementedException();
+            }
+
+
+            public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+            {
+                return Task.CompletedTask;
+            }
         }
         #endregion
     }
