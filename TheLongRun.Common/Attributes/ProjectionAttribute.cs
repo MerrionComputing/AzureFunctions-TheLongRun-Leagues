@@ -26,6 +26,7 @@ namespace TheLongRun.Common.Attributes
         /// The domain name the aggregate instance belongs to
         /// </summary>
         private readonly string _domainName;
+        [AutoResolve]
         public string DomainName
         {
             get
@@ -81,5 +82,7 @@ namespace TheLongRun.Common.Attributes
             _aggregateInstanceKey = aggregateInstanceKey;
             _projectionTypeName = projectionTypeName;
         }
+
+
     }
 }

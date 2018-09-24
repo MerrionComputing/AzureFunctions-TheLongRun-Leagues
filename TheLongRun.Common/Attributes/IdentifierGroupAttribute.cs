@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Description;
+﻿using Microsoft.Azure.WebJobs.Description;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +7,17 @@ using System.Threading.Tasks;
 
 namespace TheLongRun.Common.Attributes
 {
+
     /// <summary>
     /// An attribute to mark a classifier to use for reading identity group membership from
     /// </summary>
     /// <remarks>
-    /// This is not a trigger - we decide on a case by case basis what triggers a classifier
-    /// and the same classifier may have different invocations
+    /// This is not a trigger 
     /// </remarks>
     [AttributeUsage(AttributeTargets.Parameter)]
     [Binding]
-    public class ClassifierAttribute
-        : Attribute,
-        CQRSAzure.EventSourcing.IEventStreamUntypedIdentity
+    public class IdentifierGroupAttribute 
+        : Attribute
     {
 
         /// <summary>
@@ -48,39 +46,24 @@ namespace TheLongRun.Common.Attributes
         }
 
         /// <summary>
-        /// The unique identifier of the specific instance of the aggregate
+        /// The specific identifier group type to get the membership for
         /// </summary>
-        private readonly string _aggregateInstanceKey;
-        [AutoResolve]
-        public string InstanceKey
+        private readonly string _identifierGroupName;
+        public string IdentifierGroupName
         {
             get
             {
-                return _aggregateInstanceKey;
+                return _identifierGroupName;
             }
         }
 
-        /// <summary>
-        /// The specific classifier type to execute
-        /// </summary>
-        private readonly string _classifierTypeName;
-        public string ClassifierTypeName
-        {
-            get
-            {
-                return _classifierTypeName;
-            }
-        }
-
-        public ClassifierAttribute(string domainName,
+        public IdentifierGroupAttribute(string domainName,
                                 string aggregateTypeName,
-                                string aggregateInstanceKey,
-                                string classifierTypeName)
+                                string identifierGroupName)
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
-            _aggregateInstanceKey = aggregateInstanceKey;
-            _classifierTypeName = classifierTypeName;
+            _identifierGroupName = identifierGroupName;
         }
     }
 }

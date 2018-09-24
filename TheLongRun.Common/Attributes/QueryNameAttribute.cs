@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Azure.WebJobs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,24 @@ namespace TheLongRun.Common.Attributes
         public QueryNameAttribute(string name)
         {
             _queryName = name;
+        }
+
+        /// <summary>
+        /// Convert this to the default function name to use for a query
+        /// </summary>
+        /// <returns>
+        /// This is to allow a more easy to read set of function names in the attribute/code
+        /// </returns>
+        public FunctionNameAttribute GetDefaultFunctionName()
+        {
+            if (_queryName.EndsWith("_Query"))
+            {
+                return new FunctionNameAttribute(_queryName );
+            }
+            else
+            {
+                return new FunctionNameAttribute(_queryName  + @"_Query");
+            }
         }
 
     }

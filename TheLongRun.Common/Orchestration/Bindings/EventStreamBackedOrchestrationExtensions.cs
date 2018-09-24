@@ -36,18 +36,17 @@ namespace TheLongRun.Common.Orchestration.Bindings
             // [Command]
             var commandRule = context.AddBindingRule<EventStreamBackedCommandOrchestrationTriggerAttribute>()
                 .AddConverter<string, StartCommandOrchestrationArgs>(this.StringToStartCommandArgs)
-                .AddConverter<JObject, StartCommandOrchestrationArgs>(this.JObjectToStartCommandArgs); 
+                .AddConverter<JObject, StartCommandOrchestrationArgs>(this.JObjectToStartCommandArgs);
 
+            commandRule.BindToCollector<StartCommandOrchestrationArgs>(this.CreateCommandAsyncCollector);
             commandRule.BindToInput<EventStreamBackedCommandOrchestrator>(this.GetCommandOrchestration);
-
-            // (2) Orchestrations that can bind to outputs by IAsyncCollector
-            //commandRule.BindToCollector<ITableEntity>(builder);
 
             // [Query]
             var queryRule = context.AddBindingRule<EventStreamBackedQueryOrchestrationTriggerAttribute>()
                 .AddConverter<string, StartQueryOrchestrationArgs>(this.StringToStartQueryArgs)
-                .AddConverter<JObject, StartQueryOrchestrationArgs>(this.JObjectToStartQueryArgs); 
+                .AddConverter<JObject, StartQueryOrchestrationArgs>(this.JObjectToStartQueryArgs);
 
+            queryRule.BindToCollector<StartQueryOrchestrationArgs>(this.CreateQueryAsyncCollector);
             queryRule.BindToInput<EventStreamBackedQueryOrchestrator>(this.GetQueryOrchestration);
 
             // [Idetifier Group]
@@ -55,6 +54,7 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 .AddConverter<string, StartIdentifierGroupOrchestrationArgs>(this.StringToStartIdentifierGroupArgs)
                 .AddConverter<JObject, StartIdentifierGroupOrchestrationArgs>(this.JObjectToStartIdentifierGroupArgs);
 
+            identifierGroupRule.BindToCollector<StartIdentifierGroupOrchestrationArgs>(this.CreateIdentifierGroupAsyncCollector);
             identifierGroupRule.BindToInput<EventStreamBackedIdentifierGroupOrchestrator>(this.GetGroupOrchestration);
 
             // [Classifier]
@@ -62,6 +62,7 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 .AddConverter<string, StartClassifierOrchestrationArgs>(this.StringToStartClassifierArgs)
                 .AddConverter<JObject, StartClassifierOrchestrationArgs>(this.JObjectToStartClassifierArgs);
 
+            classifierRule.BindToCollector<StartClassifierOrchestrationArgs>(this.CreateClassifierAsyncCollector);
             classifierRule.BindToInput<EventStreamBackedClassifierOrchestrator>(this.GetClassifierOrchestration);
 
             // [Projection]
@@ -69,12 +70,8 @@ namespace TheLongRun.Common.Orchestration.Bindings
                 .AddConverter<string, StartProjectionOrchestrationArgs>(this.StringToStartProjectionArgs)
                 .AddConverter<JObject, StartProjectionOrchestrationArgs>(this.JObjectToStartProjectionArgs);
 
+            projectionRule.BindToCollector<StartProjectionOrchestrationArgs>(this.CreateProjectionAsyncCollector);
             projectionRule.BindToInput<EventStreamBackedProjectionOrchestrator>(this.GetProjectionOrchestration);
-
-            // TODO: IAsyncCollector code to pass on the called orchestrators through...(somehow)
-            //projectionRule.BindToCollector<>
-
-
 
         }
 
@@ -120,6 +117,12 @@ namespace TheLongRun.Common.Orchestration.Bindings
             return input?.ToObject<StartCommandOrchestrationArgs>();
         }
 
+        protected internal virtual IAsyncCollector<StartCommandOrchestrationArgs> CreateCommandAsyncCollector(EventStreamBackedCommandOrchestrationTriggerAttribute triggerAttribute)
+        {
+            // TODO: Load any system configuration settings... 
+            return new CommandOrchestrationClientAsyncCollector(triggerAttribute );
+        }
+
         public class CommandOrchestrationClientAsyncCollector
             : IAsyncCollector<StartCommandOrchestrationArgs>
         {
@@ -141,6 +144,11 @@ namespace TheLongRun.Common.Orchestration.Bindings
             public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
             {
                 return Task.CompletedTask;
+            }
+
+            public CommandOrchestrationClientAsyncCollector(EventStreamBackedCommandOrchestrationTriggerAttribute triggerAttribute)
+            {
+                // TODO: Set up according to the properties of the trigger attribute
             }
         }
         #endregion
@@ -183,6 +191,11 @@ namespace TheLongRun.Common.Orchestration.Bindings
             return input?.ToObject<StartQueryOrchestrationArgs>();
         }
 
+        protected internal virtual IAsyncCollector<StartQueryOrchestrationArgs> CreateQueryAsyncCollector(EventStreamBackedQueryOrchestrationTriggerAttribute triggerAttribute)
+        {
+            // TODO: Load any system configuration settings... 
+            return new QueryOrchestrationClientAsyncCollector( triggerAttribute);
+        }
 
         public class QueryOrchestrationClientAsyncCollector
             : IAsyncCollector<StartQueryOrchestrationArgs>
@@ -205,6 +218,11 @@ namespace TheLongRun.Common.Orchestration.Bindings
             public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
             {
                 return Task.CompletedTask;
+            }
+
+            public QueryOrchestrationClientAsyncCollector(EventStreamBackedQueryOrchestrationTriggerAttribute triggerAttribute)
+            {
+                // TODO - Set the collector up per the trigger attribute properties
             }
         }
         #endregion
@@ -247,6 +265,13 @@ namespace TheLongRun.Common.Orchestration.Bindings
             return input?.ToObject<StartIdentifierGroupOrchestrationArgs>();
         }
 
+        protected internal virtual IAsyncCollector<StartIdentifierGroupOrchestrationArgs> CreateIdentifierGroupAsyncCollector(EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute triggerAttribute)
+        {
+            // TODO: Load any system configuration settings... 
+            return new IdentifierGroupOrchestrationClientAsyncCollector(triggerAttribute );
+        }
+
+
         public class IdentifierGroupOrchestrationClientAsyncCollector
             : IAsyncCollector<StartIdentifierGroupOrchestrationArgs>
         {
@@ -268,6 +293,11 @@ namespace TheLongRun.Common.Orchestration.Bindings
             public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
             {
                 return Task.CompletedTask;
+            }
+
+            public IdentifierGroupOrchestrationClientAsyncCollector(EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute triggerAttribute)
+            {
+                // TODO : Set the collector up according to the parameters passed in to the constructor
             }
         }
         #endregion
@@ -310,6 +340,12 @@ namespace TheLongRun.Common.Orchestration.Bindings
             return input?.ToObject<StartClassifierOrchestrationArgs>();
         }
 
+        protected internal virtual IAsyncCollector<StartClassifierOrchestrationArgs> CreateClassifierAsyncCollector(EventStreamBackedClassifierOrchestrationTriggerAttribute triggerAttribute)
+        {
+            // TODO: Load any system configuration settings... 
+            return new ClassifierOrchestrationClientAsyncCollector(triggerAttribute );
+        }
+
         public class ClassifierOrchestrationClientAsyncCollector
            : IAsyncCollector<StartClassifierOrchestrationArgs>
         {
@@ -331,6 +367,11 @@ namespace TheLongRun.Common.Orchestration.Bindings
             public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
             {
                 return Task.CompletedTask;
+            }
+
+            public ClassifierOrchestrationClientAsyncCollector(EventStreamBackedClassifierOrchestrationTriggerAttribute triggerAttribute)
+            {
+                // TODO : Set up the collector according to the parameters of the trigger attribute
             }
         }
         #endregion
@@ -374,6 +415,12 @@ namespace TheLongRun.Common.Orchestration.Bindings
             return input?.ToObject<StartProjectionOrchestrationArgs>();
         }
 
+        protected internal virtual IAsyncCollector<StartProjectionOrchestrationArgs> CreateProjectionAsyncCollector(EventStreamBackedProjectionOrchestrationTriggerAttribute triggerAttribute)
+        {
+            // TODO: Load any system configuration settings... 
+            return new ProjectionOrchestrationClientAsyncCollector(triggerAttribute);
+        }
+
         public class ProjectionOrchestrationClientAsyncCollector
             : IAsyncCollector<StartProjectionOrchestrationArgs>
         {
@@ -395,6 +442,12 @@ namespace TheLongRun.Common.Orchestration.Bindings
             public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
             {
                 return Task.CompletedTask;
+            }
+
+            public ProjectionOrchestrationClientAsyncCollector(EventStreamBackedProjectionOrchestrationTriggerAttribute triggerAttribute)
+            {
+                // Use the properties of the trigger attribute to initialise the collector...
+
             }
         }
         #endregion

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Azure.WebJobs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,8 +34,26 @@ namespace TheLongRun.Common.Attributes
 
         public CommandNameAttribute(string name)
         {
-            _commandName = name;
+            _commandName = name.Trim();
         }
 
+
+        /// <summary>
+        /// Convert this to the default function name to use for a command
+        /// </summary>
+        /// <returns>
+        /// This is to allow a more easy to read set of function names in the attribute/code
+        /// </returns>
+        public FunctionNameAttribute GetDefaultFunctionName()
+        {
+            if (_commandName.EndsWith("_Command"))
+            {
+                return new FunctionNameAttribute(_commandName)
+;            }
+            else
+            {
+                return new FunctionNameAttribute(_commandName + @"_Command");
+            }
+        }
     }
 }

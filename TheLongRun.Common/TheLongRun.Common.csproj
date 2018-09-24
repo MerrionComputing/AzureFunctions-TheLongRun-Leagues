@@ -70,6 +70,7 @@
     <Compile Include="Attributes\DomainNameAttribute.cs" />
     <Compile Include="Attributes\EventStreamAttribute.cs" />
     <Compile Include="Attributes\EventTopicSourceNameAttribute.cs" />
+    <Compile Include="Attributes\IdentifierGroupAttribute.cs" />
     <Compile Include="Attributes\ProjectionAttribute.cs" />
     <Compile Include="Attributes\QueryNameAttribute.cs" />
     <Compile Include="AzureFunctionsResolveAssembly.cs" />
