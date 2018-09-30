@@ -53,4 +53,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Classsifiers\" />
+  </ItemGroup>
 </Project>

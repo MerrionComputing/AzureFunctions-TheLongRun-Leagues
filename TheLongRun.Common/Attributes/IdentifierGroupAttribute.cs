@@ -10,7 +10,7 @@ namespace TheLongRun.Common.Attributes
 {
 
     /// <summary>
-    /// An attribute to mark a classifier to use for reading identity group membership from
+    /// An attribute to mark the identifier group being used
     /// </summary>
     /// <remarks>
     /// This is not a trigger 
@@ -86,23 +86,5 @@ namespace TheLongRun.Common.Attributes
             }
         }
 
-
-        /// <summary>
-        /// Convert this to the default function name to use for an identifier group
-        /// </summary>
-        /// <returns>
-        /// This is to allow a more easy to read set of function names in the attribute/code
-        /// </returns>
-        public FunctionNameAttribute GetDefaultFunctionName()
-        {
-            if (IdentifierGroupFunctionName.EndsWith("-IdentifierGroup"))
-            {
-                return new FunctionNameAttribute(IdentifierGroupFunctionName);
-            }
-            else
-            {
-                return new FunctionNameAttribute(IdentifierGroupFunctionName + @"-IdentifierGroup");
-            }
-        }
     }
 }

@@ -66,12 +66,15 @@
     <Compile Include="Attributes\AggregateRootAttribute.cs" />
     <Compile Include="Attributes\ApplicationNameAttribute.cs" />
     <Compile Include="Attributes\ClassifierAttribute.cs" />
+    <Compile Include="Attributes\ClassifierNameAttribute.cs" />
     <Compile Include="Attributes\CommandNameAttribute.cs" />
     <Compile Include="Attributes\DomainNameAttribute.cs" />
     <Compile Include="Attributes\EventStreamAttribute.cs" />
     <Compile Include="Attributes\EventTopicSourceNameAttribute.cs" />
     <Compile Include="Attributes\IdentifierGroupAttribute.cs" />
+    <Compile Include="Attributes\IdentifierGroupNameAttribute.cs" />
     <Compile Include="Attributes\ProjectionAttribute.cs" />
+    <Compile Include="Attributes\ProjectionNameAttribute.cs" />
     <Compile Include="Attributes\QueryNameAttribute.cs" />
     <Compile Include="AzureFunctionsResolveAssembly.cs" />
     <Compile Include="Bindings\Classifier.cs" />

@@ -7,48 +7,46 @@ using System.Threading.Tasks;
 
 namespace TheLongRun.Common.Attributes
 {
-
     /// <summary>
-    /// The command name connected to a given handler function
+    /// The classifiewr name connected to a given classifier implementation function
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class
         , AllowMultiple = false, Inherited = false)]
-    public sealed class CommandNameAttribute:
-        Attribute 
+    public sealed class ClassifierNameAttribute
+        : Attribute 
     {
-
-        private readonly string _commandName;
+        private readonly string _classifierName;
 
         public string Name
         {
             get
             {
-                return _commandName;
+                return _classifierName;
             }
         }
 
 
-        public CommandNameAttribute(string name)
+        public ClassifierNameAttribute(string name)
         {
-            _commandName = name.Trim();
+            _classifierName = name.Trim();
         }
 
 
         /// <summary>
-        /// Convert this to the default function name to use for a command
+        /// Convert this to the default function name to use for a classifier
         /// </summary>
         /// <returns>
         /// This is to allow a more easy to read set of function names in the attribute/code
         /// </returns>
         public FunctionNameAttribute GetDefaultFunctionName()
         {
-            if (_commandName.EndsWith("-Command"))
+            if (Name.EndsWith("-Classifier"))
             {
-                return new FunctionNameAttribute(_commandName)
-;            }
+                return new FunctionNameAttribute(Name);
+            }
             else
             {
-                return new FunctionNameAttribute(_commandName + @"-Command");
+                return new FunctionNameAttribute(Name + @"-Classifier");
             }
         }
     }

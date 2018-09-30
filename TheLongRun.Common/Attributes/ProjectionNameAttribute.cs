@@ -9,47 +9,49 @@ namespace TheLongRun.Common.Attributes
 {
 
     /// <summary>
-    /// The command name connected to a given handler function
+    /// The projection name connected to a given projection implementation function
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class
         , AllowMultiple = false, Inherited = false)]
-    public sealed class CommandNameAttribute:
-        Attribute 
+    public sealed class ProjectionNameAttribute
+        : Attribute 
     {
 
-        private readonly string _commandName;
+        private readonly string _projectionName;
 
         public string Name
         {
             get
             {
-                return _commandName;
+                return _projectionName;
             }
         }
 
 
-        public CommandNameAttribute(string name)
+        public ProjectionNameAttribute(string name)
         {
-            _commandName = name.Trim();
+            _projectionName = name.Trim();
         }
 
 
         /// <summary>
-        /// Convert this to the default function name to use for a command
+        /// Convert this to the default function name to use for a projection
         /// </summary>
         /// <returns>
         /// This is to allow a more easy to read set of function names in the attribute/code
         /// </returns>
         public FunctionNameAttribute GetDefaultFunctionName()
         {
-            if (_commandName.EndsWith("-Command"))
+            if (_projectionName.EndsWith("-Projection"))
             {
-                return new FunctionNameAttribute(_commandName)
-;            }
+                return new FunctionNameAttribute(_projectionName)
+;
+            }
             else
             {
-                return new FunctionNameAttribute(_commandName + @"-Command");
+                return new FunctionNameAttribute(_projectionName + @"-Projection");
             }
         }
+
     }
 }

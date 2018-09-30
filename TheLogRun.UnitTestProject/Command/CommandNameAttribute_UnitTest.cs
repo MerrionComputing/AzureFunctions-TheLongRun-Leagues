@@ -2,29 +2,30 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TheLongRun.Common.Attributes;
 
-namespace TheLogRun.UnitTestProject.Query
+namespace TheLogRun.UnitTestProject.Command
 {
     [TestClass]
-    public class QueryNameAttribute_UnitTest
+    public class CommandNameAttribute_UnitTest
     {
+
         [TestMethod]
         public void Constructor_TestMethod()
         {
 
-            QueryNameAttribute attrTest = new QueryNameAttribute(@"Get-Cattle");
-            Assert.IsNotNull(attrTest);  
+            CommandNameAttribute attrTest = new CommandNameAttribute(@"Sell-Cow");
+            Assert.IsNotNull(attrTest);
 
         }
 
         [TestMethod]
         public void Name_Modified_TestMethod()
         {
-            string expected = @"Get-Cattle-Query";
-            string actual = @"Get-Cattle";
+            string expected = @"Sell-Cow-Command";
+            string actual = @"Sell-Cow";
 
-            QueryNameAttribute attrTest = new QueryNameAttribute(actual );
+            CommandNameAttribute attrTest = new CommandNameAttribute(actual);
 
-            actual = attrTest.GetDefaultFunctionName().Name ;
+            actual = attrTest.GetDefaultFunctionName().Name;
             Assert.AreEqual(expected, actual);
 
         }
@@ -32,10 +33,10 @@ namespace TheLogRun.UnitTestProject.Query
         [TestMethod]
         public void Name_NotModified_TestMethod()
         {
-            string expected = @"Get-Cattle-Query";
+            string expected = @"Sell-Cow-Command";
             string actual = @"Not set";
 
-            QueryNameAttribute attrTest = new QueryNameAttribute(expected );
+            CommandNameAttribute attrTest = new CommandNameAttribute(expected);
 
             actual = attrTest.GetDefaultFunctionName().Name;
             Assert.AreEqual(expected, actual);

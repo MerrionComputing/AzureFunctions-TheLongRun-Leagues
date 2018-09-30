@@ -7,48 +7,47 @@ using System.Threading.Tasks;
 
 namespace TheLongRun.Common.Attributes
 {
-
     /// <summary>
-    /// The command name connected to a given handler function
+    /// The identifier group name connected to a given identifier group implementation function
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class
         , AllowMultiple = false, Inherited = false)]
-    public sealed class CommandNameAttribute:
-        Attribute 
+    public sealed  class IdentifierGroupNameAttribute
+        : Attribute 
     {
 
-        private readonly string _commandName;
+        private readonly string _identifierGroupName;
 
         public string Name
         {
             get
             {
-                return _commandName;
+                return _identifierGroupName;
             }
         }
 
 
-        public CommandNameAttribute(string name)
+        public IdentifierGroupNameAttribute(string name)
         {
-            _commandName = name.Trim();
+            _identifierGroupName = name.Trim();
         }
 
 
         /// <summary>
-        /// Convert this to the default function name to use for a command
+        /// Convert this to the default function name to use for an identifier group
         /// </summary>
         /// <returns>
         /// This is to allow a more easy to read set of function names in the attribute/code
         /// </returns>
         public FunctionNameAttribute GetDefaultFunctionName()
         {
-            if (_commandName.EndsWith("-Command"))
+            if (Name.EndsWith("-IdentifierGroup"))
             {
-                return new FunctionNameAttribute(_commandName)
-;            }
+                return new FunctionNameAttribute(Name);
+            }
             else
             {
-                return new FunctionNameAttribute(_commandName + @"-Command");
+                return new FunctionNameAttribute(Name + @"-IdentifierGroup");
             }
         }
     }
