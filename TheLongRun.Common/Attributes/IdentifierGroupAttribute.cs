@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.WebJobs.Description;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Description;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,13 +58,51 @@ namespace TheLongRun.Common.Attributes
             }
         }
 
+        private readonly string _identifierGroupFunctionName;
+        public string IdentifierGroupFunctionName
+        {
+            get
+            {
+                return _identifierGroupFunctionName;
+            }
+
+        }
+
         public IdentifierGroupAttribute(string domainName,
                                 string aggregateTypeName,
-                                string identifierGroupName)
+                                string identifierGroupName,
+                                string identifierGroupFunctionName = "")
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
             _identifierGroupName = identifierGroupName;
+            if (string.IsNullOrWhiteSpace(identifierGroupFunctionName ) )
+            {
+                _identifierGroupFunctionName = identifierGroupName;
+            }
+            else
+            {
+                _identifierGroupFunctionName = identifierGroupFunctionName;
+            }
+        }
+
+
+        /// <summary>
+        /// Convert this to the default function name to use for an identifier group
+        /// </summary>
+        /// <returns>
+        /// This is to allow a more easy to read set of function names in the attribute/code
+        /// </returns>
+        public FunctionNameAttribute GetDefaultFunctionName()
+        {
+            if (IdentifierGroupFunctionName.EndsWith("-IdentifierGroup"))
+            {
+                return new FunctionNameAttribute(IdentifierGroupFunctionName);
+            }
+            else
+            {
+                return new FunctionNameAttribute(IdentifierGroupFunctionName + @"-IdentifierGroup");
+            }
         }
     }
 }

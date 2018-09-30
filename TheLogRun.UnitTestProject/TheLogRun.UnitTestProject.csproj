@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="Orchestration\OrchestrationCallbackIdentity_UnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\QueryNameAttribute_UnitTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -116,7 +117,6 @@
     <Folder Include="Command\" />
     <Folder Include="Identifier Group\" />
     <Folder Include="Projection\" />
-    <Folder Include="Query\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Orchestration\Orchestration.UnitTest.ReadMe.txt" />

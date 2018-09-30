@@ -72,15 +72,52 @@ namespace TheLongRun.Common.Attributes
             }
         }
 
+        private readonly string _classifierFunctionName;
+        public string ClassifierFunctionName
+        {
+            get
+            {
+                return _classifierFunctionName;
+            }
+        }
+
         public ClassifierAttribute(string domainName,
                                 string aggregateTypeName,
                                 string aggregateInstanceKey,
-                                string classifierTypeName)
+                                string classifierTypeName,
+                                string classifierFunctionName = "")
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
             _aggregateInstanceKey = aggregateInstanceKey;
             _classifierTypeName = classifierTypeName;
+            if (string.IsNullOrWhiteSpace( classifierFunctionName ))
+            {
+                // TODO: Make a function name from the projection type name
+                _classifierFunctionName = classifierFunctionName;
+            }
+            else
+            {
+                _classifierFunctionName = classifierFunctionName;
+            }
+        }
+
+        /// <summary>
+        /// Convert this to the default function name to use for a classifier
+        /// </summary>
+        /// <returns>
+        /// This is to allow a more easy to read set of function names in the attribute/code
+        /// </returns>
+        public FunctionNameAttribute GetDefaultFunctionName()
+        {
+            if (ClassifierFunctionName.EndsWith("-Classifier"))
+            {
+                return new FunctionNameAttribute(ClassifierFunctionName);
+            }
+            else
+            {
+                return new FunctionNameAttribute(ClassifierFunctionName + @"-Classifier");
+            }
         }
     }
 }

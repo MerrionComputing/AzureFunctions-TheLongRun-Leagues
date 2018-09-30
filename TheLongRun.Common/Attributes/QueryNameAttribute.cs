@@ -44,13 +44,13 @@ namespace TheLongRun.Common.Attributes
         /// </returns>
         public FunctionNameAttribute GetDefaultFunctionName()
         {
-            if (_queryName.EndsWith("_Query"))
+            if (_queryName.EndsWith("-Query"))
             {
                 return new FunctionNameAttribute(_queryName );
             }
             else
             {
-                return new FunctionNameAttribute(_queryName  + @"_Query");
+                return new FunctionNameAttribute(_queryName  + @"-Query");
             }
         }
 

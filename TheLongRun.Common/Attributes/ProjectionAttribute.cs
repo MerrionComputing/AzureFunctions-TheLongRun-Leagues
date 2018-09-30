@@ -72,17 +72,56 @@ namespace TheLongRun.Common.Attributes
             }
         }
 
+        /// <summary>
+        /// The name of the Azure serverless function that can perform this projection
+        /// </summary>
+        private readonly string _projectionFunctionName;
+        public string ProjectionFunctionName
+        {
+            get
+            {
+                return _projectionFunctionName;
+            }
+        }
+
         public ProjectionAttribute(string domainName,
                                 string aggregateTypeName,
                                 string aggregateInstanceKey,
-                                string projectionTypeName)
+                                string projectionTypeName,
+                                string projectionFunctionName = "")
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
             _aggregateInstanceKey = aggregateInstanceKey;
             _projectionTypeName = projectionTypeName;
+            if (string.IsNullOrWhiteSpace(projectionFunctionName ) )
+            {
+                // TODO: Make a function name from the projection type name
+                _projectionFunctionName = ProjectionTypeName;
+            }
+            else
+            {
+                _projectionFunctionName = projectionFunctionName;
+            }
         }
 
 
+        /// <summary>
+        /// Convert this to the default function name to use for a query
+        /// </summary>
+        /// <returns>
+        /// This is to allow a more easy to read set of function names in the attribute/code
+        /// </returns>
+        public FunctionNameAttribute GetDefaultFunctionName()
+        {
+            if (ProjectionFunctionName.EndsWith("-Projection"))
+            {
+                return new FunctionNameAttribute(ProjectionFunctionName);
+            }
+            else
+            {
+                return new FunctionNameAttribute(ProjectionFunctionName + @"-Projection");
+            }
+        }
     }
 }

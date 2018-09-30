@@ -46,13 +46,13 @@ namespace TheLongRun.Common.Attributes
         /// </returns>
         public FunctionNameAttribute GetDefaultFunctionName()
         {
-            if (_commandName.EndsWith("_Command"))
+            if (_commandName.EndsWith("-Command"))
             {
                 return new FunctionNameAttribute(_commandName)
 ;            }
             else
             {
-                return new FunctionNameAttribute(_commandName + @"_Command");
+                return new FunctionNameAttribute(_commandName + @"-Command");
             }
         }
     }
