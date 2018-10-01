@@ -9,4 +9,4 @@ The command an dquery handlers are implemented in a modified (bastardaised) vers
 
 Each orchestration is itself backed by an event stream so that it can be diagnosed and the state can be recreated as at any given point in time.
 
-![Overview of CQRS](../Images/eventsourcing_use_with_cqrs.png)
+![Overview of CQRS](Images/eventsourcing_use_with_cqrs.png)
