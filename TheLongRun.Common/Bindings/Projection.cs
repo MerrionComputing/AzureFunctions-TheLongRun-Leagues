@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TheLongRun.Common.Attributes;
 
 using CQRSAzure.EventSourcing;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRun.Common.Bindings
 {
@@ -71,6 +72,22 @@ namespace TheLongRun.Common.Bindings
             {
                 _projectionProcessor.Process(projectionToProcess);
             }
+        }
+
+        /// <summary>
+        /// Process the projection asynchronously and return the end state of the projection
+        /// </summary>
+        /// <param name="projectionToProcess">
+        /// The projection to run
+        /// </param>
+        /// <returns>
+        /// The sequence number up until which the projection was run
+        /// </returns>
+        public async Task<IProjectionResponse> ProcessAsync(IProjectionUntyped projectionToProcess,
+            OrchestrationCallbackIdentity responseSource = null)
+        {
+            await Task.Run(()=>  Process(projectionToProcess));
+            return ProjectionResponse.Create(projectionToProcess, responseSource ); 
         }
 
         public Projection (string domainName,

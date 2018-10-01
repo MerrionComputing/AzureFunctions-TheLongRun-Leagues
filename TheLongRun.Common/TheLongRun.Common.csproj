@@ -156,6 +156,7 @@
     <Compile Include="Orchestration\IQueryRunner.cs" />
     <Compile Include="Orchestration\OrchestrationCallbackIdentity.cs" />
     <Compile Include="Orchestration\OrchestrationCalloutIdentity.cs" />
+    <Compile Include="Orchestration\ProjectionResponse.cs" />
     <Compile Include="Orchestration\StartClassifierOrchestrationArgs.cs" />
     <Compile Include="Orchestration\StartCommandOrchestrationArgs.cs" />
     <Compile Include="Orchestration\StartIdentifierGroupOrchestrationArgs.cs" />
