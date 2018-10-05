@@ -1,4 +1,5 @@
 ﻿using CQRSAzure.EventSourcing;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,5 +68,29 @@ namespace TheLongRun.Common.Orchestration
                 (int)projectionRun.CurrentSequenceNumber,
                 responseSource);
         }
+
+
+        public static JArray GetValuesAsArray<TRecordType>(IEnumerable<ProjectionSnapshotProperty> propertyValues)
+        {
+            if (null == propertyValues)
+            {
+                // No values returned for the projection
+                return null;
+            }
+            else
+            {
+                JArray ret = new JArray();
+                // Group by ProjectionSnapshotProperty.RowNumber
+                var propertyObjectsQuery = propertyValues.OrderBy(record => record.RowNumber )
+                    .GroupBy(record => record.RowNumber)
+                    .ToArray();
+
+                // hmm...
+
+                return ret;
+            }
+        }
     }
+
+    
 }
