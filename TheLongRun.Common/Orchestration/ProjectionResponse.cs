@@ -39,8 +39,18 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        private   ProjectionResponse(DateTime? responseAsOfDate,
+        private readonly JArray _values;
+        public JArray Values
+        {
+            get
+            {
+                return _values;
+            }
+        }
+
+        private ProjectionResponse(DateTime? responseAsOfDate,
             int asOfSequence,
+            JArray projectionValues,
             OrchestrationCallbackIdentity responseSource = null)
         {
             if (responseAsOfDate.HasValue  )
@@ -52,6 +62,10 @@ namespace TheLongRun.Common.Orchestration
                 _asOfDate = DateTime.UtcNow;
             }
             _asOfSequenceNumber = asOfSequence;
+            if (null != projectionValues )
+            {
+                _values = projectionValues;
+            }
             if (null != responseSource )
             {
                 _responseSource = responseSource;
@@ -61,16 +75,14 @@ namespace TheLongRun.Common.Orchestration
         public static ProjectionResponse Create(IProjectionUntyped projectionRun,
             OrchestrationCallbackIdentity responseSource = null)
         {
-            // TODO - Package projectionRun.CurrentValues into a JSon object
-             
-
             return new ProjectionResponse(projectionRun.CurrentAsOfDate,
                 (int)projectionRun.CurrentSequenceNumber,
+                GetValuesAsArray(projectionRun.CurrentValues ),
                 responseSource);
         }
 
 
-        public static JArray GetValuesAsArray<TRecordType>(IEnumerable<ProjectionSnapshotProperty> propertyValues)
+        public static JArray GetValuesAsArray(IEnumerable<ProjectionSnapshotProperty> propertyValues)
         {
             if (null == propertyValues)
             {
@@ -82,10 +94,31 @@ namespace TheLongRun.Common.Orchestration
                 JArray ret = new JArray();
                 // Group by ProjectionSnapshotProperty.RowNumber
                 var propertyObjectsQuery = propertyValues.OrderBy(record => record.RowNumber )
-                    .GroupBy(record => record.RowNumber)
                     .ToArray();
 
-                // hmm...
+                int currentRow = 0;
+                JObject currentObject = new JObject();
+                // hmm...add the name/value pairs as tokens..
+                foreach (var item in propertyObjectsQuery)
+                { 
+                    if (item.RowNumber > currentRow )
+                    {
+                        ret.Add(currentObject);
+                        // new object
+                        currentObject = new JObject();
+                        currentRow = item.RowNumber;
+                    }
+                    else
+                    {
+                        // new property on existing object
+                        currentObject.Add(item.Name, JToken.FromObject(item.ValueAsObject));
+                    }
+                }
+                if (null != currentObject )
+                {
+                    ret.Add(currentObject);
+                }
+                
 
                 return ret;
             }

@@ -15,6 +15,9 @@ namespace TheLongRun.Common.Bindings
     /// </summary>
     public class Classifier
     {
+
+        private readonly CQRSAzure.IdentifierGroup.IClassifierProcessorUntyped  _classifierProcessor = null;
+
         /// <summary>
         /// The domain name the aggregate instance belongs to
         /// </summary>
@@ -72,6 +75,7 @@ namespace TheLongRun.Common.Bindings
             _aggregateTypeName = aggregateTypeName;
             _aggregateInstanceKey = aggregateInstanceKey;
             _classifierTypeName = classifierTypeName;
+
         }
 
         public Classifier(ClassifierAttribute attribute )
@@ -80,6 +84,7 @@ namespace TheLongRun.Common.Bindings
                   attribute.InstanceKey ,
                   attribute.ClassifierTypeName )
         {
+
         }
     }
 }

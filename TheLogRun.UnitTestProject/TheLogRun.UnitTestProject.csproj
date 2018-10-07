@@ -79,10 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classifier\ClassifierNameAttribute_UnitTest.cs" />
+    <Compile Include="Classifier\ClassifierRespons_UnitTest.cs" />
     <Compile Include="Command\CommandNameAttribute_UnitTest.cs" />
     <Compile Include="Identifier Group\IdentifierGroupNameAttribute_UnitTest.cs" />
     <Compile Include="Orchestration\OrchestrationCallbackIdentity_UnitTest.cs" />
     <Compile Include="Projection\ProjectionNameAttribute_UnitTest.cs" />
+    <Compile Include="Projection\ProjectionResponse_UnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\QueryNameAttribute_UnitTest.cs" />
   </ItemGroup>

@@ -138,6 +138,7 @@
     <Compile Include="Orchestration\Bindings\BindingHelper.cs" />
     <Compile Include="Orchestration\Bindings\EventStreamBackedClassifierOrchestratorTriggerBindingProvider.cs" />
     <Compile Include="Orchestration\Bindings\EventStreamBackedOrchestrationExtensions.cs" />
+    <Compile Include="Orchestration\ClassifierResponse.cs" />
     <Compile Include="Orchestration\EventStreamBackedClassifierOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedCommandOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedIdentifierGroupOrchestrator.cs" />

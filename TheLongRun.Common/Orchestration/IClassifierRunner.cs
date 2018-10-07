@@ -49,5 +49,10 @@ namespace TheLongRun.Common.Orchestration
         IAsOfSequenceOrchestrationResponse 
     {
 
+        /// <summary>
+        /// Is this included in the identifier group according the classification rule
+        /// </summary>
+        bool Included { get; }
+
     }
 }
