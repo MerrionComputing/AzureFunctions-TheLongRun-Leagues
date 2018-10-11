@@ -1,0 +1,6 @@
+﻿Projections
+===========
+
+A projection is a function is a function run over the event stream of an individual entity
+which turns the event history into a point in time state.
+

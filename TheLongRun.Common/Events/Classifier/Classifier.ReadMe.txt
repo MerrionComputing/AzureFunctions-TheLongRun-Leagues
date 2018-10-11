@@ -1,0 +1,9 @@
+﻿Classifiers
+===========
+
+A classifier is a very simplified form of projection that is used to decide if any given entity is inside or outside
+some business meaningful rule.  
+
+Classifiers form the basis of identifier groups as they are used to decide membership of the group as at a given point 
+in time.
+

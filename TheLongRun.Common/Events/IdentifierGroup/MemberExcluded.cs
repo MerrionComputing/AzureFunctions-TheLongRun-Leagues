@@ -13,7 +13,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup
     [Serializable()]
     [CQRSAzure.EventSourcing.DomainNameAttribute("Identifier Group")]
     [CQRSAzure.EventSourcing.Category("Group")]
-    public class MemberExcluded
+    public sealed class MemberExcluded
         : IEvent
     {
 

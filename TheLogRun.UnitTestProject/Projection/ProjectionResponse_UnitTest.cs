@@ -4,6 +4,7 @@ using CQRSAzure.EventSourcing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using TheLongRun.Common.Orchestration;
+using TheLogRun.UnitTestProject.Mocking;
 
 namespace TheLogRun.UnitTestProject.Projection
 {
@@ -13,14 +14,15 @@ namespace TheLogRun.UnitTestProject.Projection
         [TestMethod]
         public void Constructor_TestMethod()
         {
-            ProjectionResponse testObj = ProjectionResponse.Create(Mocking.GetProjectionUntyped());
-            Assert.IsNotNull(testObj); 
+            ProjectionResponse testObj = ProjectionResponse.Create(Mocking.Mocking.GetProjectionUntyped());
+            Assert.IsNotNull(testObj);
         }
+
 
         [TestMethod]
         public void GetValuesAsArray_NotNull_TestMethod()
         {
-            ProjectionResponse projResp = ProjectionResponse.Create(Mocking.GetProjectionUntyped());
+            ProjectionResponse projResp = ProjectionResponse.Create(Mocking.Mocking.GetProjectionUntyped());
             JArray testArray = projResp.Values;
 
             Assert.IsNotNull(testArray);
@@ -33,11 +35,11 @@ namespace TheLogRun.UnitTestProject.Projection
             decimal expected = 70.0M;
             decimal actual = -1.9M;
 
-            ProjectionResponse projResp = ProjectionResponse.Create(Mocking.GetProjectionUntyped());
+            ProjectionResponse projResp = ProjectionResponse.Create(Mocking.Mocking.GetProjectionUntyped());
             JArray testArray = projResp.Values;
 
-            Mocking.MockBalanceResponse testItem =  testArray.First.ToObject<Mocking.MockBalanceResponse>();
-            if (null != testItem )
+            Mocking.Mocking.MockBalanceResponse testItem = testArray.First.ToObject<Mocking.Mocking.MockBalanceResponse>();
+            if (null != testItem)
             {
                 actual = testItem.Balance;
             }
@@ -52,10 +54,10 @@ namespace TheLogRun.UnitTestProject.Projection
             string expected = "Acct.1";
             string actual = "Not set";
 
-            ProjectionResponse projResp = ProjectionResponse.Create(Mocking.GetProjectionUntyped());
+            ProjectionResponse projResp = ProjectionResponse.Create(Mocking.Mocking.GetProjectionUntyped());
             JArray testArray = projResp.Values;
 
-            Mocking.MockBalanceResponse testItem = testArray.First.ToObject<Mocking.MockBalanceResponse>();
+            Mocking.Mocking.MockBalanceResponse testItem = testArray.First.ToObject<Mocking.Mocking.MockBalanceResponse>();
             if (null != testItem)
             {
                 actual = testItem.AccountNumber;
@@ -64,12 +66,14 @@ namespace TheLogRun.UnitTestProject.Projection
             Assert.AreEqual(expected, actual);
         }
     }
+}
+namespace TheLogRun.UnitTestProject.Mocking
+{
 
-
-    public  static partial class Mocking
+    public static partial class Mocking
     {
 
-        public static IProjectionUntyped GetProjectionUntyped ()
+        public static IProjectionUntyped GetProjectionUntyped()
         {
             MockProjectionUntyped test = new MockProjectionUntyped();
             // add some values
@@ -82,12 +86,12 @@ namespace TheLogRun.UnitTestProject.Projection
         /// <summary>
         /// A mock projection for unit test
         /// </summary>
-        public  class MockProjectionUntyped :
+        public class MockProjectionUntyped :
         CQRSAzure.EventSourcing.ProjectionBaseUntyped
         {
 
 
-            public override bool SupportsSnapshots => true ;
+            public override bool SupportsSnapshots => true;
 
             /// <summary>
             /// Handle a deposit
@@ -97,7 +101,7 @@ namespace TheLogRun.UnitTestProject.Projection
                 if (null != eventHandled)
                 {
                     int rowNumber = GetAccountRow(eventHandled.AccountNumber);
-                    base.IncrementValue<decimal>(nameof(Balance), eventHandled.Amount , rowNumber); 
+                    base.IncrementValue<decimal>(nameof(Balance), eventHandled.Amount, rowNumber);
                 }
             }
 
@@ -105,14 +109,14 @@ namespace TheLogRun.UnitTestProject.Projection
             private int GetAccountRow(string accountNumber)
             {
                 int ret = 0;
-                while ( PropertyExists(nameof(AccountNumber  ), ret))
+                while (PropertyExists(nameof(AccountNumber), ret))
                 {
                     string acctNum = base.GetPropertyValue<string>(nameof(AccountNumber), ret);
-                    if (accountNumber.Equals(acctNum, StringComparison.OrdinalIgnoreCase) )
+                    if (accountNumber.Equals(acctNum, StringComparison.OrdinalIgnoreCase))
                     {
                         return ret;
                     }
-                    ret++; 
+                    ret++;
                 }
                 // Not found - add it
                 base.AddOrUpdateValue<string>(nameof(AccountNumber), ret, accountNumber);
@@ -173,12 +177,12 @@ namespace TheLogRun.UnitTestProject.Projection
             /// </summary>
             public string AccountNumber(int row)
             {
-                return base.GetPropertyValue<string>(nameof(AccountNumber), row );
+                return base.GetPropertyValue<string>(nameof(AccountNumber), row);
             }
 
-            public decimal  Balance(int row)
+            public decimal Balance(int row)
             {
-                return base.GetPropertyValue<decimal >(nameof(Balance), row);
+                return base.GetPropertyValue<decimal>(nameof(Balance), row);
             }
 
             #endregion
@@ -197,7 +201,7 @@ namespace TheLogRun.UnitTestProject.Projection
 
             public MockDepositEvent(SerializationInfo info, StreamingContext context)
             {
-                AccountNumber = info.GetString (nameof(AccountNumber));
+                AccountNumber = info.GetString(nameof(AccountNumber));
                 Amount = info.GetDecimal(nameof(Amount));
             }
 
@@ -209,17 +213,17 @@ namespace TheLogRun.UnitTestProject.Projection
 
             public void GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                info.AddValue(nameof(AccountNumber ), AccountNumber);
-                info.AddValue(nameof(Amount ), Amount);
+                info.AddValue(nameof(AccountNumber), AccountNumber);
+                info.AddValue(nameof(Amount), Amount);
             }
         }
 
         public class MockBalanceResponse
         {
 
-           public string AccountNumber { get; set; }
+            public string AccountNumber { get; set; }
 
-           public  decimal Balance { get; set; }
+            public decimal Balance { get; set; }
         }
     }
 }

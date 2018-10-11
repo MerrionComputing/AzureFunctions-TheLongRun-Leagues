@@ -1,63 +1,71 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using CQRSAzure.EventSourcing;
+using CQRSAzure.IdentifierGroup;
 
-namespace TheLongRun.Common.Events.IdentifierGroup
+namespace TheLongRun.Common.Events.Projection
 {
     /// <summary>
-    /// A member was included in this identifier group
+    /// A snapshot was taken of this projection
     /// </summary>
     /// <remarks>
-    /// An identifier group name must be unique within a domain
+    /// Unlike a classifier projection, in this case the snapshot is stored 
+    /// outside the projection processor event stream and a URI to it is stored
+    /// in the event.
     /// </remarks>
-    [Serializable()]
-    [CQRSAzure.EventSourcing.DomainNameAttribute("Identifier Group")]
-    [CQRSAzure.EventSourcing.Category("Group")]
-    public sealed class MemberIncluded
+    public sealed class SnapshotTaken
         : IEvent
     {
 
-
         /// <summary>
-        /// The unique identifier of the instance included in the identifier group
+        /// The unique instance over which the classifier was running
         /// </summary>
         public string AggregateInstanceKey { get; set; }
 
+
         /// <summary>
-        /// As of when the classification results was run that marked this member as being in the group
+        /// As of when the classifier snapshot was taken
         /// </summary>
         public Nullable<DateTime> AsOfDate { get; set; }
 
         /// <summary>
-        /// The sequence number of the last event read by this classification which marked this member
-        /// as being in the group
+        /// The sequence number of the last event read by this classification before
+        /// the snapshot.
         /// </summary>
         public uint AsOfSequenceNumber { get; set; }
 
         /// <summary>
-        /// Additional commentary as to how this member became included
+        /// Additional commentary for when the snapshot was taken
         /// </summary>
         public string Commentary { get; set; }
 
-        public MemberIncluded(string aggregateKeyIn,
-            DateTime asOfDateIn,
-            uint asOfSequenceIn,
-            string commentaryIn)
+        /// <summary>
+        /// The URI where the projection snapshot can be found
+        /// </summary>
+        public string PersistedLocation { get; set; }
+
+        public SnapshotTaken(string aggregateKeyIn,
+        DateTime asOfDateIn,
+        uint asOfSequenceIn,
+        string commentaryIn,
+        string persistedToLocation)
         {
 
             AggregateInstanceKey = aggregateKeyIn;
             AsOfDate = asOfDateIn;
             AsOfSequenceNumber = asOfSequenceIn;
             Commentary = commentaryIn;
+            PersistedLocation  = persistedToLocation;
 
         }
 
-        public MemberIncluded(SerializationInfo info, StreamingContext context)
+        public SnapshotTaken(SerializationInfo info, StreamingContext context)
         {
             AggregateInstanceKey = info.GetString(nameof(AggregateInstanceKey));
             AsOfDate = info.GetDateTime(nameof(AsOfDate));
             AsOfSequenceNumber = info.GetUInt32(nameof(AsOfSequenceNumber));
             Commentary = info.GetString(nameof(Commentary));
+            PersistedLocation  = info.GetString(nameof(PersistedLocation));
         }
 
         /// <summary>
@@ -76,6 +84,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup
             }
             info.AddValue(nameof(AsOfSequenceNumber), AsOfSequenceNumber);
             info.AddValue(nameof(Commentary), Commentary);
+            info.AddValue(nameof(PersistedLocation), PersistedLocation);
         }
     }
 }

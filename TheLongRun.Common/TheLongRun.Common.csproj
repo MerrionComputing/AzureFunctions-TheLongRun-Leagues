@@ -93,6 +93,7 @@
     <Compile Include="CommandLogRecord.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="CQRSAzureBindings.cs" />
+    <Compile Include="Events\Classifier\SnapshotTaken.cs" />
     <Compile Include="Events\Command\ClassificationRequested.cs" />
     <Compile Include="Events\Command\ClassificationResultReturned.cs" />
     <Compile Include="Events\Command\ClassificationRunStarted.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Events\IdentifierGroup\MemberExcluded.cs" />
     <Compile Include="Events\IdentifierGroup\MemberIncluded.cs" />
     <Compile Include="Events\IdentifierGroup\Projections\Membership_Projection.cs" />
+    <Compile Include="Events\Projection\SnapshotTaken.cs" />
     <Compile Include="Events\Query\ClassificationRequested.cs" />
     <Compile Include="Events\Query\ClassificationResultReturned.cs" />
     <Compile Include="Events\Query\ClassificationRunStarted.cs" />
@@ -427,9 +429,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Events\Classifier\Classifier.ReadMe.txt" />
     <Content Include="Events\IdentifierGroup\IdentifierGroup.ReadMe.txt" />
+    <Content Include="Events\Projection\Projection.ReadMe.txt" />
     <Content Include="Orchestration\Bindings\Orchestration.Bindings.Readme.txt" />
     <Content Include="Orchestration\Orchestration.Readme.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
