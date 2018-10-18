@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TheLongRun.Common.Attributes;
+using Microsoft.Azure.WebJobs;
 
 namespace TheLogRun.UnitTestProject.Command
 {
