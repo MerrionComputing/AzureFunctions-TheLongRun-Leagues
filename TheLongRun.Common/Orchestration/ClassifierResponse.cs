@@ -6,10 +6,21 @@ using System.Threading.Tasks;
 
 namespace TheLongRun.Common.Orchestration
 {
+    /// <summary>
+    /// The response a classifier uses to return information back to its calling
+    /// function when it has performed its task
+    /// </summary>
     public sealed class ClassifierResponse
         : IClassifierResponse
     {
 
+        /// <summary>
+        /// The effective date/time as of which this classification is valid
+        /// </summary>
+        /// <remarks>
+        /// This only updates where an event is tagged as having an effective date and so
+        /// the sequence number is preferable for any "should I run this again" testing
+        /// </remarks>
         private readonly DateTime? _asOfDate;
         public DateTime? AsOfDate
         {
@@ -19,6 +30,10 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
+        /// <summary>
+        /// The sequence number in the event stream as of which this classification is 
+        /// valid.
+        /// </summary>
         private readonly int _asOfSequenceNumber;
         public int AsOfSequenceNumber
         {
@@ -40,6 +55,10 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
+        /// <summary>
+        /// An identifier of the source of this classifier response - in case the calling code
+        /// want to rerun it
+        /// </summary>
         private readonly OrchestrationCallbackIdentity _responseSource;
         public OrchestrationCallbackIdentity ResponseSource
         {
@@ -70,5 +89,25 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
+        /// <summary>
+        /// Create a standard classifier response to return back to whoever called the classifier
+        /// </summary>
+        /// <param name="responseAsOfDate">
+        /// The effective date/time as of which this classification is valid
+        /// </param>
+        /// <param name="asOfSequence"></param>
+        /// <param name="included"></param>
+        /// <param name="responseSource"></param>
+        /// <returns></returns>
+        public static ClassifierResponse Create(DateTime? responseAsOfDate,
+            int asOfSequence,
+            bool included,
+            OrchestrationCallbackIdentity responseSource = null)
+        {
+            return new ClassifierResponse(responseAsOfDate,
+                asOfSequence,
+                included,
+                responseSource);
+        }
     }
 }

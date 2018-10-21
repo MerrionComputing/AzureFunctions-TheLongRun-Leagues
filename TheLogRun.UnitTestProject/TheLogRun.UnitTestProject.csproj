@@ -172,6 +172,7 @@
     <Compile Include="Classifier\ClassifierRespons_UnitTest.cs" />
     <Compile Include="Command\CommandNameAttribute_UnitTest.cs" />
     <Compile Include="Identifier Group\IdentifierGroupNameAttribute_UnitTest.cs" />
+    <Compile Include="Identifier Group\IdentifierGroupMembershipSnapshotResponse_UnitTest.cs" />
     <Compile Include="Orchestration\OrchestrationCallbackIdentity_UnitTest.cs" />
     <Compile Include="Projection\ProjectionNameAttribute_UnitTest.cs" />
     <Compile Include="Projection\ProjectionResponse_UnitTest.cs" />

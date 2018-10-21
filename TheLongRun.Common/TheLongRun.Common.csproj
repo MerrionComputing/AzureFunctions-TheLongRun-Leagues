@@ -165,6 +165,7 @@
     <Compile Include="Orchestration\EventStreamBackedQueryOrchestrator.cs" />
     <Compile Include="Orchestration\IClassifierRunner.cs" />
     <Compile Include="Orchestration\ICommandRunner.cs" />
+    <Compile Include="Orchestration\IdentifierGroupMembershipSnapshotResponse.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestrator.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestratorClassification.cs" />
     <Compile Include="Orchestration\IEventStreamBackedOrchestratorContext.cs" />

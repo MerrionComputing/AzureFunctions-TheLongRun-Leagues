@@ -37,5 +37,22 @@ namespace TheLongRun.Common.Orchestration
         IAsOfDateOrchestrationResponse 
     {
 
+        /// <summary>
+        /// The unique identifier of the entity that is a member of this identifier group
+        /// </summary>
+        string MemberUniqueIdentifier { get; }
+
+    }
+
+    /// <summary>
+    /// The response giving the membership of an identifier group as at a particular
+    /// point in time
+    /// </summary>
+    public interface IIdentifierGroupMembershipSnapshotResponse:
+        IAsOfDateOrchestrationResponse
+    {
+
+        IReadOnlyCollection<string > Members { get; }
+
     }
 }

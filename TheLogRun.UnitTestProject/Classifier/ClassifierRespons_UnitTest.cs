@@ -14,7 +14,9 @@ namespace TheLogRun.UnitTestProject.Classifier
         public void Constructor_TestMethod()
         {
             ClassifierResponse testObj = null;
-            //TODO ClassifierResponse testObj = ClassifierResponse.Create(Mocking.GetProjectionUntyped());
+             testObj = ClassifierResponse.Create(new DateTime(2017,12,19),
+                713,
+                false);
             Assert.IsNotNull(testObj);
         }
     }
