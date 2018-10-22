@@ -1,28 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace TheLongRun.Common.Orchestration
 {
-    /// <summary>
-    /// Response from an identifier group function indicating the group membership as at a 
-    /// particular point in time
-    /// </summary>
-    public sealed class IdentifierGroupMembershipSnapshotResponse
-        : IIdentifierGroupMembershipSnapshotResponse
+    public sealed class IdentifierGroupMemberResponse
+        : IIdentifierGroupMemberResponse
     {
-        private System.Collections.Generic.List<string> _members = new System.Collections.Generic.List<string>();
-
-        public IReadOnlyCollection<string> Members
-        {
-            get
-            {
-                return new ReadOnlyCollection<string>(_members);
-            }
-        }
 
         /// <summary>
         /// The effective date/time as of which this classification is valid
@@ -40,6 +26,14 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
+        private readonly string _memberUniqueIdentifier;
+        public string MemberUniqueIdentifier
+        {
+            get
+            {
+                return _memberUniqueIdentifier;
+            }
+        }
 
         /// <summary>
         /// An identifier of the source of this classifier response - in case the calling code
@@ -55,8 +49,8 @@ namespace TheLongRun.Common.Orchestration
         }
 
 
-        private IdentifierGroupMembershipSnapshotResponse(DateTime? responseAsOfDate,
-            IEnumerable<string > membersIncluded,
+        private IdentifierGroupMemberResponse(DateTime? responseAsOfDate,
+            string memberIncluded,
             OrchestrationCallbackIdentity responseSource = null)
         {
             if (responseAsOfDate.HasValue)
@@ -67,25 +61,21 @@ namespace TheLongRun.Common.Orchestration
             {
                 _asOfDate = DateTime.UtcNow;
             }
-            if (null != membersIncluded )
-            {
-                _members = new List<string>(membersIncluded); 
-            }
+            _memberUniqueIdentifier = memberIncluded;
             if (null != responseSource)
             {
                 _responseSource = responseSource;
             }
-
         }
 
-        public static IdentifierGroupMembershipSnapshotResponse Create(DateTime? responseAsOfDate,
-            IEnumerable<string> membersIncluded,
+
+        public static IdentifierGroupMemberResponse Create(DateTime? responseAsOfDate,
+            string memberIncluded,
             OrchestrationCallbackIdentity responseSource = null)
         {
-            return new IdentifierGroupMembershipSnapshotResponse(responseAsOfDate,
-                membersIncluded,
+            return new IdentifierGroupMemberResponse(responseAsOfDate,
+                memberIncluded,
                 responseSource);
         }
-
     }
 }

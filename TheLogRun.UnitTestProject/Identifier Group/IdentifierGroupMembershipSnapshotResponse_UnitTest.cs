@@ -18,5 +18,37 @@ namespace TheLogRun.UnitTestProject.Identifier_Group
             Assert.IsNotNull(testResp); 
 
         }
+
+        [TestMethod ]
+        public void AsOfDate_RoundTrip_TestMethod()
+        {
+            DateTime? expected = new DateTime(2017, 12, 18);
+            DateTime? actual = null;
+
+            IdentifierGroupMembershipSnapshotResponse testResp = IdentifierGroupMembershipSnapshotResponse.Create(expected ,
+    new List<string>() { "abc", "def" });
+
+            actual = testResp.AsOfDate;
+
+            Assert.AreEqual(expected, actual);  
+
+        }
+
+        [TestMethod]
+        public void AsOfDate_Empty_TestMethod()
+        {
+            DateTime? expected = null;
+            DateTime? actual = null;
+
+            IdentifierGroupMembershipSnapshotResponse testResp = IdentifierGroupMembershipSnapshotResponse.Create(expected,
+    new List<string>() { "abc", "def" });
+
+            actual = testResp.AsOfDate;
+
+            Assert.AreNotEqual (expected, actual);
+
+        }
+
     }
+
 }
