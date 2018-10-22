@@ -156,6 +156,7 @@
     <Compile Include="Orchestration\Bindings\EventStreamBackedClassifierOrchestratorTriggerBindingProvider.cs" />
     <Compile Include="Orchestration\Bindings\EventStreamBackedOrchestrationExtensions.cs" />
     <Compile Include="Orchestration\ClassifierResponse.cs" />
+    <Compile Include="Orchestration\CommandResponse.cs" />
     <Compile Include="Orchestration\EventStreamBackedClassifierOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedCommandOrchestrator.cs" />
     <Compile Include="Orchestration\EventStreamBackedIdentifierGroupOrchestrator.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="Orchestration\OrchestrationCallbackIdentity.cs" />
     <Compile Include="Orchestration\OrchestrationCalloutIdentity.cs" />
     <Compile Include="Orchestration\ProjectionResponse.cs" />
+    <Compile Include="Orchestration\QueryResponse.cs" />
     <Compile Include="Orchestration\StartClassifierOrchestrationArgs.cs" />
     <Compile Include="Orchestration\StartCommandOrchestrationArgs.cs" />
     <Compile Include="Orchestration\StartIdentifierGroupOrchestrationArgs.cs" />

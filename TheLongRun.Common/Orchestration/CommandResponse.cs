@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 
 namespace TheLongRun.Common.Orchestration
 {
-    public sealed class IdentifierGroupMemberResponse
-        : IIdentifierGroupMemberResponse
+
+    /// <summary>
+    /// A response to indicate that a command has completed
+    /// </summary>
+    /// <remarks>
+    /// No status is passed back as we want to allow for completely
+    /// "fire-and-forget" execution of commands if the business needs
+    /// </remarks>
+    public sealed class CommandResponse
+        : ICommandResponse
     {
 
         /// <summary>
         /// The effective date/time as of which this response is valid
         /// </summary>
-        /// <remarks>
-        /// This only updates where an event is tagged as having an effective date and so
-        /// the sequence number is preferable for any "should I run this again" testing
-        /// </remarks>
         private readonly DateTime? _asOfDate;
         public DateTime? AsOfDate
         {
@@ -26,14 +30,6 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        private readonly string _memberUniqueIdentifier;
-        public string MemberUniqueIdentifier
-        {
-            get
-            {
-                return _memberUniqueIdentifier;
-            }
-        }
 
         /// <summary>
         /// An identifier of the source of this response - in case the calling code
@@ -48,9 +44,7 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-
-        private IdentifierGroupMemberResponse(DateTime? responseAsOfDate,
-            string memberIncluded,
+        private CommandResponse(DateTime? responseAsOfDate,
             OrchestrationCallbackIdentity responseSource = null)
         {
             if (responseAsOfDate.HasValue)
@@ -61,20 +55,16 @@ namespace TheLongRun.Common.Orchestration
             {
                 _asOfDate = DateTime.UtcNow;
             }
-            _memberUniqueIdentifier = memberIncluded;
             if (null != responseSource)
             {
                 _responseSource = responseSource;
             }
         }
 
-
-        public static IdentifierGroupMemberResponse Create(DateTime? responseAsOfDate,
-            string memberIncluded,
+        public CommandResponse Create(DateTime? responseAsOfDate,
             OrchestrationCallbackIdentity responseSource = null)
         {
-            return new IdentifierGroupMemberResponse(responseAsOfDate,
-                memberIncluded,
+            return new CommandResponse(responseAsOfDate,
                 responseSource);
         }
     }

@@ -33,8 +33,15 @@ namespace TheLongRun.Common.Orchestration
 
     }
 
+    /// <summary>
+    /// A response to indicate that a command has completed
+    /// </summary>
+    /// <remarks>
+    /// No status is passed back as we want to allow for completely
+    /// "fire-and-forget" execution of commands if the business needs
+    /// </remarks>
     public interface ICommandResponse
-        : IOrchestrationResponse 
+        : IAsOfDateOrchestrationResponse
     {
 
     }
