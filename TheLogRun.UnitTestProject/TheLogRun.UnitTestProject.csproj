@@ -179,6 +179,7 @@
     <Compile Include="Projection\SnapshotTaken_UnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\QueryNameAttribute_UnitTest.cs" />
+    <Compile Include="Query\QueryResponse_UnitTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -23,12 +23,19 @@ namespace TheLongRun.Common.Orchestration
         }
 
 
-        private readonly JArray _values;
-        public JArray Values
+        /// <summary>
+        /// The object containing the result of the query execution
+        /// </summary>
+        /// <remarks>
+        /// This may need to be cast to the correct type-safe return value by the 
+        /// recipient of the response
+        /// </remarks>
+        private readonly JObject _result;
+        public JObject Result
         {
             get
             {
-                return _values;
+                return _result ;
             }
         }
 
@@ -45,5 +52,33 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
+
+        private QueryResponse(DateTime? responseAsOfDate,
+            JObject responseResult,
+            OrchestrationCallbackIdentity responseSource = null)
+        {
+            if (responseAsOfDate.HasValue)
+            {
+                _asOfDate = responseAsOfDate;
+            }
+            else
+            {
+                _asOfDate = DateTime.UtcNow;
+            }
+            _result = responseResult;
+            if (null != responseSource)
+            {
+                _responseSource = responseSource;
+            }
+        }
+
+        public static QueryResponse Create(DateTime? responseAsOfDate,
+            JObject responseResult,
+            OrchestrationCallbackIdentity responseSource = null)
+        {
+            return new QueryResponse(responseAsOfDate,
+                responseResult,
+                responseSource);
+        }
     }
 }
