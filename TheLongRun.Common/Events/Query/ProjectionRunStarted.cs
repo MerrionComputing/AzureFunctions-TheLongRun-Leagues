@@ -11,8 +11,8 @@ namespace TheLongRun.Common.Events.Query
     /// Typically projections could run asynchronously in a fan-out invocation methodology
     /// </remarks>
     [Serializable()]
-    [CQRSAzure.EventSourcing.DomainNameAttribute("Query")]
-    [CQRSAzure.EventSourcing.Category("Query")]
+    [DomainNameAttribute("Query")]
+    [Category("Query")]
     public class  ProjectionRunStarted
         : IEvent 
     {
