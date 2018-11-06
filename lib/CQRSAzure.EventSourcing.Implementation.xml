@@ -1,0 +1,2730 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+CQRSAzure.EventSourcing.Implementation
+</name>
+</assembly>
+<members>
+<member name="T:CQRSAzure.EventSourcing.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AggregateMapBuilder">
+ <summary>
+ A class to build a mapping between aggregate classes and the classes that provide access to the underlying event stream data for
+ those aggregate classes
+ </summary>
+ <remarks>
+ This is conceptually similar to the way the DbContextBuilder class works in entity framework
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AggregateMapBuilder.MapAggregateClassByType(System.Type)">
+ <summary>
+ Add an entry to the internal map such that the class can be used to find an appropriate persistence 
+ class instance to read or write to its back end storage mechanism
+ </summary>
+ <param name="AggregateType">
+ The type (implementing IAggregate) that events can be recorded for in an event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AggregateMapBuilder.CreateImplementationMap(System.Type)">
+ <summary>
+ Using the implementations configurations put together an implementation map to allow 
+ rapid creation of reader/writer streams for the given aggregate
+ </summary>
+ <param name="aggregateType">
+ The type (implementing IAggregate) that events can be recorded for in an event stream
+ </param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AggregateMapBuilder.#ctor(CQRSAzure.EventSourcing.AggregateMapBuilderCore.MapCreationOption,CQRSAzure.EventSourcing.CQRSAzureEventSourcingConfigurationSection)">
+ <summary>
+ Create a new aggregate map builder using the "Create on demand" method by default unless told otherwise
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AggregateMapBuilderCore">
+ <summary>
+ Common functionality to be shared between an AggregateMapBuilder and an IdentityGroupAggregateMapBuilder
+ </summary>
+ <remarks>
+ We need to do this to preserve some DRY while still keeping the code used to instantiate identity groups
+ physically separate to the code used in the common CQRS/ES functionality (so that end users can opt not to use the
+ concept of identity groups if they choose)
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AggregateMapBuilderCore.MapCreationOption">
+ <summary>
+ How should new aggregate-persistence map records be created?
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.AggregateMapBuilderCore.MapCreationOption.OnDemand">
+ <summary>
+ Create a new map instance the first time an aggregate class storage is requested
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.AggregateMapBuilderCore.MapCreationOption.UpFront">
+ <summary>
+ Create all the map instances up-front when the application is started
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.AggregateMapBuilderCore.MapCreation">
+ <summary>
+ How/when should new aggregate-persistence map records be created?
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AggregateMapBuilderFactory.CreateImplementationMap(System.Type,CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement,CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement)">
+ <summary>
+ Create an implementation map for the given aggregate type using the settings passed in
+ </summary>
+ <param name="aggregateType">
+ The type (implementing IAggregate) that events can be recorded for in an event stream
+ </param>
+ <param name="implementationToUse">
+ The settings to use for the implementation of the event stream
+ </param>
+ <param name="snapshotSettingsToUse">
+ The settings to use for the snapshot functionality 
+ </param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AggregateMapBuilderFactory.CreateNewImplementationMap(System.Type,System.Type,CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement,CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement)">
+ <summary>
+ Using the implementation and snapshot settings passed in,create a new IAggregateImplementationMap(Of TAggregate As IAggregationIdentifier, TAggregateKey)
+ for the aggregate type passed in
+ </summary>
+ <param name="aggregateType">
+ The aggregate type to create an event stream for
+ </param>
+ <param name="aggregateKeyType">
+ The data type that provides the unique identifier of the aggregate
+ </param>
+ <param name="implementationToUse">
+ The backing technology setting to use to hold the event stream for that aggregate
+ </param>
+ <param name="snapshotSettingsToUse">
+ The backing technology to use to hold snapshots of the event stream for the aggregate 
+ </param>
+ <returns>
+ An aggregate implementation map that can be used to spin up connectiosn to the underlyiong data for instances of the 
+ given aggregate
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Debugging.DebuggingProjectionProcessor`2">
+ <summary>
+ A special type of projection processor that emits debug information and allows single-step operations for
+ debugging and technology explaining
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate whose event stream we are to run the projection over
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type of the key that uniquely identifies an instance of that
+ </typeparam>
+ <remarks>
+ This should not be used in any production system as it will affect performance
+ </remarks>
+</member>
+<member name="F:CQRSAzure.EventSourcing.Debugging.DebuggingProjectionProcessor`2.m_streamReader">
+ <summary>
+ The stream reader instance that will be used to run the projections
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Debugging.DebuggingProjectionProcessor`2.Process(CQRSAzure.EventSourcing.IProjection{`0,`1})">
+ <summary>
+ Process the given projection using the event stream reader we have set up
+ </summary>
+ <param name="projectionToProcess">
+ The class that defines the projection operation we are going to process
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Debugging.DebuggingProjectionProcessor`2.ProcessSingleStep(CQRSAzure.EventSourcing.IProjection{`0,`1})">
+ <summary>
+ Run the next event through the projection
+ </summary>
+ <param name="projectionToProcess">
+ The projection we are running
+ </param>
+ <remarks>
+ The single step process is intended for debugging or demonstrations 
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Debugging.DebuggingProjectionProcessor`2.#ctor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1},CQRSAzure.EventSourcing.ISnapshotProcessor{`0,`1})">
+ <summary>
+ Create a new projection processor that will use the given event stream reader to do its processing
+ </summary>
+ <param name="readerTouse">
+ The event stream processor to use
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AggregateEventStreamImplementationMap`2">
+ <summary>
+ A mapping between an aggregate identifier and the event stream techniology used as backing to it
+ </summary>
+ <typeparam name="TAggregate">
+ </typeparam>
+ <remarks>
+ This allows different aggregate types to have different backing store technologies
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AggregateEventStreamImplementationMap`2.Create(CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement,CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement)">
+ <summary>
+ Create an implementation map to use for a given aggregate type's underlying event stream and snapshot storage
+ </summary>
+ <param name="implementationToUse">
+ The configuration setings for the event stream implementation
+ </param>
+ <param name="snapshotSettingsToUse">
+ The configuration settings for the snapshot persistenece for that event stream
+ </param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AggregateEventStreamImplementationMapFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement,CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement)">
+ <summary>
+ Create a typed event stream implementation map for the given aggregate and key
+ </summary>
+ <typeparam name="TAggregate">
+ The type of aggregate for which to create an implementation map
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type of the unique key of the aggregate instance
+ </typeparam>
+ <param name="aggregateInstance">
+ An instance of the aggregate 
+ </param>
+ <param name="aggregateIdentifierKey">
+ An unique identifier identifying an instance of the aggregate
+ </param>
+ <param name="implementationToUse">
+ Settings to use to store the event stream for the aggregate
+ </param>
+ <param name="snapshotSettingsToUse">
+ Settings to use to store snapshots of the aggregate instance
+ </param>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AzureStorageEventStreamBase">
+ <summary>
+ Common functionality that both reader and writer use to access any event store based on Azure storage
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.AzureStorageEventStreamBase.DomainName">
+ <summary>
+ The name of the domain model this event stream belongs to
+ </summary>
+ <remarks>
+ This allows multiple domains to share the same Azure storage account/area
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.AzureStorageEventStreamBase.StorageConnectionStringSettingName">
+ <summary>
+ Gets the storage connection string settting's name for this domain
+ </summary>
+ <returns>
+ e.g. [Domain]StorageConnectionString
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AzureStorageEventStreamBase.GetWriteConnectionStringName(System.String,CQRSAzure.EventSourcing.Azure.IAzureStorageSettings)">
+ <summary>
+ Get the name of the connection string to use when writing to the event stream
+ </summary>
+ <param name="connectionStringName">
+ The name of the global connection string explicitly passed in
+ </param>
+ <param name="settings">
+ Any specif settings that could override that connection string
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.AzureStorageEventStreamBase.GetReadConnectionStringName(System.String,CQRSAzure.EventSourcing.Azure.IAzureStorageSettings)">
+ <summary>
+ Get the name of the connection string to use when reading from the event stream
+ </summary>
+ <param name="connectionStringName">
+ The name of the global connection string explicitly passed in
+ </param>
+ <param name="settings">
+ Any specific settings that could override that connection string
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockWrappedProjectionSnapshot">
+ <summary>
+ A class to wrap up a projection snapshot so it can be written to an Azure append blob
+ </summary>
+ <remarks>
+ Each block in an append blob can be a different size, up to a maximum of 4 MB, and an append blob can include a maximum of 50,000 blocks.
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockWrappedProjectionSnapshot.Sequence">
+ <summary>
+ The effective sequence number of the projection snapshot taken
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockWrappedProjectionSnapshot.AsOfDate">
+ <summary>
+ The effective date of the data as at the point in time that the snapshot was taken
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockWrappedProjectionSnapshotProperty">
+ <summary>
+ An individual property of a snapshot, wrapped for saving in an Azure blob
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockWrappedProjectionSnapshotProperty.UpdateValue(System.Object)">
+ <summary>
+ This is not implemented as you should never update a value that has been taken from a projection
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamProvider`2.ContainerBasePath">
+ <summary>
+ The storage location that the event streams for this event stream are located
+ </summary>
+ <returns>
+ /eventstreams/[aggregate-class-name]/
+ </returns>
+ <remarks>
+ This is a virtual path that is added to the blob name to create a traversable path
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotBase`3.ContainerBasePath">
+ <summary>
+ The storage location that the event streams for this event stream are located
+ </summary>
+ <returns>
+ /snapshots/[aggregate-class-name]/[projection-name]/
+ </returns>
+ <remarks>
+ This is a virtual path that is added to the blob name to create a traversable path
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotBase`3.ProjectionSnapshotBlobFilename">
+ <summary>
+ The filename that this specific projection snapshot stream will be written to
+ </summary>
+ <returns>
+ e.g. /snapshots/car/olj565m.snapshots 
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotBase`3.AppendBlob">
+ <summary>
+ The blob that the events are written to/read from
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotBase`3.RequestOptions">
+ <summary>
+ The system-wide options for writing to the event stream
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotBase`3.GetHighestSequence">
+ <summary>
+ Get the highest sequence number snapshot stored in this append blob
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotBase`3.#ctor(System.String,`1,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotBase.MakeValidStorageFolderName(System.String)">
+ <summary>
+ Turn a name into a valid folder name for azure blob storage
+ </summary>
+ <param name="rawName">
+ The name of the thing we want to turn into a blob storage folder name
+ </param>
+ <returns>
+ A folder name that can be used to locate this object type's event streams
+ </returns>
+ <remarks>
+ Container names must start With a letter Or number, And can contain only letters, numbers, And the dash (-) character.
+ Every dash (-) character must be immediately preceded And followed by a letter Or number; consecutive dashes are Not permitted in container names.
+ All letters in a container name must be lowercase.
+ Container names must be from 3 through 63 characters long.
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotBase.#ctor(System.String,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+ <param name="connectionStringName">
+ The configuration name to use to look up the Azure storage account connection string - this 
+ allows the read and write side to have different connection strings
+ </param>
+ <param name="writeAccess">
+ Does the process need write access to the underlying storage account
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockWrappedEvent">
+ <summary>
+ An event instance wrapped up in a way that allows it to be stored in an Azure blob
+ </summary>
+ <remarks>
+ Each block in an append blob can be a different size, up to a maximum of 4 MB, and an append blob can include a maximum of 50,000 blocks.
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockWrappedEvent.EventName">
+ <summary>
+ The class name of the event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockWrappedEvent.Sequence">
+ <summary>
+ The sequence number of this record
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase`2">
+ <summary>
+ Common functionality that both reader and writer use to access the event store on the Azure storage
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase`2.ContainerBasePath">
+ <summary>
+ The storage location that the event streams for this event stream are located
+ </summary>
+ <returns>
+ /eventstreams/[aggregate-class-name]/
+ </returns>
+ <remarks>
+ This is a virtual path that is added to the blob name to create a traversable path
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase`2.EventStreamBlobFilename">
+ <summary>
+ The filename that this specific event stream will be written to
+ </summary>
+ <returns>
+ e.g. /eventstreams/car/olj565m.events 
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase`2.AppendBlob">
+ <summary>
+ The blob that the events are written to/read from
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase`2.RequestOptions">
+ <summary>
+ The system-wide options for writing to the event stream
+ </summary>
+ <remarks>
+ 
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase`2.#ctor(System.String,`1,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase">
+ <summary>
+ Common functionality that both reader and writer use to access the event store on the Azure storage
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase.MakeValidStorageFolderName(System.String)">
+ <summary>
+ Turn a name into a valid folder name for azure blob storage
+ </summary>
+ <param name="rawName">
+ The name of the thing we want to turn into a blob storage folder name
+ </param>
+ <returns>
+ A folder name that can be used to locate this object type's event streams
+ </returns>
+ <remarks>
+ Container names must start With a letter Or number, And can contain only letters, numbers, And the dash (-) character.
+ Every dash (-) character must be immediately preceded And followed by a letter Or number; consecutive dashes are Not permitted in container names.
+ All letters in a container name must be lowercase.
+ Container names must be from 3 through 63 characters long.
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase.#ctor(System.String,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+ <param name="connectionStringName">
+ The configuration name to use to look up the Azure storage account connection string - this 
+ allows the read and write side to have different connection strings
+ </param>
+ <param name="writeAccess">
+ Does the process need write access to the underlying storage account
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReader`2">
+ <summary>
+ Class to read events from an event stream implemented as a windows azure append blob
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate that the event stream belongs to
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type which provides the unique key by which to recognise an instance of the aggregate
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReader`2.Key">
+ <summary>
+ The unique key of the aggregate whose event stream this azure blob reader is operating over
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReader`2.GetAppendBlobSnapshot">
+ <summary>
+ Get a snapshot of the append blob to use when reading this event stream
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReader`2.#ctor(System.String,`1,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction)">
+ <summary>
+ Create a new windows azure blob stream reader to read events from the blob
+ </summary>
+ <param name="AggregateDomainName">
+ The domain in which the aggregate resides
+ </param>
+ <remarks>
+ The unique key which identifies the instance of the aggregate to read the event stream for
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReader`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="settings">
+ The settings to use to connect to the azure storage account to use
+ </param>
+ <param name="eventFilter">
+ The filter to apply when reading back the events
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Create a projection processor that works off an azure blob backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1})">
+ <summary>
+ Create a projection processor that works off an in-memory backed event stream
+ </summary>
+ <param name="readerToUse">
+ The event stream reader to use to run the projection
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReaderFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Creates an azure blob based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="eventFilter">
+ An optional array of event definitions to use to filter the incoming event stream by
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReaderFactory.CreateProjectionProcessor``2(``0,``1,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Create a projection processor that works off an azure file backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamReaderFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create a reader of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamWriter`2.IncrementSequence">
+ <summary>
+ Update the sequence number metadata and return the new sequence number
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamWriter`2.IncrementRecordCountAndSequence">
+ <summary>
+ Update the sequence number metadata and return the new sequence number
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamWriter`2.Reset">
+ <summary>
+ Clear down the event stream
+ </summary>
+ <remarks>
+ This will delete existing events so should not be done in any production environment therefore this is not
+ part of the IEventStreamWriter interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamWriter`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamWriterFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Creates an azure append blob file storage based event stream writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to write the event stream
+ </param>
+ <param name="settings">
+ Any additional settings 
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamWriterFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create an event stream writer of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotReader`3">
+ <summary>
+ Class to read projection snapshot records that have been stored in an Azure blob record
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the base class to which the event stream is attached
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an instance of that aggregation base class is uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotReader`3.GetAppendBlobSnapshot">
+ <summary>
+ Get a snapshot of the append blob to use when reading this event stream
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotReader`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Creates a projection reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotReader.Create``3(CQRSAzure.EventSourcing.IAggregationIdentifier{``1},CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Creates a projection reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotWriter`3.Reset">
+ <summary>
+ Clear down the snapshot collection
+ </summary>
+ <remarks>
+ This will delete existing snapshots so should not be done in any production environment therefore this is not
+ part of the IProjectionSnapshotWriter interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotWriter`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobProjectionSnapshotWriter.Create``3(CQRSAzure.EventSourcing.IAggregationIdentifier{``1},CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockJsonWrappedEvent.EventName">
+ <summary>
+ The class name of the event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockJsonWrappedEvent.Sequence">
+ <summary>
+ The sequence number of this record
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.BlobBlockJsonWrappedEvent.#ctor">
+ <summary>
+ Empty constructor for serialisation
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamBaseUntyped">
+ <summary>
+ Common functionality that both untyped reader and untyped writer use to access the event store on the Azure storage
+ </summary>
+ <remarks>
+ Care must be taken to make sure this remains compatible with the type-safe implementation
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamBaseUntyped.ContainerBasePath">
+ <summary>
+ The storage location that the event streams for this event stream are located
+ </summary>
+ <returns>
+ /eventstreams/[aggregate-class-name]/
+ </returns>
+ <remarks>
+ This is a virtual path that is added to the blob name to create a traversable path
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamBaseUntyped.EventStreamBlobFilename">
+ <summary>
+ The filename that this specific event stream will be written to
+ </summary>
+ <returns>
+ e.g. /eventstreams/car/olj565m.events 
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamBaseUntyped.AppendBlob">
+ <summary>
+ The blob that the events are written to/read from
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamBaseUntyped.ResetBlob">
+ <summary>
+ Create the Blob or get the reference to an existing one
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamReaderUntyped">
+ <summary>
+ Class to read events from an untyped event stream implemented as a windows azure append blob
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamReaderUntyped.GetAppendBlobSnapshot">
+ <summary>
+ Get a snapshot of the append blob to use when reading this event stream
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamReaderUntyped.Create(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="settings">
+ The settings to use to connect to the azure storage account to use
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamReaderUntyped.CreateProjectionProcessor(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings,CQRSAzure.EventSourcing.ISnapshotProcessorUntyped)">
+ <summary>
+ Create a projection processor that works off an azure blob backed event stream
+ </summary>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamWriterUntyped">
+ <summary>
+ An untyped writer to append events to the end of an event stream implemented as an AppendBlob
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamWriterUntyped.IncrementRecordCountAndSequence">
+ <summary>
+ Update the sequence number metadata and return the new sequence number
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamWriterUntyped.Reset">
+ <summary>
+ Clear down the event stream
+ </summary>
+ <remarks>
+ This will delete existing events so should not be done in any production environment therefore this is not
+ part of the IEventStreamWriter interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamWriterUntyped.Create(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,System.String,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings)">
+ <summary>
+ Creates an azure blob storage based event stream writer for the given aggregate
+ </summary>
+ <param name="settings">
+ The settings to use to connect to the azure storage account to use
+ </param>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobProjectionSnapshotBaseUntyped.ContainerBasePath">
+ <summary>
+ The storage location that the event streams for this event stream are located
+ </summary>
+ <returns>
+ /snapshots/[aggregate-class-name]/[projection-name]/
+ </returns>
+ <remarks>
+ This is a virtual path that is added to the blob name to create a traversable path
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobProjectionSnapshotBaseUntyped.ProjectionSnapshotBlobFilename">
+ <summary>
+ The filename that this specific projection snapshot stream will be written to
+ </summary>
+ <returns>
+ e.g. /snapshots/car/olj565m.snapshots 
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobProjectionSnapshotBaseUntyped.AppendBlob">
+ <summary>
+ The blob that the events are written to/read from
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobProjectionSnapshotBaseUntyped.RequestOptions">
+ <summary>
+ The system-wide options for writing to the event stream
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobProjectionSnapshotBaseUntyped.GetHighestSequence">
+ <summary>
+ Get the highest sequence number snapshot stored in this append blob
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobProjectionSnapshotReaderUntyped">
+ <summary>
+ Class to read untyped projection snapshot records that have been stored in an Azure blob record
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobProjectionSnapshotReaderUntyped.GetAppendBlobSnapshot">
+ <summary>
+ Get a snapshot of the append blob to use when reading this event stream
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobProjectionSnapshotWriterUntyped.Reset">
+ <summary>
+ Clear down the snapshot collection
+ </summary>
+ <remarks>
+ This will delete existing snapshots so should not be done in any production environment therefore this is not
+ part of the IProjectionSnapshotWriter interface
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedEvent">
+ <summary>
+ An event instance wrapped up in a way that allows it to be stored in an Azure file
+ </summary>
+ <remarks>
+ The size of the event is stored in the outer wrapper to allow a file reader to skip over and events 
+ it doesn't need to process
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedEvent.EventName">
+ <summary>
+ The class name of the event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedEvent.Sequence">
+ <summary>
+ The sequence number of this record
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedEvent.m_eventClassName">
+ <summary>
+ The .NET class used to serialise/deserialise the underlying event blob data
+ </summary>
+ <remarks>
+ It is possible to derive this by a lookup table from the event name and version if you prefer not to save the class name
+ in the event record.  Usually any storage space critical systems would do this so as to reduce redundant data stored.
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedProjectionSnapshot">
+ <summary>
+ A projection snapshot wrapped up in a way that allows it to be stored in an Azure file
+ </summary>
+ <remarks>
+ Only one snapshot is held per file - this class only exists to allow additional fields to be stored pertinent to the 
+ snapshot circumstance rather than its data
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedProjectionSnapshot.Sequence">
+ <summary>
+ The effective sequence number of the projection snapshot taken
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedProjectionSnapshot.AsOfDate">
+ <summary>
+ The effective date of the data as at the point in time that the snapshot was taken
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedProjectionSnapshotProperty">
+ <summary>
+ An individual property of a snapshot, wrapped for saving in an Azure blob
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileBlockWrappedProjectionSnapshotProperty.UpdateValue(System.Object)">
+ <summary>
+ This is not implemented as you should never update a value that has been taken from a projection
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileEventStreamBase`2">
+ <summary>
+ Common functionality that both reader and writer use to access the file based event store on the Azure storage for a specified
+ aggregation type
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileEventStreamBase`2.File">
+ <summary>
+ The file underlying the event stream
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamBase`2.#ctor(System.String,`1,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileEventStreamBase">
+ <summary>
+ Common functionality that both reader and writer use to access the file based event store on the Azure storage
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamBase.MakeValidStorageFolderName(System.String)">
+ <summary>
+ Turn a name into a valid folder name for azure file storage
+ </summary>
+ <param name="rawName">
+ The name of the thing we want to turn into a file storage folder name
+ </param>
+ <returns>
+ A folder name that can be used to locate this object type's event streams
+ </returns>
+ <remarks>
+ Container names must start With a letter Or number, And can contain only letters, numbers, And the dash (-) character.
+ Every dash (-) character must be immediately preceded And followed by a letter Or number; consecutive dashes are Not permitted in container names.
+ All letters in a container name must be lowercase.
+ Container names must be from 3 through 63 characters long.
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamBase.#ctor(System.String,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReader`2">
+ <summary>
+ Class to read events from an event stream implemented as a windows azure append blob
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate that the event stream belongs to
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type which provides the unique key by which to recognise an instance of the aggregate
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReader`2.#ctor(System.String,`1,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction)">
+ <summary>
+ Create a new windows azure file stream reader to read events from the file
+ </summary>
+ <param name="AggregateDomainName">
+ The domain in which the aggregate resides
+ </param>
+ <remarks>
+ The unique key which identifies the instance of the aggregate to read the event stream for
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReader`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Creates an azure file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReader`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier,`1,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Creates an azure file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Create a projection processor that works off an azure blob backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1})">
+ <summary>
+ Create a projection processor that works off an in-memory backed event stream
+ </summary>
+ <param name="readerToUse">
+ The event stream reader to use to run the projection
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReaderFactory.Create``2(CQRSAzure.EventSourcing.IAggregationIdentifier{``1},``1,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Creates an azure file storage based event stream writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to write the event stream
+ </param>
+ <param name="settings">
+ Any additional settings 
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReaderFactory.CreateProjectionProcessor``2(``0,``1,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Create a projection processor that works off an azure file backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReaderFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create a reader of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriter`2">
+ <summary>
+ Implementation class to write to an event stream based on an Azure File backing store
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate this event stream is attached to
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type of the key that uniquely identifies an instance of that key
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriter`2.Reset">
+ <summary>
+ Clear down the event stream
+ </summary>
+ <remarks>
+ This will delete existing events so should not be done in any production environment therefore this is not
+ part of the IEventStreamWriter interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriter`2.#ctor(System.String,`1,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Create a new windows azure file stream reader to write events to the file
+ </summary>
+ <param name="AggregateDomainName">
+ The domain in which the aggregate resides
+ </param>
+ <remarks>
+ The unique key which identifies the instance of the aggregate to read the event stream for
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriter`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Creates an azure file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriter`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier,`1,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Creates an azure file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriterFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Creates an azure file storage based event stream writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to write the event stream
+ </param>
+ <param name="settings">
+ Any additional settings 
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriterFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create an event stream writer of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase`3">
+ <summary>
+ Common functionality that both reader and writer use to access the file based projection snapshots on the Azure storage for a specified
+ aggregation type
+ </summary>
+ <remarks>
+ There is only one snapshot stored in any given file
+ The file path consists of the projection name and snapshot sequence number (incremental)
+ Therefore getting the latest snapshot means doing a directory listing of the [aggregate]\[key]\snapshots\[projection name]\ folder
+ e.g.
+ [Aggregate]\[key]\snapshots\[projection]\103.[asofdate] is snapshot as at seqeuence # 103
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase`3.SnapshotsDirectory">
+ <summary>
+ The root path that this aggregate/projection combination will store its snapshot records in
+ e.g.
+ [Aggregate]/[key]/snapshots/[projection]/
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase`3.SnapshotBasePath">
+ <summary>
+ The root path that this aggregate/projection combination will store its snapshot records in
+ e.g.
+ [Aggregate]/[key]/snapshots/[projection]/
+ </summary>
+ <remarks>
+ This can be used to make an URI directly into that directory
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase`3.MakeSnapshotFilename(System.UInt32,System.DateTime)">
+ <summary>
+ Make a filename to use to store the given snapshot in
+ </summary>
+ <param name="snapshotSequence">
+ The sequence number the snapshot is effective for
+ </param>
+ <param name="snapshotAsOfDate">
+ The effective date the snapshot is effective for
+ </param>
+ <returns>
+ a filename like 00000000203.20160715113910 that uniquely identifies the sequence and effective date of a snapshot
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase`3.ListSnapshotFiles">
+ <summary>
+ List the snapshot files stored for this aggregate key
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase`3.#ctor(System.String,`1,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Create a new base for a projection snapshot reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase">
+ <summary>
+ Base class for all file based projection snapshot operations
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase.FileClient">
+ <summary>
+ The connection to the azure storage through which file operations are performed
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase.#ctor(System.String,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase.FormatSequenceAsOfDate(System.DateTime)">
+ <summary>
+ Formats the effective date of a snapshot as a string
+ </summary>
+ <param name="snapshotAsOfDate">
+ The as-of date of the string
+ </param>
+ <returns>
+ A date formatted as a alphabetically sortable string e.g. 207601021403
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase.FormatSequenceNumber(System.UInt32)">
+ <summary>
+ Formats a sequence number (up to a maximum of 4294967295)
+ </summary>
+ <param name="snapshotSequence">
+ The seque3nce number to format
+ </param>
+ <remarks>
+ The number is left padded with zeroes so both numeric and alphabetical sorts match
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase.FilenameToSequenceNumber(System.String)">
+ <summary>
+ Turn a snapshot filename into the sequence number component
+ </summary>
+ <param name="filename">
+ e.g. 0000000017.20160415092207
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotBase.FilenameToAsOfDate(System.String)">
+ <summary>
+ Turn a snapshot filename into the as-of date component
+ </summary>
+ <param name="filename">
+ e.g. 0000000017.20160415092207
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotReader`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},`2,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Creates an azure file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotReaderFactory.Create``3(``0,``1,``2,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Creates an azure file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotWriter`3.Reset">
+ <summary>
+ Clear down all of the saved snapshots
+ </summary>
+ <remarks>
+ This will delete existing snapshot records so should not be done in any production environment therefore this is not
+ part of the IProjectionSnapshotWriter interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotWriter`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},`2,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Creates an azure file storage based event stream writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileProjectionSnapshotWriterFactory.Create``3(``0,``1,``2,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Creates an azure file storage based projection snapshot writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ </param>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase`2.AggregateIdentifierField">
+ <summary>
+ The name of the field in which the unique identifier of the aggregate is stored
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase`2.EventTypeField">
+ <summary>
+ The name of the field in which the event type is stored
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase`2.EventVersionField">
+ <summary>
+ The name of the field in which the event version is held
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase`2.SequenceField">
+ <summary>
+ The field name that holds the event sequence number
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase`2.TableName">
+ <summary>
+ The name of the table that the event stream is held in
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase`2.GetEventTableName(System.Type)">
+ <summary>
+ Get the table name to use for a given event instance type
+ </summary>
+ <param name="eventInstanceType">
+ The CLR type for the event being persisted to / read from the database
+ </param>
+ <returns>
+ aggregate name + event name + "Detail" e.g. [Cow Purchased Detail] , [Player Injured Detail]
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase`2.#ctor(System.String,`1,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+ <param name="settings">
+ Configuration settings that affect how/where the event stream is written
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase.#ctor(System.String,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+ <param name="settings">
+ Configuration settings that affect how/where the event stream is written
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase.MakeFieldName(System.String)">
+ <summary>
+ In SQL server the rules for a field name match those for a table name
+ </summary>
+ <param name="propertyName">
+ The name of the .NET property
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase.MakeFieldParameter(System.String)">
+ <summary>
+ Tuen a property name into a parameter
+ </summary>
+ <param name="propertyName">The property name from the class</param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamReader`2.#ctor(System.String,`1,CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction)">
+ <summary>
+ Create a new windows azure file stream reader to read events from the file
+ </summary>
+ <param name="AggregateDomainName">
+ The domain in which the aggregate resides
+ </param>
+ <remarks>
+ The unique key which identifies the instance of the aggregate to read the event stream for
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamReader`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Create a projection processor that works off an azure blob backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1})">
+ <summary>
+ Create a projection processor that works off an in-memory backed event stream
+ </summary>
+ <param name="readerToUse">
+ The event stream reader to use to run the projection
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamReaderFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Factory method to create a type-safe event stream reader based off an SQL server back end event stream
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate to which the event stream is attached
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key which uniquely identifies the unique instance of the aggregate for which to get the event stream reader
+ </typeparam>
+ <param name="instance">
+ The unique instance of the aggregate for which we are getting the event stream reader
+ </param>
+ <param name="key">
+ The key that uniquely identifies the aggregate instance
+ </param>
+ <param name="settings">
+ (Optional) Additional settings to control how the event stream is read from the SQL Server database
+ </param>
+ <param name="eventFilter">
+ (Optional) A set of events to read - anything not in the set is ignored
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamReaderFactory.CreateProjectionProcessor``2(``0,``1,CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Create a projection processor that works off an SQL server backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamReaderFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create a reader of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamWriter`2.MakeEventInsertCommand(CQRSAzure.EventSourcing.IEvent{`0})">
+ <summary>
+ Create an SQL "INSERT INTO" type of command to insert the data for this event into the event detail table
+ </summary>
+ <param name="eventInstance">
+ The event we are looking to save to the database
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamWriter`2.MakeEventInsertCommand(System.Type)">
+ <summary>
+ Create an SQL "INSERT INTO" type of command to insert the data for this event into the event detail table
+ </summary>
+ <param name="eventInstanceType">
+ The type of the event we are looking to save to the database
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamWriter`2.#ctor(System.String,`1,CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings)">
+ <param name="AggregateDomainName">
+ The domain in which the aggregate resides
+ </param>
+ <remarks>
+ The unique key which identifies the instance of the aggregate to read the event stream for
+ </remarks>
+ <param name="settings">
+ Configuration settings that affect how/where the event stream is written
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamWriter`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings)">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamWriterFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings)">
+ <summary>
+ Factory method to create a type-safe event stream writer to add events to a stream on an SQL database
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate to which the event stream is linked
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which this aggregate is uniquely identified
+ </typeparam>
+ <param name="instance">
+ The specific instance of the aggregate to write events for
+ </param>
+ <param name="key">
+ The unique key by which to identify the specific instance of the aggregate to write events for
+ </param>
+ <param name="settings">
+ Additional settings to control how events are written to an SQL server database
+ </param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamWriterFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create an event stream writer of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Table.TableAggregateKeyRecord">
+ <summary>
+ A single row in the domain aggregates table
+ </summary>
+ <remarks>
+ This is to allow identity group operations withour requiring a table scan on the event stream tables
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.TableAggregateKeyRecord.CreatedDateTime">
+ <summary>
+ The date/time this aggregate key instance was first created
+ </summary>
+ <remarks>
+ This can be used to derive the "All" group membership as at a point in time
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableAggregateKeyRecord.#ctor">
+ <summary>
+ Parameterless constructor for serialisation
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamBase`2.MakeDynamicTableEntity(CQRSAzure.EventSourcing.IEventContext{`1})">
+ <summary>
+ Turn an event and its data load into a row to save in an Azure table
+ </summary>
+ <param name="eventToSave">
+ The instance of the event and related context data to save to the table
+ </param>
+ <returns>
+ A dynamic table entity that represnets the event in a format that can be saved into the table
+ </returns>
+ <remarks>
+ Currently Azure tables has a hard limit of 252 properties so we must throw an error if the event has more 
+ properties than that (although this may change in future)
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamBase`2.#ctor(System.String,`1,System.Boolean,System.String,CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamBase.Table">
+ <summary>
+ The table reference to use when accessing the underlying event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamBase.AggregateKeyTable">
+ <summary>
+ The table reference to use when accessing the aggregate key details
+ </summary>
+ <remarks>
+ This can also be used to give a secondary key lookup if an aggregate has different candidates for unqiue
+ identifier (e.g. CUSIP/ISIN/SEDOL etc for stocks, Chassis No/Veh Reg for vehicle etc..)
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamBase.TableName">
+ <summary>
+ The name of the table in which the event stream for this aggregate type is stored
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamBase.MakeEntityProperty(System.Reflection.PropertyInfo,CQRSAzure.EventSourcing.IEvent)">
+ <summary>
+ Turn a property of an event into an entity property that can be stored in an Azure table
+ </summary>
+ <param name="pi">
+ The specific property in from the event
+ </param>
+ <param name="inputEvent">
+ The parent event to which that proeprty belongs
+ </param>
+ <remarks>
+ For a production system we will probably replace reflection with an interface with "ToDynamicTableEntity" to be implemented by every 
+ event class but this reflection based system is useful for getting started and rapid prototyping
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamBase.MakeValidStorageTableName(System.String)">
+ <summary>
+ Turn the raw input into a valid Microsoft Azure table name
+ </summary>
+ <param name="rawName">
+ The raw class name that we want to turn into a table
+ </param>
+ <remarks>
+ Table names must conform to these rules:
+ • Table names may contain only alphanumeric characters.
+ • A table name may Not begin with a numeric character. 
+ • Table names are case-insensitive.
+ • Table names must be from 3 through 63 characters long.
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamProvider`2.AggregateKeyTable">
+ <summary>
+ The table reference to use when accessing the aggregate key details
+ </summary>
+ <remarks>
+ This can also be used to give a secondary key lookup if an aggregate has different candidates for unqiue
+ identifier (e.g. CUSIP/ISIN/SEDOL etc for stocks, Chassis No/Veh Reg for vehicle etc..)
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReader`2">
+ <summary>
+ An event stream reader that gets its events from an Azure Table 
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate against which the events are stored
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that uniquely identifies the aggregate instance that teh event stream is connected to
+ </typeparam>
+ <remarks>
+ Azure Table Storage uses a continuation token in the response header to indicate that there are additional results for a query. 
+ You can retrieve these results by issuing another request that is parameterized by the continuation token. 
+ This scenario enables you to retrieve items beyond the 1,000-entity limit.
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReader`2.CreateQuery(System.String,System.Int64)">
+ <summary>
+ Create a table query where the partition key is the aggregate instance identifier  and the sequence number is greater than or equal to the current starting
+ sequence number (which may be zero)
+ </summary>
+ <param name="StartingSequenceNumber">
+ The sequence number (0 based) of the first event to retrieve
+ </param>
+ <remarks>
+ There is no concept of order-by but this does not matter as we explicitly use the sequence number as the row key, and results are 
+ always in row key order
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReader`2.#ctor(System.String,`1,CQRSAzure.EventSourcing.Azure.Table.ITableSettings,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction)">
+ <summary>
+ Create a new windows azure tables stream reader to read events from the file
+ </summary>
+ <param name="AggregateDomainName">
+ The domain in which the aggregate resides
+ </param>
+ <remarks>
+ The unique key which identifies the instance of the aggregate to read the event stream for
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReader`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Table.ITableSettings,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction)">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Table.ITableSettings,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction)">
+ <summary>
+ Create a projection processor that works off an azure blob backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1})">
+ <summary>
+ Create a projection processor that works off an in-memory backed event stream
+ </summary>
+ <param name="readerToUse">
+ The event stream reader to use to run the projection
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReaderFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.Azure.Table.ITableSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Factory method to create a type-safe event stream reader based off an SQL server back end event stream
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate to which the event stream is attached
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key which uniquely identifies the unique instance of the aggregate for which to get the event stream reader
+ </typeparam>
+ <param name="instance">
+ The unique instance of the aggregate for which we are getting the event stream reader
+ </param>
+ <param name="key">
+ The key that uniquely identifies the aggregate instance
+ </param>
+ <param name="settings">
+ (Optional) Additional settings to control how the event stream is read from the SQL Server database
+ </param>
+ <param name="eventFilter">
+ (Optional) A set of events to read - anything not in the set is ignored
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReaderFactory.CreateProjectionProcessor``2(``0,``1,CQRSAzure.EventSourcing.Azure.Table.ITableSettings,System.Collections.Generic.IEnumerable{System.Type})">
+ <summary>
+ Create a projection processor that works off an Azure tables backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamReaderFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create a reader of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamWriter`2.Reset">
+ <summary>
+ Clear out this event stream 
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamWriter`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamWriterFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableEventStreamWriterFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create an event stream writer of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotBase`3">
+ <summary>
+ Base functionality for storing projection snapshots in an Azure table
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregation to which the event stream and projection are being run
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type of the key that uniquely identifies an instance of this aggregation
+ </typeparam>
+ <typeparam name="TProjection">
+ The type of the projection being snapshotted
+ </typeparam>
+ <remarks>
+ The snapshot table contains one row per key/sequence number and row
+ The as-of date is held as a field in that row 
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotBase.SequenceAndRowToRowKey(System.UInt32,System.UInt32)">
+ <summary>
+ Turns teh sequence number and row pair into a key that canbe used to search for a snapshot row in a table
+ </summary>
+ <param name="sequenceNumber">
+ The event stream sequence number as of which the snapshot was taken
+ </param>
+ <param name="rowNumber">
+ The row number of the row of data that the snapshot is for
+ </param>
+ <remarks>
+ A snapshot will always have a row 0 so this can be used to find a snapshot by sequence number only
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotBase.SequenceFromRowKey(System.String)">
+ <summary>
+ Turns the row key into a sequence number
+ </summary>
+ <remarks>
+ A snapshot will always have a row 0 so this can be used to find a snapshot by sequence number only
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotReader`3.Create(`0,`1,`2,CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Creates an azure table storage based projection snapshot reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the snapshot
+ </param>
+ <param name="key">
+ The key that uniquely identifies the instance for which we are reading a snapshot
+ </param>
+ <param name="projection">
+ The projection itself for which the snapshot is being loaded
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotReaderFactory.Create``3(``0,``1,``2,CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Creates an azure table storage based projection snapshot reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the snapshot
+ </param>
+ <param name="key">
+ The key that uniquely identifies the instance for which we are reading a snapshot
+ </param>
+ <param name="projection">
+ The projection itself for which the snapshot is being loaded
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotWriter`3.MakeTableEntity(`1,System.Int32,CQRSAzure.EventSourcing.IProjectionSnapshot{`0,`1})">
+ <summary>
+ Make a table entity to store one row of values for this snapshot
+ </summary>
+ <param name="key">
+ The key that uniquely identifies the aggregate instance being snapshotted
+ </param>
+ <param name="valuesRow">
+ The ordinal position of the row of values being saved
+ </param>
+ <param name="snapshotToSave">
+ The snapshot with all the data values to save
+ </param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotWriter`3.Reset">
+ <summary>
+ Reset the snapshot list
+ </summary>
+ <remarks>
+ This should only be used for unit testing so is not part of the core IProjectionSnapshotWriter interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotWriter`3.Create(`0,`1,`2,CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Creates an azure table storage based projection snapshot writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to write the snapshot
+ </param>
+ <param name="key">
+ The key that uniquely identifies the instance for which we are writing a snapshot
+ </param>
+ <param name="projection">
+ The projection itself for which the snapshot is being saved
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.TableProjectionSnapshotWriterFactory.Create``3(``0,``1,``2,CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Creates an azure file storage based event stream writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableEventStreamBaseUntyped">
+ <summary>
+ An implementation of event streams using Azure tables for non type-specified streams
+ </summary>
+ <remarks>
+ Care must be taken to make sure this remains compatible with the type-safe implementation
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableEventStreamReaderUntyped">
+ <summary>
+ An event stream reader with Azure Tables as the backing store that allows untyped aggregate definition
+ </summary>
+ <remarks>
+ Care must be taken to make sure this remains compatible with the type-safe implementation
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableEventStreamReaderUntyped.CreateQuery(System.Int64)">
+ <summary>
+ Create a table query where the partition key is the aggregate instance identifier  and the sequence number is greater than or equal to the current starting
+ sequence number (which may be zero)
+ </summary>
+ <param name="StartingSequenceNumber">
+ The sequence number (0 based) of the first event to retrieve
+ </param>
+ <remarks>
+ There is no concept of order-by but this does not matter as we explicitly use the sequence number as the row key, and results are 
+ always in row key order
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableEventStreamReaderUntyped.Create(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,System.String,CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Creates an azure blob storage based event stream reader for the given aggregate
+ </summary>
+ <param name="settings">
+ The settings to use to connect to the azure storage account to use
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableEventStreamReaderUntyped.CreateProjectionProcessor(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,System.String,CQRSAzure.EventSourcing.Azure.Table.ITableSettings,CQRSAzure.EventSourcing.ISnapshotProcessorUntyped)">
+ <summary>
+ Create a projection processor that works off an azure blob backed event stream
+ </summary>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableEventStreamWriterUntyped">
+ <summary>
+ An event stream writer with Azure Tables as the backing store that allows untyped aggregate definition
+ </summary>
+ <remarks>
+ Care must be taken to make sure this remains compatible with the type-safe implementation
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableEventStreamWriterUntyped.Reset">
+ <summary>
+ Clear down the event stream
+ </summary>
+ <remarks>
+ This is only used for unit testing so is not part of the Event Stream Writer interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableEventStreamWriterUntyped.Create(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,System.String,CQRSAzure.EventSourcing.Azure.Table.ITableSettings)">
+ <summary>
+ Creates an azure table storage based event stream writer for the given aggregate - untyped
+ </summary>
+ <param name="settings">
+ The settings to use to connect to the azure storage account to use
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableJsonWrappedEvent">
+ <summary>
+ Turns an event serialised in an Azure table to a JSON version that can be processed 
+ by the "untyped" event stream processors
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableJsonWrappedEvent.EventName">
+ <summary>
+ The class name of the event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableJsonWrappedEvent.Sequence">
+ <summary>
+ The sequence number of this record
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableJsonWrappedEvent.#ctor">
+ <summary>
+ Empty constructor for serialisation
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventStreamBase">
+ <summary>
+ A base class for any functionality to be shared by absolutely anything that reads from or writes to an event stream
+ </summary>
+ <remarks>
+ Any code specific to an implementation or class of implementations should be placed in a class that inherits from
+ this one
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IKeyConverter`1">
+ <summary>
+ Because some storage mechanisms cannot use the full set of CLR types for their key we need a way to 
+ convert them to/from a string so as to store that
+ </summary>
+ <typeparam name="TAggregateKey"></typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IKeyConverter`1.FromString(System.String)">
+ <summary>
+ Convert a string to the given key type
+ </summary>
+ <param name="value">
+ The value stored as a string
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IKeyConverter`1.ToUniqueString(`0)">
+ <summary>
+ Convert the value to an unique string that corresponds to that value
+ </summary>
+ <param name="value">
+ The key value in its data type
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamBase`2.AppendEvent(CQRSAzure.EventSourcing.IEvent,System.String,System.Int64,System.String,System.String)">
+ <summary>
+ Wrap an event in context information and add it to the internal stream for the aggregate
+ </summary>
+ <param name="EventInstance"></param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamBase`2.#ctor(`1,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates a new event stream writer to read events from the event stream for the given aggregate
+ </summary>
+ <param name="aggregateIdentityKey">
+ The unique identifier fo the instance of that aggregate class
+ </param>
+ <param name="settings">
+ The additional settings to control how event streams are created in memory
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamBase`2.ResetStream(`1)">
+ <summary>
+ Reset the specific event stream
+ </summary>
+ <param name="aggregateIdentityKey">
+ The unique key for which to clear all events
+ </param>
+ <remarks>
+ This should be used to ensure a known "start state" for any given event stream for 
+ reliable repeatable unit tests
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.IsEventValid(System.Type)">
+ <summary>
+ Decide if an event type is valid to be read for this event stream reader
+ </summary>
+ <param name="eventType">
+ The event type read (or to be read) from the stream
+ </param>
+ <returns>
+ True if the event type should be passed on
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.CurrentSequenceNumber">
+ <summary>
+ The current event sequence in the stream being read
+ </summary>
+ <remarks>
+ This is somewhat analoguous to an object pointer to the event in a memory based system
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.GetNextEventWithContext">
+ <summary>
+ Get the next event from the stream given the current sequence number
+ </summary>
+ <returns>
+ An event wrapped in the event context information
+ </returns>
+ <remarks>
+ This will be null if there are no more events that match the filter conditions
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.ResetToStart">
+ <summary>
+ Set the current sequence pointer back to zero to restart reading the event stream
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.#ctor(`1,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates a new event stream writer to read events from the event stream for the given aggregate
+ </summary>
+ <param name="aggregateIdentityKey">
+ The unique identifier fo the instance of that aggregate class
+ </param>
+ <param name="eventFilter">
+ A set of type to filter the event stream by
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="eventFilter">
+ An optional array of event definitions to use to filter the incoming event stream by
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.Create(`1,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instanceKey">
+ The unique identifier of the aggregate for which we want to read the event stream
+ </param>
+ <param name="eventFilter">
+ An optional array of event definitions to use to filter the incoming event stream by
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Create a projection processor that works off an in-memory backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.CreateProjectionProcessor(`1,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Create a projection processor that works off an in-memory backed event stream
+ </summary>
+ <param name="instanceKey">
+ The unique identifier of the instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1})">
+ <summary>
+ Create a projection processor that works off an in-memory backed event stream
+ </summary>
+ <param name="readerToUse">
+ The event stream reader to use to run the projection
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReaderFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.InMemory.IInMemorySettings,System.Collections.Generic.IEnumerable{System.Type},CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="eventFilter">
+ An optional array of event definitions to use to filter the incoming event stream by
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamReaderFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create a reader of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamWriter`2">
+ <summary>
+ Class to write events to an in-memory store
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the base class to which the event stream is attached
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an instance of that aggregation base class is uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamWriter`2.Reset">
+ <summary>
+ Clear down the event stream
+ </summary>
+ <remarks>
+ This will delete existing events so should not be done in any production environment therefore this is not
+ part of the IEventStreamWriter interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamWriter`2.#ctor(`1,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates a new event stream writer to write events to the event stream for the given aggregate
+ </summary>
+ <param name="aggregateIdentityKey">
+ The unique identifier fo the instance of that class
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamWriter`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamWriter`2.Create(`1,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instanceKey">
+ The unique identifier of the instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamWriterFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryEventStreamWriterFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create an event stream writer of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.InMemory.InMemoryProjectionSnapshotBase`2">
+ <summary>
+ Base class for saving projection snapshots in memory
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the base class to which the event stream is attached
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an instance of that aggregation base class is uniquely identified
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.InMemory.InMemoryProjectionSnapshotReader`3">
+ <summary>
+ Class to read projection snapshots (cached values) from an in-memory store
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the base class to which the event stream is attached
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an instance of that aggregation base class is uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryProjectionSnapshotReader`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates a projection reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryProjectionSnapshotReader.Create``3(CQRSAzure.EventSourcing.IAggregationIdentifier{``1},CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates a projection reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.InMemory.InMemoryProjectionSnapshotWriter`3">
+ <summary>
+ Class to write projection snapshots (cached values) into an in-memory store
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the base class to which the event stream is attached
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an instance of that aggregation base class is uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryProjectionSnapshotWriter`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.InMemory.InMemoryProjectionSnapshotWriter.Create``3(CQRSAzure.EventSourcing.IAggregationIdentifier{``1},CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Creates an in-memory event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamBase`2.Filename">
+ <summary>
+ The filename in which the event stream is written
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamBase`2.#ctor(System.String,`1,System.Boolean,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Create a new base for a reader or writer class in the given domain
+ </summary>
+ <param name="AggregateDomainName">
+ The name of the domain to store/retrieve the event streams under
+ </param>
+ <param name="AggregateKey">
+ The key by which the instance of the aggregate whose event stream is accessed is identified
+ </param>
+ <param name="writeAccess">
+ Should this class be able to write to the file 
+ </param>
+ <param name="settings">
+ Configuration settings that affect where (and how) the files are stored
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamBase`2.LoadEventStreamDetailBlock">
+ <summary>
+ Load the EventStreamDetailBlock from the start of the file
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamBase`2.LoadEventStreamDetailBlock(System.IO.Stream)">
+ <summary>
+ Load the EventStreamDetailBlock from the start of the file
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamBase.MakeHomeDirectory(System.String,System.String,System.String,System.String)">
+ <summary>
+ Create a directory reference for where we are going to store the event streams for this aggregate
+ </summary>
+ <param name="rootPath"></param>
+ <param name="aggregateClassName"></param>
+ <returns>
+ {root}\{domain}\{aggregate name}\eventstreams\
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamBase.MakeValidLocalFolderName(System.String)">
+ <summary>
+ Turn a name into a valid folder name for azure file storage
+ </summary>
+ <param name="rawName">
+ The name of the thing we want to turn into a file storage folder name
+ </param>
+ <returns>
+ A folder name that can be used to locate this object type's event streams
+ </returns>
+ <remarks>
+ Container names must start With a letter Or number, And can contain only letters, numbers, And the dash (-) character.
+ Every dash (-) character must be immediately preceded And followed by a letter Or number; consecutive dashes are Not permitted in container names.
+ All letters in a container name must be lowercase.
+ Container names must be from 3 through 63 characters long.
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Local.File.EventStreamDetailBlock">
+ <summary>
+ Connection between a file and the data it contains
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.EventStreamDetailBlock.KeyAsString">
+ <summary>
+ The key of the aggregate as convterted to a string
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.EventStreamDetailBlock.SequenceNumber">
+ <summary>
+ The current sequence number of the event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.EventStreamDetailBlock.DateCreated">
+ <summary>
+ The date/time the event stream was created
+ </summary>
+ <remarks>
+ We could use the file properties but this would preclude event streams being copied between test
+ and production machines
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.EventStreamDetailBlock.RecordCount">
+ <summary>
+ The number of records in the stream
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamReader`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an azure file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamReader`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier,`1,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <returns>
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Local.File.ILocalFileSettings,CQRSAzure.EventSourcing.ISnapshotProcessor{`0,`1})">
+ <summary>
+ Create a projection processor that works off an local file system backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamReader`2.CreateProjectionProcessor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1})">
+ <summary>
+ Create a projection processor that works off an in-memory backed event stream
+ </summary>
+ <param name="readerToUse">
+ The event stream reader to use to run the projection
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamReaderFactory.Create``2(CQRSAzure.EventSourcing.IAggregationIdentifier{``1},``1,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to write the event stream
+ </param>
+ <param name="settings">
+ Any additional settings 
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamReaderFactory.CreateProjectionProcessor``2(``0,``1,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings,CQRSAzure.EventSourcing.ISnapshotProcessor{``0,``1})">
+ <summary>
+ Create a projection processor that works off an local file backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <param name="key">
+ The unique key by which the aggregate instance the projection is running over is identified
+ </param>
+ <param name="settings">
+ (Optional) Configuration settings controlling the event stream being read
+ </param>
+ <param name="snapshotProcessor">
+ (Optional) A processor to allow the projection to take point-in-time snapshots
+ </param>
+ <returns>
+ A projection processor that can run projections over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamReaderFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create a reader of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamWriter`2">
+ <summary>
+ Implementation class to write to an event stream based on an local files backing store
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate this event stream is attached to
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type of the key that uniquely identifies an instance of that key
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamWriter`2.AppendEventInternal(CQRSAzure.EventSourcing.IEvent{`0})">
+ <summary>
+ Append an event to the file, without saving the record count
+ </summary>
+ <param name="EventInstance"></param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamWriter`2.Reset">
+ <summary>
+ Clear down the event stream
+ </summary>
+ <remarks>
+ This will delete existing events so should not be done in any production environment therefore this is not
+ part of the IEventStreamWriter interface
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamWriter`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamWriter`2.Create(CQRSAzure.EventSourcing.IAggregationIdentifier,`1,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamWriterFactory.Create``2(``0,``1,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to write the event stream
+ </param>
+ <param name="settings">
+ Any additional settings 
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileEventStreamWriterFactory.GenerateCreationFunctionDelegate``2">
+ <summary>
+ Generate a function that can be used to create an event stream writer of the given type
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate class
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identification of an instance of the reader class
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Local.File.LocalFileProjectionSnapshotBase`3">
+ <summary>
+ Base class for storing projection state in a local file
+ </summary>
+ <remarks>
+ Snapshots go in e.g. :-
+ {root}\{domain}\{aggregate name}\snapshots\{key}.snapshot.{as-of-sequence-number}
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileProjectionSnapshotReader`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},`2,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileProjectionSnapshotReaderFactory.Create``3(``0,``1,``2,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an azure file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ The projection instance for which snapshots are to be read
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Local.File.LocalFileProjectionSnapshotWriter`3">
+ <summary>
+ Base class for storing projection state in a local file
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileProjectionSnapshotWriter`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},`2,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ The projection instance of which snapshots are taken
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileProjectionSnapshotWriterFactory.Create``3(``0,``1,``2,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates a local file storage based projection snapshot writer for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+ <param name="projection">
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedEvent">
+ <summary>
+ An event instance wrapped up in a way that allows it to be stored in an local file
+ </summary>
+ <remarks>
+ The size of the event is stored in the outer wrapper to allow a file reader to skip over and events 
+ it doesn't need to process
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedEvent.EventClassName">
+ <summary>
+ The class name of the event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedEvent.Sequence">
+ <summary>
+ The sequence number of this record
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedEvent.m_eventClassName">
+ <summary>
+ The .NET class used to serialise/deserialise the underlying event blob data
+ </summary>
+ <remarks>
+ It is possible to derive this by a lookup table from the event name and version if you prefer not to save the class name
+ in the event record.  Usually any storage space critical systems would do this so as to reduce redundant data stored.
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedProjectionSnapshot">
+ <summary>
+ A projection snapshot wrapped up in a way that allows it to be stored in a local file
+ </summary>
+ <remarks>
+ Only one snapshot is held per file - this class only exists to allow additional fields to be stored pertinent to the 
+ snapshot circumstance rather than its data
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedProjectionSnapshot.Sequence">
+ <summary>
+ The effective sequence number of the projection snapshot taken
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedProjectionSnapshot.AsOfDate">
+ <summary>
+ The effective date of the data as at the point in time that the snapshot was taken
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedProjectionSnapshotProperty">
+ <summary>
+ An individual property of a snapshot, wrapped for saving in an local file
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Local.File.LocalFileWrappedProjectionSnapshotProperty.UpdateValue(System.Object)">
+ <summary>
+ This is not implemented as you should never update a value that has been taken from a projection
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ProjectionProcessor`2.m_streamReader">
+ <summary>
+ The stream reader instance that will be used to run the projections
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionProcessor`2.Process(CQRSAzure.EventSourcing.IProjection{`0,`1})">
+ <summary>
+ Process the given projection using the event stream reader we have set up
+ </summary>
+ <param name="projectionToProcess">
+ The class that defines the projection operation we are going to process
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionProcessor`2.#ctor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1},CQRSAzure.EventSourcing.ISnapshotProcessor{`0,`1})">
+ <summary>
+ Create a new projection processor that will use the given event stream reader to do its processing
+ </summary>
+ <param name="readerTouse">
+ The event stream processor to use
+ </param>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ProjectionProcessorUntyped.m_streamReader">
+ <summary>
+ The stream reader instance that will be used to run the projections
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionProcessorUntyped.#ctor(CQRSAzure.EventSourcing.IEventStreamReaderUntyped,CQRSAzure.EventSourcing.ISnapshotProcessorUntyped)">
+ <summary>
+ Create a new projection processor that will use the given event stream reader to do its processing
+ </summary>
+ <param name="readerTouse">
+ The event stream processor to use
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionSnapshotBase`1">
+ <summary>
+ Base class for all projection snapshots
+ </summary>
+ <typeparam name="TProjection">
+ The type of the projection that is being snapshotted
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.SnapshotProcessor`2">
+ <summary>
+ Processor to load or save snapshots for a projection
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.SnapshotProcessor`2.SaveSnapshot(CQRSAzure.EventSourcing.IProjectionSnapshot{`0,`1})">
+ <summary>
+ Save the given projection snapshot to the underlying storage technology
+ </summary>
+ <param name="snapshotToSave">
+ The projection snapshot to be saved to the backing storage
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.SnapshotProcessor`2.GetLatestSnapshot(System.UInt32)">
+ <summary>
+ Get the most recent projection snapshot from the underlying storage technology
+ </summary>
+ <param name="priorToSequence">
+ if this is non zero get the snapshot record closest to the prior-to sequence number (inclusive)
+ </param>
+ <returns>
+ The most recent snapshot available if one has been saved - or Nothing (null) if none exists
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.SnapshotProcessor`2.GenerateSnapshot(CQRSAzure.EventSourcing.IProjection{`0,`1},System.UInt32,System.DateTime)">
+ <summary>
+ Turn the current state of a projection into a snapshot record that can be saved to a backing store
+ </summary>
+ <param name="projectionToSave">
+ The projection that has been run over an event stream
+ </param>
+ <param name="CurrentSequence">
+ The current sequence number we have got to in that event stream
+ </param>
+ <param name="CurrentAsOfDate">
+ The as-of date of the most recent event in the event stream (Optional)
+ </param>
+</member>
+</members>
+</doc>

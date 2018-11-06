@@ -1,0 +1,147 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+CQRSAzure.CommandHandler
+</name>
+</assembly>
+<members>
+<member name="T:CQRSAzure.CommandHandler.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:CQRSAzure.CommandHandler.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:CQRSAzure.CommandHandler.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="T:CQRSAzure.CommandHandler.CQRSAzureCommandHandlerConfigurationSection">
+ <summary>
+ Wrapper class for the possible configuration elements and element collections that affect how the 
+ command handler operates.
+ </summary>
+</member>
+<member name="T:CQRSAzure.CommandHandler.CQRSCommandHandlerMappingSettingsElement">
+ <summary>
+ Configuration setting used to map a command definition type to the handler type that handles it
+ </summary>
+ <remarks>
+ This allows handlers to be changed without rebuilding an application - for example to swap in a debug version 
+ </remarks>
+</member>
+<member name="P:CQRSAzure.CommandHandler.CQRSCommandHandlerMappingSettingsElement.DefinitionName">
+ <summary>
+ Unique fully qualified class name of the command definition class
+ </summary>
+</member>
+<member name="P:CQRSAzure.CommandHandler.CQRSCommandHandlerMappingSettingsElement.HandlerName">
+ <summary>
+ Fully qualified class name of the command handler class
+ </summary>
+</member>
+<member name="T:CQRSAzure.CommandHandler.CQRSCommandHandlerMappingSettingsElementCollection">
+ <summary>
+ The set of configuration setting used to map a command definition type to the handler type that handles it
+ </summary>
+</member>
+<member name="M:CQRSAzure.CommandHandler.CQRSCommandHandlerMappingSettingsElementCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+ <summary>
+ The command definition is the unique key
+ </summary>
+ <param name="element">
+ The full configuration element for which to retireve the key
+ </param>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.CommandHandler.CQRSCommandHandlerSettingsElement.Name">
+ <summary>
+ Unique name by which the handler is known
+ </summary>
+ <remarks>
+ If this is not set then the address and port are used.  
+ Ideally a human readable unique name should be used to aid debugging/logging
+ </remarks>
+</member>
+<member name="P:CQRSAzure.CommandHandler.ICommandHandlerMapping.DefinitionName">
+ <summary>
+ Unique fully qualified class name of the command definition class
+ </summary>
+</member>
+<member name="P:CQRSAzure.CommandHandler.ICommandHandlerMapping.HandlerName">
+ <summary>
+ Fully qualified class name of the command handler class
+ </summary>
+</member>
+<member name="T:CQRSAzure.CommandHandler.IHostCommandHandlerSettings">
+ <summary>
+ Settings pertaining to a command handler host
+ </summary>
+</member>
+<member name="T:CQRSAzure.CommandHandler.CommandHandlerBase`1">
+ <summary>
+ A base class for any command handler implementations
+ </summary>
+ <typeparam name="TCommandDefinition">
+ The specific type of command to handle
+ </typeparam>
+ <remarks>
+ This is to hold common cross-cutting functionality that applies to all command handlers (such as routing, error notifications, logging etc.)
+ </remarks>
+</member>
+<member name="M:CQRSAzure.CommandHandler.CommandHandlerBase`1.HandleCommand(`0)">
+ <summary>
+ handle the specific instance of the command passed in
+ </summary>
+ <param name="cmdToHandle">
+ The instance of the command to handle along with its input parameters
+ </param>
+</member>
+<member name="T:CQRSAzure.CommandHandler.CommandHandlerFactory">
+ <summary>
+ Factory methods for spinning-up instances of command handlers for given command definitions
+ </summary>
+</member>
+<member name="M:CQRSAzure.CommandHandler.CommandHandlerFactory.Initialise">
+ <summary>
+ Perform the start-up initialisations neccessary to link command handlers up to their definitions
+ </summary>
+ <remarks>
+ These may be declared in a config file or may be discovered by reflection as desired
+ </remarks>
+</member>
+<member name="M:CQRSAzure.CommandHandler.CommandHandlerFactory.Create``1(``0)">
+ <summary>
+ Spin up an instance of a command handler to handle a given command
+ </summary>
+ <typeparam name="TCommandDefinition">
+ The type of the command to handle
+ </typeparam>
+ <param name="commandInstance">
+ The instance of the command, with its specific parameters, to handle
+ </param>
+</member>
+<member name="T:CQRSAzure.CommandHandler.ICommandHandler`1">
+ <summary>
+ Base interface for any class that handles a specific command 
+ </summary>
+ <typeparam name="TCommandDefinition">
+ The command definition to perform the action for
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.CommandHandler.ICommandHandler`1.HandleCommand(`0)">
+ <summary>
+ Handle the command
+ </summary>
+ <param name="cmdToHandle">
+ The instance of the command to handle (with parameters)
+ </param>
+</member>
+</members>
+</doc>

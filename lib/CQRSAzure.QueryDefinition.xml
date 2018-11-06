@@ -1,0 +1,399 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+CQRSAzure.QueryDefinition
+</name>
+</assembly>
+<members>
+<member name="T:CQRSAzure.QueryDefinition.GetCommandStatusQueryDefinition">
+ <summary>
+ A special query used to get the status of a given command that has been sent
+ for execution
+ </summary>
+ <remarks>
+ This allows for a complete separation of command and query sides while still 
+ making it possible to 
+ </remarks>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.CommandStatusResult">
+ <summary>
+ Data transfer object for reporting the status of a command that has been sent for processing
+ </summary>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.QueryDefinitionBase`1">
+ <summary>
+ Base class from which the query definitions should be build
+ </summary>
+ <remarks>
+ To avoid a fragile base class do not add any functionality to this class that is not related to the attaching of
+ parameters to a query
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.QueryDefinitionBase`1.QueryName">
+ <summary>
+ The unique name for the query 
+ </summary>
+ <remarks>
+ This must be provided by the implementing class as each query type should have an unique name
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.QueryDefinitionBase`1.InstanceIdentifier">
+ <summary>
+ Unique identifier of the query instance
+ </summary>
+ <remarks>
+ Thsi allows us to identify which query to respond to if there are multiple concurrent queries of the same type
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.QueryDefinitionBase`1.IdentityGroupName">
+ <summary>
+ The name of the identity group over which this query should be executed
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.ICommandStatusResult">
+ <summary>
+ Interface describing a data transfer object for reporting the status of a command that has been sent for processing
+ </summary>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandExecutionStatus">
+ <summary>
+ The different statuses a command can have
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandExecutionStatus.UnknownCommand">
+ <summary>
+ The command for which we are seeming the status is not known to the system
+ </summary>
+ <remarks>
+ This may occur if the command has not yet been received but the query gets asked
+ before it
+ </remarks>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandExecutionStatus.SuccessfulCompletion">
+ <summary>
+ The command has completed successfully 
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandExecutionStatus.InProgress">
+ <summary>
+ The command is being processed
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandExecutionStatus.Queued">
+ <summary>
+ The command is in the queue to process but has not yet started
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandExecutionStatus.Retrying">
+ <summary>
+ The command failed (or only partially completed) but has been sent for a retry
+ </summary>
+ <remarks>
+ This might be used if a handler was overloaded or offline when the command was in progress
+ </remarks>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandExecutionStatus.Failed">
+ <summary>
+ The command failed fatally and will not be retried
+ </summary>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandFailureCause">
+ <summary>
+ Underlying reason why the command failed 
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandFailureCause.NotKnown">
+ <summary>
+ The underlying reason is not known 
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandFailureCause.InsufficientPermission">
+ <summary>
+ The account that sent the command does not have permission to do so
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandFailureCause.InvalidBusinessDataState">
+ <summary>
+ The business state of the data makes the command not valid
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandFailureCause.UnavailableHanlder">
+ <summary>
+ Nothing was able to handle the given command
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandFailureCause.InvalidCommandParameter">
+ <summary>
+ The input parameters of the command were wrong
+ </summary>
+</member>
+<member name="F:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandFailureCause.InvalidCommandContext">
+ <summary>
+ The context (machine, execute time etc.) for the command was invalid
+ </summary>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandInstanceIdentifier">
+ <summary>
+ The unique instance identifier of the command to which this status pertains
+ </summary>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.ICommandStatusResult.CommandName">
+ <summary>
+ The name of the command type that this status pertains to
+ </summary>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.ICommandStatusResult.ExecutationStatus">
+ <summary>
+ The status returned from the command when queried
+ </summary>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.ICommandStatusResult.FailureCause">
+ <summary>
+ If the command has failed, this gives the reason
+ </summary>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.ICommandStatusResult.StatusMessage">
+ <summary>
+ The text message from a command 
+ </summary>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.IQueryDefinition`1">
+ <summary>
+ Type safe query definition that specifies the expected return results
+ </summary>
+ <typeparam name="TResult">
+ The data type of the data we expect back from this query
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.IQueryDefinition">
+ <summary>
+ Interface to be implemented by all query definitions 
+ </summary>
+ <remarks>
+ This allows for a separation of concerns between the definition of the query and any parameters it requires,
+ the validation(s) of that query and the execution of the query
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.IQueryDefinition.InstanceIdentifier">
+ <summary>
+ Unique identifier of this query instance
+ </summary>
+ <remarks>
+ This allows queries to be queued and the response to a given query definition to be identified
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.IQueryDefinition.QueryName">
+ <summary>
+ The unique name of the query being requested
+ </summary>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.IQueryDefinition.AddParameter``1(CQRSAzure.QueryDefinition.QueryParameter{``0})">
+ <summary>
+ Add a paremeter to this query
+ </summary>
+ <param name="parameter">
+ The parameter to add to the query
+ </param>
+ <remarks>
+ This will throw an argument exception if this query already has a parameter with the same name and index.  
+ Use TryAddParameter to avoid this exception
+ </remarks>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.IQueryDefinition.TryAddParameter``1(CQRSAzure.QueryDefinition.QueryParameter{``0})">
+ <summary>
+ Add a paremeter to this query
+ </summary>
+ <param name="parameter">
+ The parameter to add to the query
+ </param>
+ <remarks>
+ This will return true if the parameter was successfully added
+ </remarks>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.IQueryDefinition.ParameterExists(System.String,System.Int32)">
+ <summary>
+ True if this query has the parameter defined for it
+ </summary>
+ <param name="parameterName">
+ The name of the parameter to look for
+ </param>
+ <param name="parameterIndex">
+ The zero-based index of the parameter
+ </param>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.IQueryDefinition.GetParameterValue``1(System.String,System.Int32)">
+ <summary>
+ Get the parameter value for the named parameter
+ </summary>
+ <param name="parameterName">
+ The name of the parameter to look for
+ </param>
+ <param name="parameterIndex">
+ The zero-based index of the parameter
+ </param>
+ <remarks>
+ This will throw an error if the parameter does not exists.  Use TryGetParameter instead if that is not desired
+ </remarks>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.IQueryDefinition.TryGetParameter``1(System.String,System.Int32,``0@)">
+ <summary>
+ Get the parameter value for the named parameter
+ </summary>
+ <param name="parameterName">
+ The name of the parameter to look for
+ </param>
+ <param name="parameterIndex">
+ The zero-based index of the parameter
+ </param>
+ <param name="value">
+ The variable to hold the parameter value if found
+ </param>
+ <remarks>
+ This will return true if the parameter was retrieved
+ </remarks>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.IQueryDefinition.SetParameterValue``1(System.String,System.Int32,``0@)">
+ <summary>
+ Set the value of the indicated parameter
+ </summary>
+ <typeparam name="TValueType">
+ The type of the parameter we are setting
+ </typeparam>
+ <param name="parameterName">
+ The name of the parameter to look for
+ </param>
+ <param name="parameterIndex">
+ The zero-based index of the parameter
+ </param>
+ <param name="value">
+ The value to assign to the parameter
+ </param>
+ <remarks>
+ if the parameter doesn't exist, add it, otherwise update it
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.IQueryDefinition.IdentityGroupName">
+ <summary>
+ The name of the identity group over which this query is to be executed
+ </summary>
+ <remarks>
+ This may be blank if the query runs over all event stream instances, and is passed as a specific named parameter so that the 
+ identity group can be tuned/set at the application front end
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.IQueryDefinition.ProjectionName">
+ <summary>
+ The name of the projection to run over each member of the identity group to get the results for the query
+ </summary>
+ <remarks>
+ This may also be blank meaning use the default projection defined for the query (lookup by name)
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.IQueryDefinition.MultiRowResults">
+ <summary>
+ Does the query return a set of results (as an IEnumerable) as opposed to just one result object
+ </summary>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.IQueryParameter">
+ <summary>
+ identifies a single parameter that is used to restrict the results returned for a given query definition
+ </summary>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.IQueryParameter.Name">
+ <summary>
+ The name of the parameter
+ </summary>
+ <remarks>
+ This should be unique in any given query definition, unless there are multuiple indexed properties with the same name
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.IQueryParameter.Index">
+ <summary>
+ The index (zero based) of the parameter
+ </summary>
+ <remarks>
+ For a non-indexed parameter, this will always be zero
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.IQueryParameter.Value">
+ <summary>
+ The value attached to the query parameter
+ </summary>
+ <returns>
+ </returns>
+</member>
+<member name="T:CQRSAzure.QueryDefinition.QueryParameter`1">
+ <summary>
+ A single parameter that is used to restrict the results returned for a given query definition
+ </summary>
+ <remarks>
+ This is an immutable class to allow for safe parallel/asynchronous processing
+ </remarks>
+ <typeparam name="TValue" >
+ The data type of the value held for this parameter
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.QueryParameter`1.Name">
+ <summary>
+ The name of the parameter
+ </summary>
+ <remarks>
+ This should be unique in any given query definition, unless there are multuiple indexed properties with the same name
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.QueryParameter`1.Index">
+ <summary>
+ The index (zero based) of the parameter
+ </summary>
+ <remarks>
+ For a non-indexed parameter, this will always be zero
+ </remarks>
+</member>
+<member name="P:CQRSAzure.QueryDefinition.QueryParameter`1.Value">
+ <summary>
+ The value of the parameter
+ </summary>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.QueryParameter`1.#ctor(System.String,System.Int32,`0)">
+ <summary>
+ Creatre a new parameter instance with the given properties
+ </summary>
+ <param name="nameInit">
+ The name of the parameter
+ </param>
+ <param name="indexInit">
+ The zero-based index of the parameter
+ </param>
+ <param name="valInit">
+ The starting value of the parameter - this can be Nothing (null) to indicate that the parameter is not set
+ </param>
+ <remarks></remarks>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.QueryParameter`1.Create(System.String,System.Int32,`0)">
+ <summary>
+ Create a new parameter for the given properties
+ </summary>
+ <param name="name">
+ The name of the parameter
+ </param>
+ <param name="index">
+ The zero-based index of the parameter
+ </param>
+ <param name="value">
+ The value to use for this parameter
+ </param>
+</member>
+<member name="M:CQRSAzure.QueryDefinition.QueryParameter`1.GetParameterKey(CQRSAzure.QueryDefinition.IQueryParameter)">
+ <summary>
+ Get the unique key of the given parameter as a string
+ </summary>
+ <param name="parameter">
+ The parameter for which to get the key
+ </param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+</members>
+</doc>

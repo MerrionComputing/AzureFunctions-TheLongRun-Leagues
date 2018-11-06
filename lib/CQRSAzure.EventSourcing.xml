@@ -1,0 +1,3067 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+CQRSAzure.EventSourcing
+</name>
+</assembly>
+<members>
+<member name="T:CQRSAzure.EventSourcing.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AggregateIdentifierAttribute">
+ <summary>
+ An attribute to mark a class with the aggregate identifier to which it pertains
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AggregateKeyAttribute">
+ <summary>
+ Attribute to use to tag an input parameter of a command or query as being the key identifier of the aggregate to which the
+ query or command should be applied
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AggregateNameAttribute">
+ <summary>
+ An attribute to tag an aggregate identifier class with a specific name
+ </summary>
+ <remarks>
+ If an aggregate identifier is not explicitly named then the class name is returned
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.AggregateNameAttribute.AggregateName">
+ <summary>
+ The business meaningful name of the aggregate identifier that this class implements
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CategoryAttribute">
+ <summary>
+ An attribute to tag an entity for business role classification
+ </summary>
+ <remarks>
+ This is primarily used in the domain documentation
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.CommandAggregateIdentifier">
+ <summary>
+ Aggregate identifier specifically for commands that are passed into the domain
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Commands.CommandAggregateIdentifier.GetAggregateIdentifier">
+ <summary>
+ Turn the GUID key to a string for any storage systems that require that
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Commands.CommandAggregateIdentifier.#ctor">
+ <summary>
+ Empty constructor for use in serialisation
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.CommandCancelledEvent">
+ <summary>
+ A command execution was cancelled
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.CommandCompletedEvent">
+ <summary>
+ The command completed successfully
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.CommandCreatedEvent">
+ <summary>
+ A command was created (or issued) by a person or system external to the domain boundary
+ </summary>
+ <remarks>
+ This event provides all the context about the command
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandCreatedEvent.CommandUniqueIdentifier">
+ <summary>
+ The unique identifier given to the command to identify it
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.CommandEventBase">
+ <summary>
+ Base class for events in the command event stream
+ </summary>
+ <remarks>
+ This is used to force them to have a serialisation constructor
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Commands.CommandEventBase.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+ <summary>
+ Force all command events to have a serialisation constructor
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.CommandFatalErrorOccuredEvent">
+ <summary>
+ A fatal error has occured while processing this command that means it cannot (or should not)
+ be retried
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.CommandStartedEvent">
+ <summary>
+ A command processor has started executing the command
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.CommandStatusProjection">
+ <summary>
+ A projection to get the status of a specified command
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandStatusProjection.StatusMessage">
+ <summary>
+ The text status of the command based on the most recent event that occured to it
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandStatusProjection.LastStepComplete">
+ <summary>
+ The last step in the command that was completed
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandStatusProjection.SupportsSnapshots">
+ <summary>
+ The status of a command can be stored in a snapshot
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandStatusProjection.IsCancelled">
+ <summary>
+ The command has been cancelled
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandStatusProjection.IsComplete">
+ <summary>
+ The command has completed successfully without error
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandStatusProjection.IsFatalError">
+ <summary>
+ The command ened with a fatal error
+ </summary>
+ <remarks>
+ It probably does not make sense to retry the command automatically
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandStatusProjection.IsTransientError">
+ <summary>
+ A transient error occured while processing this command
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.CommandStepCompletedEvent.StepNumber">
+ <summary>
+ The ordinal number of the step that was completed
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.Commands.CommandTransientFaultOccuredEvent.m_FaultDate">
+ <summary>
+ The date/time the command step was stopped with a transient error
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.ICommandCancelledEvent">
+ <summary>
+ A command execution was cancelled
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCancelledEvent.CancellationDate">
+ <summary>
+ The date/time the command was cancelled
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCancelledEvent.Reason">
+ <summary>
+ The reason the command was cancelled
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.ICommandCompletedEvent">
+ <summary>
+ The command completed successfully
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCompletedEvent.CompletionDate">
+ <summary>
+ The date/time the command completed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCompletedEvent.SuccessMessage">
+ <summary>
+ The human readable description of the completion state
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.ICommandCreatedEvent">
+ <summary>
+ A command was created (or issued) by a person or system external to the domain boundary
+ </summary>
+ <remarks>
+ This event provides all the context about the command
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCreatedEvent.CommandUniqueIdentifier">
+ <summary>
+ The unique identifier given to the command to identify it
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCreatedEvent.CommandName">
+ <summary>
+ The name of the type of command issued
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCreatedEvent.CreationDate">
+ <summary>
+ The date/time the command was created
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCreatedEvent.IdentityGroupName">
+ <summary>
+ The name of the identity group over which to apply the command
+ </summary>
+ <remarks>
+ This may be blank if the command does not apply to any named identity group
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandCreatedEvent.CommandParameters">
+ <summary>
+ The URL (or other system lookup identifier maybe?) to use to retrieve the parameters passed in to this command
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.ICommandEventContext">
+ <summary>
+ Common components that provide context information for all the events that can happen to a command
+ </summary>
+ <remarks>
+ This is to allow a single place to add mandatory fields (such as IP address or security token) if your business
+ process should need that
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandEventContext.Source">
+ <summary>
+ Where was the command event request sent from
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandEventContext.Username">
+ <summary>
+ The user who caused the command event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandEventContext.Token">
+ <summary>
+ A token to be used if the command requires authentication
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.ICommandFatalErrorOccuredEvent">
+ <summary>
+ A fatal error has occured while processing this command that means it cannot (or should not)
+ be retried
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandFatalErrorOccuredEvent.ErrorDate">
+ <summary>
+ The date/time the command step was stopped with a fatal error
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandFatalErrorOccuredEvent.StepNumber">
+ <summary>
+ If the command has many steps, this is the one that failed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandFatalErrorOccuredEvent.ErrorMessage">
+ <summary>
+ The human readable description of the error
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandRequeuedEvent.RequeueDate">
+ <summary>
+ The date/time the command step was re-queued
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Commands.ICommandStartedEvent">
+ <summary>
+ A command processor has started executing the command
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandStartedEvent.ProcessingStartDate">
+ <summary>
+ The date/time the processing of the command was started
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandStepCompletedEvent.StepCompletionDate">
+ <summary>
+ The date/time the command step was completed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandStepCompletedEvent.StepNumber">
+ <summary>
+ The ordinal number of the step that was completed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandStepCompletedEvent.StatusMessage">
+ <summary>
+ Message accompanying the step completion
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandTransientFaultOccuredEvent.FaultDate">
+ <summary>
+ The date/time the command step was stopped with a transient error
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandTransientFaultOccuredEvent.StepNumber">
+ <summary>
+ If the command has many steps, this is the one that has the fault
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Commands.ICommandTransientFaultOccuredEvent.FaultMessage">
+ <summary>
+ The human readable description of the fault
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAggregateMapElement">
+ <summary>
+ Maps an aggregation class to the event stream implementation
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAggregateMapElement.AggregateDomainQualifiedName">
+ <summary>
+ The domain-qualified name of the aggregate class that uses the given implementation 
+ for it's event stream backing store
+ </summary>
+ <remarks>
+ This must be unqiue within the CQRSAzureEventSourcingAggregateMapElementCollection
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAggregateMapElement.ImplementationName">
+ <summary>
+ The name of the implementation to use - this allows different configuration properties per event stream
+ </summary>
+ <remarks>
+ The name relates to the XXXXSettingsElement identified by the name
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAggregateMapElement.SnapshotSettingsName">
+ <summary>
+ The name of the snapshot settings to use - this allows different configuration properties per event stream
+ </summary>
+ <remarks>
+ The name relates to the XXXXSnapshotSettingElement identified by the name
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAggregateMapElementCollection">
+ <summary>
+ The set of mapped aggregate to implementations in the application
+ </summary>
+ <remarks>
+ These are uniquely keyed by domain qualified aggregate name
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAzureStorageSettingsBase">
+ <summary>
+ Base class for all event store implementations that sit on top of a 
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAzureStorageSettingsBase.ConnectionStringName">
+ <summary>
+ The name of the Azure storage connection string that the configuration will use to connect to the underlying event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAzureStorageSettingsBase.ReadSideConnectionStringName">
+ <summary>
+ The name of the Azure storage connection string that the configuration will use to read from to the underlying event stream
+ </summary>
+ <remarks>
+ If this is not set then the same connection is used for read and write
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingAzureStorageSettingsBase.DomainName">
+ <summary>
+ The domain name to use when storing / readin gthe events of this aggregate
+ </summary>
+ <remarks>
+ If this is not set the aggregate may be tagged with a domain attribute
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingBlobSettingsElement">
+ <summary>
+ Specific configuration settings for the Azure Append-Only blob based streams 
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingConfigurationSection">
+ <summary>
+ Wrapper class for the possible configuration elements and element collections that affect how the 
+ event sourcing library operates.
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.CQRSAzureEventSourcingConfigurationSection.DefaultConfiguration">
+ <summary>
+ An empty configuration that can be used as a default if Null/Nothing is not allowed
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingFileSettingsElement">
+ <summary>
+ Configuration settings to customise how an event stream is stored in an Azure file
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingFileSettingsElement.InitialSize">
+ <summary>
+ The initialsize to allocate for the file when creating it
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement">
+ <summary>
+ Top level for all the common parts of an event stream backing store
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement.Name">
+ <summary>
+ The unique name of this specific implementation
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement.ImplementationType">
+ <summary>
+ The specific type of the underlying implementation 
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement.BlobSettings">
+ <summary>
+ The settings specific to an Azure Blob backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement.FileSettings">
+ <summary>
+ The settings specific to an Azure Blob backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement.SQLSettings">
+ <summary>
+ The settings specific to an Azure SQL Server backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement.TableSettings">
+ <summary>
+ The settings specific to an Azure Table backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement.InMemorySettings">
+ <summary>
+ The settings specific to an in-memory backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement.LocalFileSettings">
+ <summary>
+ The settings specific to a local file system backed event stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElementCollection">
+ <summary>
+ The set of implementation settings properties in the &lt;Implementations&gt; section
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingInMemorySettingsElement">
+ <summary>
+ Settings for an in local memory backed event stream (typically used for testing)
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingLocalFileSettingsElement">
+ <summary>
+ Settings for an in local memory file system event stream (typically used for testing)
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement">
+ <summary>
+ A single setting to use for persisting projection snapshots against a backing storage technology
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement.Name">
+ <summary>
+ The unique name of this specific snapshot setting
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement.ImplementationType">
+ <summary>
+ The specific type of the underlying implementation 
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement.BlobSettings">
+ <summary>
+ The settings specific to an Azure Blob backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement.FileSettings">
+ <summary>
+ The settings specific to an Azure Blob backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement.SQLSettings">
+ <summary>
+ The settings specific to an Azure SQL Server backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement.TableSettings">
+ <summary>
+ The settings specific to an Azure Table backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement.InMemorySettings">
+ <summary>
+ The settings specific to an in-memory backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement.LocalFileSettings">
+ <summary>
+ The settings specific to a local file system backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingSQLSettingsElement.AggregateIdentifierField">
+ <summary>
+ What is the field name of the unique identifier of the aggregate in the table
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingSQLSettingsElement.EventStreamTableName">
+ <summary>
+ What to use as the name of the base table for the event stream
+ </summary>
+ <remarks>
+ if this is blank then an name made from the aggregate name + Events] is used
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingTableSettingsElement">
+ <summary>
+ Specific settings for using Azure Tables as a backing store for an event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingTableSettingsElement.SequenceNumberFormat">
+ <summary>
+ If set, use this format string to turn the sequence number into a row key of the record
+ </summary>
+ <remarks>
+ Default is "0000000000"
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingTableSettingsElement.IncludeDomainInTableName">
+ <summary>
+ If set, include the domain name in the table name
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingTableSettingsElement.ValidStandardNumericFormats">
+ <summary>
+ The subset of the .NET standard numeric formats we can use for formatting the sequence number
+ </summary>
+ <remarks>
+ Commas, currency and any regional variation must be avoided
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.CQRSAzureEventSourcingTableSettingsElement.IsValidCustomNumberFormat(System.String)">
+ <summary>
+ 
+ </summary>
+ <param name="customNumberFormat">
+ The custom number format to use - e.g. "0000"
+ </param>
+ <remarks>
+ The sequence number is a signed Integer - from 0 to 4,294,967,295
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.CQRSAzureEventSourcingTableSettingsElement.RowNumberFormat">
+ <summary>
+ If set, use this format string to turn the row number into a row key of the snapshot record
+ </summary>
+ <remarks>
+ Default is "0000000000"
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElementCollection">
+ <summary>
+ Configuration settings controlling how projection snapshots are persisted to a backing storage mechanism
+ </summary>
+ <remarks>
+ The default (if not specified) is for the projection snapshot to use the same backing storage settings as
+ the event stream over which the projection is run
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.IAzureStorageSettings">
+ <summary>
+ Settings specific to event stream implementations hosted on Windows Azure
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.IAzureStorageSettings.ConnectionStringName">
+ <summary>
+ The name of the Azure storage connection string that the configuration will use to connect to the underlying event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.IAzureStorageSettings.ReadSideConnectionStringName">
+ <summary>
+ The name of the Azure storage connection string that the configuration will use to read from to the underlying event stream
+ </summary>
+ <remarks>
+ If this is not set then the same connection is used for read and write
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.IAzureStorageSettings.DomainName">
+ <summary>
+ The domain name to use when storing this 
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings">
+ <summary>
+ Settings specific to serialising the event stream to an Azure Append-Only blob
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings">
+ <summary>
+ Settings for using an Azure file as the backing store for an event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings.InitialSize">
+ <summary>
+ The initialsize to allocate for the file when creating it
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings">
+ <summary>
+ Configuration settings for running an event stream over an Azure SQL database
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings.AggregateIdentifierField">
+ <summary>
+ What is the field name of the unique identifier of the aggregate in the table
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings.SequenceField">
+ <summary>
+ What is the name of the field holding the sequence number
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings.EventTypeField">
+ <summary>
+ What is the name of the field holding the event type
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings.EventVersionField">
+ <summary>
+ What field holds the event version number
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings.EventStreamTableName">
+ <summary>
+ What to use as the name of the base table for the event stream
+ </summary>
+ <remarks>
+ if this is blank then an name made from the aggregate name + Events] is used
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.Table.ITableSettings">
+ <summary>
+ Additional settings required for using an Azure table as backing store for an event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.ITableSettings.SequenceNumberFormat">
+ <summary>
+ If set, use this format string to turn the sequence number into a row key of the record
+ </summary>
+ <returns>
+ Default is "0000000000000000000" 
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.ITableSettings.IncludeDomainInTableName">
+ <summary>
+ Should the generated table name include the domain name
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.Table.ITableSettings.RowNumberFormat">
+ <summary>
+ If set, use this format string to turn the row number into a row key of the snapshot record
+ </summary>
+ <returns>
+ Default is "0000000000000000000" 
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamSettings">
+ <summary>
+ Marker interface that all the various event stream settings classes must implement 
+ so that the optional parameter can be used to set them up
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.InMemory.IInMemorySettings">
+ <summary>
+ Settings that change how an in-memory event stream operates
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.InMemory.IInMemorySettings.DebugMessages">
+ <summary>
+ Should the in-memory stream write to the debug message whenever it handles an event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.ILocalFileSettings.EventStreamRootFolder">
+ <summary>
+ The top-level folder where the event streams are stored
+ </summary>
+ <remarks>
+ The folder structure is {root}\{domain}\{aggregate name} with each event stream being stored in an individual 
+ file in that folder
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.ILocalFileSettings.SnapshotsRootFolder">
+ <summary>
+ The top-level folder where snapshots are stored
+ </summary>
+ <remarks>
+ The folder structure is {root}\{domain}\{projection name} with each snapshot being stored in an individual 
+ file in that folder with the file suffix indicating the as-of sequence number
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Local.File.ILocalFileSettings.SerialiserType">
+ <summary>
+ The different types of serialiser we can use to persist to file
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.Local.File.ILocalFileSettings.SerialiserType.Binary">
+ <summary>
+ Use this for max performance if only this app will read the files
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.Local.File.ILocalFileSettings.SerialiserType.NameValuePairs">
+ <summary>
+ Use this for readability and file sharing scenarios
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Local.File.ILocalFileSettings.UnderlyingSerialiser">
+ <summary>
+ The type of serialiser we use to persist to a local file
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ContextWrappedEvent`1">
+ <summary>
+ An event wrapped with the context information used to provide an audit trail
+ </summary>
+ <typeparam name="TAggregateKey">
+ The type of the key which uniquely identifies the aggregate that this event is wrapped for
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.EventSerializerFactory.AddOrSetSerialiser(System.Type,CQRSAzure.EventSourcing.IEventSerializer)">
+ <summary>
+ Add the event serialiser to the known event serialisers
+ </summary>
+ <param name="eventTypeToSerialise">
+ The data type of the event to be serialised
+ </param>
+ <param name="serialiserToUse">
+ The class that can serialise the given event
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.EventSerializerFactory.AddOrSetSerialiser``1(CQRSAzure.EventSourcing.EventSerializer{``0})">
+ <summary>
+ Add the event serialiser to the known event serialisers
+ </summary>
+ <param name="serialiser">
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.EventSerializerFactory.CreateDefaultSaveNameValuePairsFunction``1">
+ <summary>
+ Create a default serialiser to save an event data to name/value pairs 
+ </summary>
+ <typeparam name="TEvent">
+ The type of the object that will be read
+ </typeparam>
+ <remarks>
+ This allows a global swapping out of serialisers if needed
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.EventSerializerFactory.CreateDefaultReadNameValuePairsFunction``1">
+ <summary>
+ Create a default serialiser function to read from a name-values pair data source
+ </summary>
+ <typeparam name="TEvent">
+ The type of the object that will be read
+ </typeparam>
+ <remarks> 
+ This allows a global swapping out of serialisers if needed
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.DomainNameAttribute">
+ <summary>
+ An attribute to tag an aggregate or event as belonging to a particular domain
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.DomainNameAttribute.Domain">
+ <summary>
+ The name of the business domain that this class is part of
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventAsOfDateAttribute">
+ <summary>
+ An attribute to mark one property of an event as being the "as-of date" of the event 
+ (This being the real-world date and time as of which the event occured)
+ </summary>
+ <remarks>
+ The named property is the one that will provide teh as-of date for any given instance
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventAsOfDateAttribute.PropertyName">
+ <summary>
+ The name of this event
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventNameAttribute">
+ <summary>
+ Attribute to tag an IEvent based class with a specific event name
+ </summary>
+ <remarks>
+ This is useful if we want to use event names that are not valid .NET class names
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventNameAttribute.EventName">
+ <summary>
+ The name of this event
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventSerializer`1.SaveToStream">
+ <summary>
+ Save the given event type to a stream (binary, JSON etc)
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventSerializer`1.FromStream">
+ <summary>
+ Read the given event data from a binary stream
+ </summary>
+ <returns>
+ The created event object populated with the data from the stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventSerializer`1.ToNameValuePairs">
+ <summary>
+ Serialise the event to a dictionary of name:value pairs to be saved
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventSerializer`1.FromNameValuePairs">
+ <summary>
+ Deserialise the event data from name:value pairs
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventSerializer`1.Capabilities">
+ <summary>
+ What functions can this serialiser perform
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventSerializeToNameValuePairsAttribute">
+ <summary>
+ Attribute to tag an event with the name of the (static) function that can be used to serialize that 
+ event to a name/values pair dictionary
+ </summary>
+ <remarks>
+ This is the serialisation method that will be used when the backing storage needs to store an event as property name / value pairs
+ for example if the backing store is a NoSQL table
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventSerializeToNameValuePairsAttribute.FunctionName">
+ <summary>
+ The name of the function that does the serialising to name/value pairs magic
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventDeserializeFromNameValuePairsAttribute">
+ <summary>
+ Attribute to tag an event with the name of the (static) function that can be used to deserialize that 
+ event from a name/values pair dictionary
+ </summary>
+ <remarks>
+ This is the serialisation method that will be used when the backing storage needs to store an event as property name / value pairs
+ for example if the backing store is a NoSQL table
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventDeserializeFromNameValuePairsAttribute.FunctionName">
+ <summary>
+ The name of the function that does the deserialising from name/value pairs magic
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventGetFormatterForStreamAttribute">
+ <summary>
+ Attribute to tag an event with the name of the (static) function that can provide the formatter be used to serialize that 
+ event to or from a stream
+ </summary>
+ <remarks>
+ This is the serialisation method that may be used when the backing storage needs to store an event as raw binary
+ for example if the backing store is a file or blob.
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventGetFormatterForStreamAttribute.FunctionName">
+ <summary>
+ The name of the function that returns the formatter that does the serialising to binary streams magic
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventSourcing">
+ <summary>
+ Common functionality that needs to be available throughout the library
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.EventSourcing.EventSourcingTraceSwitch">
+ <summary>
+ This switch controls the tracing of the common parts of the event sourcing
+ library.  
+ </summary>
+ <remarks>
+ Individual implementations will have their own trace switches which add fine grain
+ tracing control for each 
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.EventSourcing.LogError(System.String)">
+ <summary>
+ Log an error to the trace listener(s)
+ </summary>
+ <param name="errorMessage">
+ The message to log
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.EventSourcing.LogWarning(System.String)">
+ <summary>
+ Log a warning to the trace listener(s)
+ </summary>
+ <param name="warningMessage">
+ The warning message to log
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.EventSourcing.LogInfo(System.String)">
+ <summary>
+ Log information to the trace listener(s)
+ </summary>
+ <param name="infoMessage">
+ The warning message to log
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.EventSourcing.LogVerboseInfo(System.String)">
+ <summary>
+ Log verbose information to the trace listener(s)
+ </summary>
+ <param name="infoMessage">
+ The warning message to log
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.AggregateKeyChangedException">
+ <summary>
+ An aggregate may not have its key changed once it has been set
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.AggregateKeyChangedException.NewKey">
+ <summary>
+ The new key we are attempting to assign to an aggregate
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.AggregateKeyChangedException.OldKey">
+ <summary>
+ The existing key we have for the object
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventStreamExceptionBase">
+ <summary>
+ Common function shread by all event stream exceptions
+ </summary>
+ <remarks>
+ This is used to identify the specific event stream in which the error occured
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamExceptionBase.DomainName">
+ <summary>
+ The domain in which the event stream that had the problem resides
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamExceptionBase.AggregateName">
+ <summary>
+ The aggregate type that the event stream that had the problem belongs to
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamExceptionBase.AggregateKey">
+ <summary>
+ The unique key identifying the instance of the aggregate that teh event stream that had a problem belongs to
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamExceptionBase.SequenceNumber">
+ <summary>
+ The sequence number of the event to which the problem occured
+ </summary>
+ <remarks>
+ This may be zero if the failure occured before the sequence number could be determined
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventStreamReadException">
+ <summary>
+ An error occured while reading from an event stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventStreamUnderlyingStorageUnavailableException">
+ <summary>
+ An exception to indicate an error that occured when trying to get the underlying storage technology 
+ used to store event streams for aggregates in the system
+ </summary>
+ <remarks>
+ This can be a transient error or a permanent error such as a missing or invalid connection string
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamUnderlyingStorageUnavailableException.DomainName">
+ <summary>
+ The domain in which the event stream that had the problem resides
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamUnderlyingStorageUnavailableException.AggregateName">
+ <summary>
+ The aggregate type that the event stream that had the connection problem belongs to
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamUnderlyingStorageUnavailableException.StorageType">
+ <summary>
+ The storage typ that this event stream is expected to be stored in
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventStreamWriteConcurrencyException">
+ <summary>
+ Where an update does not lock an event stream before executing a command over it then it is possible that
+ another update has occured in that time.  If that occurs an exception is raised to get the command to 
+ refresh its state and try again
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamWriteConcurrencyException.ExpectedSequenceNumber">
+ <summary>
+ What we expected the max sequence number to be when we were writing to the 
+ event stream underlying an aggregate
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.EventStreamWriteConcurrencyException.ActualSequenceNumber">
+ <summary>
+ The actual sequence number of the end of the event stream when we attempted to write an event to it
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventStreamWriteConflictException">
+ <summary>
+ An event stream writer attempted to write to an event stream that was already exclusively opened by another writer
+ </summary>
+ <remarks>
+ Stream readers are inherently parallel, but only one writer may write to a stream at any given time
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.EventStreamWriteException">
+ <summary>
+ An error prevented an event from being written to an event stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionSnapshotExceptionBase">
+ <summary>
+ Common function shread by all projection snapshot exceptions
+ </summary>
+ <remarks>
+ This is used to identify the specific projection and snapshot in which the error occured
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.ProjectionSnapshotExceptionBase.AggregateName">
+ <summary>
+ The aggregate type that the event stream that had the problem belongs to
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.ProjectionSnapshotExceptionBase.AggregateKey">
+ <summary>
+ The unique key identifying the instance of the aggregate that teh event stream that had a problem belongs to
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionSnapshotReadException">
+ <summary>
+ An exception has occured reading from a projection snapshot
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionSnapshotWriteException">
+ <summary>
+ An exception has occured writing to a projection snapshot
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.UnmappedAggregateException">
+ <summary>
+ An aggregate has not been mapped to a reader or writer class
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.UnmappedAggregateException.AggregateTypeName">
+ <summary>
+ The name of the aggregate type that has no mapped reader
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.UnmappedAggregateException.AggregateKey">
+ <summary>
+ The unique key that identifies the aggregate instance
+ </summary>
+ <returns>
+ Thsi allows for per-key event stream mapping, although that is a very unlikely scenario
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.FilterFunctions">
+ <summary>
+ Functions to allow for fine grained event filtering control
+ </summary>
+ <remarks>
+ This might, for example, allow filtering events by type and version, or by classification
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction">
+ <summary>
+ Function to filter an event type read from an event stream
+ </summary>
+ <param name="eventType">
+ The event type to decide if we should read it or not
+ </param>
+ <returns>
+ True if our defined filter should allow this event through, otherwise false
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.HistoryQueue`1">
+ <summary>
+ A queue based data structure that can have a fixed size that automatically rolls off any elements that 
+ exceed that queue size
+ </summary>
+ <typeparam name="TElement">
+ The type-safe element type of this generic queue
+ </typeparam>
+ <remarks>
+ This is used for "Top n elements" type processing of projections
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.HistoryQueue`1.#ctor(System.Int32)">
+ <summary>
+ Initialise the queue with a maximum queue size
+ </summary>
+ <param name="MaxQueueSize">
+ The maximum size to allow this queue to grow to
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IAggregateImplementationMap`2.CreateReader(`0,`1)">
+ <summary>
+ Create an event stream reader that can be used to read the event stream for this aggregate 
+ </summary>
+ <param name="aggregate">
+ The instance of the aggregate for which we want the event stream reader
+ </param>
+ <param name="key">
+ The unique identifier of the instance of the aggregate for which we want the eveny stream reader
+ </param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IAggregateImplementationMap`2.CreateProjectionProcessor(`0,`1)">
+ <summary>
+ Create a projection processor to run over event streams of this aggregate
+ </summary>
+ <param name="aggregate">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <param name="key">
+ The unique identifier of the instance of the aggregate for which we want to run projections
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IAggregateImplementationMap`2.CreateWriter(`0,`1)">
+ <summary>
+ Create an event stream writer that can be used to write events to the event stream for this aggregate instance
+ </summary>
+ <param name="aggregate">
+ The aggregate instance for which we are creating the event stream writer
+ </param>
+ <param name="key">
+ The unique identifier by which the instance of the aggregate is known
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IAggregateImplementationMap`2.CreateSnapshotReader``1(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},`1)">
+ <summary>
+ Create a snapshot reader of the given projection over this event stream
+ </summary>
+ <typeparam name="TProjection">
+ The type of the projection being run over the event stream
+ </typeparam>
+ <param name="instance">
+ The aggregate instance for which this event stream projection reader is being created
+ </param>
+ <param name="key">
+ The unique identifier by which the instance of the aggregate is known
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IAggregateImplementationMap`2.CreateSnapshotWriter``1(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},`1)">
+ <summary>
+ Create a snapshot writer for the given projection over this event stream
+ </summary>
+ <typeparam name="TProjection">
+ The type of the projection being run over the event stream
+ </typeparam>
+ <param name="instance">
+ The aggregate instance for which this event stream projection reader is being created
+ </param>
+ <param name="key">
+ The unique identifier by which the instance of the aggregate is known
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IAggregateImplementationMap.ReaderCreationFunction`2">
+ <summary>
+ A function that calls a factory method to create an instance of an event stream reader
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate the event stream belongs to
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies the aggregate isntanec for which to create an event stream reader
+ </typeparam>
+ <param name="instance">
+ The specific aggregate instance for which to create an event stream reader
+ </param>
+ <param name="key">
+ The key that uniquely identifies an instance of this aggregate type
+ </param>
+ <param name="settings">
+ Additional configuration settings used to set up the event stream
+ </param>
+ <returns>
+ The event stream reader to use to process this event stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IAggregateImplementationMap.WriterCreationFunction`2">
+ <summary>
+ A function that calls a factory method to create an instance of an event stream writer
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate the event stream belongs to
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies the aggregate isntanec for which to create an event stream writer
+ </typeparam>
+ <param name="instance">
+ The specific aggregate instance for which to create an event stream writer
+ </param>
+ <param name="key">
+ The key that uniquely identifies an instance of this aggregate type
+ </param>
+ <param name="settings">
+ Additional configuration settings used to set up the event stream
+ </param>
+ <returns>
+ The event stream writer to use to append to this event stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IAggregateImplementationMap.SnapshotReaderCreationFunction`3">
+ <summary>
+ A function that calls a factory method to create an instance of a projection snapshot reader
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate the event stream belongs to
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies the aggregate isntanec for which to create a projection snapshot reader
+ </typeparam>
+ <param name="instance">
+ The specific aggregate instance for which to create a projection snapshot reader
+ </param>
+ <param name="key">
+ The key that uniquely identifies an instance of this aggregate type
+ </param>
+ <param name="settings">
+ Additional configuration settings used to set up the event stream
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IAggregateImplementationMap.SnapshotWriterCreationFunction`3">
+ <summary>
+ A function that calls a factory method to create an instance of a projection snapshot writer
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate the event stream belongs to
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies the aggregate isntanec for which to create a projection snapshot writer
+ </typeparam>
+ <param name="instance">
+ The specific aggregate instance for which to create a projection snapshot writer
+ </param>
+ <param name="key">
+ The key that uniquely identifies an instance of this aggregate type
+ </param>
+ <param name="settings">
+ Additional configuration settings used to set up the event stream
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IAggregationIdentifier">
+ <summary>
+ A marker interface to state that a class can uniquely identify an aggregation
+ </summary>
+ <remarks>
+ This is used to allow us to make the compiler enforce rules that "x must be an aggregation"
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IAggregationIdentifier.GetAggregateIdentifier">
+ <summary>
+ The identifier of this aggregate, as a string
+ </summary>
+ <remarks>
+ This is used if the event source is backed by Azure tables to set the partition key to use for it
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IAggregationIdentifier`1">
+ <summary>
+ A typed interface to set the key to use to identify an aggregation
+ </summary>
+ <typeparam name="TAggregateKey">
+ The base type that uniquely identifies an individual of the aggregation
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IAggregationIdentifier`1.SetKey(`0)">
+ <summary>
+ Set the key to use to create the aggregation identifier for this type of thing
+ </summary>
+ <param name="key"></param>
+ <remarks></remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IAggregationIdentifier`1.GetKey">
+ <summary>
+ Get the key used to uniquely identify the aggregate
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroupAttribute.IdentityGroupname">
+ <summary>
+ The explicitly set group name to use (if set)
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IdentityGroupAttribute.#ctor">
+ <summary>
+ Constructor with no explicitly named identity group
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IdentityGroupAttribute.#ctor(System.String)">
+ <summary>
+ Constructor for explicitly named identity group
+ </summary>
+ <param name="IdentityGroupIn">
+ The name of the identity group explicitly specified by the attribute
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IdentityGroups.IdentityGroupEventBase.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+ <summary>
+ Force all identity group events to have a serialisation constructor
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IdentityGroups.IdentityGroupSnapshotWrittenEvent">
+ <summary>
+ A point-in-time snapshot of the membership of an identity group was taken
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupIdentifier.DomainName">
+ <summary>
+ The name of the domain (per DDD) containing this identity group
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupIdentifier.IdentityGroupName">
+ <summary>
+ The unique name of this identity group (unique within the domain)
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMemberExcludedEvent`1.AsOfDate">
+ <summary>
+ The effective date of the last event of the classification that counted this member
+ as being out of the group
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMemberExcludedEvent`1.MemberUniqueIdentifier">
+ <summary>
+ The unique identifier of the member excluded from the group
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMemberIncludedEvent`1.AsOfDate">
+ <summary>
+ The effective date of the last event of the classification that counted this member
+ as being in the group
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMemberIncludedEvent`1.MemberUniqueIdentifier">
+ <summary>
+ The unique identifier of the member included in the group
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMembersRequestedEvent">
+ <summary>
+ A query or command asked to know the membership of a given identity group as at a given 
+ point in time
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMembersRequestedEvent.AsOfDate">
+ <summary>
+ The effective date/time to get the group membership for
+ </summary>
+ <remarks>
+ If not set then this will run the underlying projection/classifier to the current point in time
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMembersRequestedEvent.RequestSource">
+ <summary>
+ Where the request for the identity group members came from
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMembersReturnedEvent">
+ <summary>
+ The set of members for an identity group were identified as at a given point in time
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMembersReturnedEvent.AsOfDate">
+ <summary>
+ The effective date/time we got the group membership for
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMembersReturnedEvent.RequestSource">
+ <summary>
+ Where the request for the identity group members came from
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupMembersReturnedEvent.GroupMembersLocation">
+ <summary>
+ Where the group members data are stored
+ </summary>
+ <remarks>
+ This could be an URL or the raw results themselves 
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupSnapshotWrittenEvent">
+ <summary>
+ A point-in-time snapshot of the membership of an identity group was taken
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupSnapshotWrittenEvent.AsOfDate">
+ <summary>
+ The effective date/time we got the group membership for
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupSnapshotWrittenEvent.RequestSource">
+ <summary>
+ Where the request for the identity group members came from
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupSnapshotWrittenEvent.SnapshotLocation">
+ <summary>
+ Where the group members data are stored
+ </summary>
+ <remarks>
+ This could be an URL or the raw results themselves 
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IdentityGroups.IIdentityGroupSnapshotWrittenEvent.WriterType">
+ <summary>
+ What technology was used to persiste the snapshot
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEvent">
+ <summary>
+ marker interface to denote anything as being an event
+ </summary>
+ <remarks>
+ Ideally the type-safe versio of this that is an aggregate's event
+ should be used where possible
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEvent`1">
+ <summary>
+ Marker interface for an event pertaining to an aggregation
+ </summary>
+ <typeparam name="TAggregate">
+ The type which identifies the aggregation
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEvent`1.Version">
+ <summary>
+ The version of the event 
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventContext">
+ <summary>
+ Additional context information about an event 
+ </summary>
+ <remarks>
+ Different domains often require additional context information about events that occured
+ By having a seperate context interface you can segregate these from the actual event itself
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventContext.Who">
+ <summary>
+ Which user caused the event to occur
+ </summary>
+ <remarks>
+ This can be empty in the case of timer or state triggered events
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventContext.Timestamp">
+ <summary>
+ The time at which this event occured
+ </summary>
+ <remarks>
+ This should be stored as UTC or have timezone information
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventContext.Source">
+ <summary>
+ The source from whence this event originated
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventContext.SequenceNumber">
+ <summary>
+ Sequence for holding events in a queue or queue-like storage
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventContext.Commentary">
+ <summary>
+ Any additional comments attached to the event for audit purposes for example
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventContext.CorrelationIdentifier">
+ <summary>
+ Externally provided identifier for linking together events caused by the same external
+ command
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IWriteContext.Who">
+ <summary>
+ Which user caused the event to occur
+ </summary>
+ <remarks>
+ This can be empty in the case of timer or state triggered events
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IWriteContext.Source">
+ <summary>
+ The source from whence this event originated
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IWriteContext.Commentary">
+ <summary>
+ Any additional comments attached to the event for audit purposes for example
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IWriteContext.CorrelationIdentifier">
+ <summary>
+ An externally provided unique identifier to tie together events comming from the 
+ same command
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventIdentity`1">
+ <summary>
+ Interface to allow unique identification of an event
+ </summary>
+ <typeparam name="TAggregate">
+ The type which identifies the aggregation
+ </typeparam>
+ <remarks>
+ These are the infrastructure elements of an event that do not have any business meaning.
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventIdentity`1.GetAggregateIdentifier">
+ <summary>
+ Get the identifier by which this events aggregate is uniquely known
+ </summary>
+ <remarks>
+ Most implementation suse a GUID for this but if you have a known unique identifier 
+ then that can be used instead - e.g. ISBN, CUSIP, VIN etc.
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventIdentity`1.Sequence">
+ <summary>
+ The event sequence - this is the order in which the events occured for the aggregate
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventIdentity`1.EventInstance">
+ <summary>
+ The event that is identified by this event identity
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventInstance">
+ <summary>
+ Interface to uniquely identify an event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventInstance.Version">
+ <summary>
+ Incremental number of the event in its event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventInstance.EventInstance">
+ <summary>
+ The data component of the event
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventInstance`1">
+ <summary>
+ Interface to uniquely identify an event that belongs to a given aggregate identifier that can be 
+ retrieved 
+ </summary>
+ <typeparam name="TAggregateKey">
+ The data type that uniquely identifies the aggregate that this event occured for
+ </typeparam>
+ <remarks>
+ The connection to the aggregate is kept outside the event itself so that we discourage logic from being built
+ that uses this aggregate key (in projections or classifiers)
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventInstance`1.AggregateKey">
+ <summary>
+ The unique identifier of the aggregate to which this event occured
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventSerializer">
+ <summary>
+ Specialised class that can serialize an event to or from a backing store either as name:value pairs or 
+ as a binary stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventSerializer.SerialiserCapability">
+ <summary>
+ The different ways this serialiser can serialise/deserialise an event
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.IEventSerializer.SerialiserCapability.None">
+ <summary>
+ None - fall back on the system default serialisation
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.IEventSerializer.SerialiserCapability.NameValuePairs">
+ <summary>
+ Name/Value pair based serialisation
+ </summary>
+ <remarks>
+ This is good for JSON or NoSQL serialisation
+ </remarks>
+</member>
+<member name="F:CQRSAzure.EventSourcing.IEventSerializer.SerialiserCapability.Stream">
+ <summary>
+ Serialise to/from a binary stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventSerializer.Capabilities">
+ <summary>
+ What capabilities does the serialiser support
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventSerializer.ToNameValuePairs(System.Object)">
+ <summary>
+ Turn the event into a dictionary of name/value pairs describing its properties
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventSerializer.FromNameValuePairs(System.Collections.Generic.IDictionary{System.String,System.Object})">
+ <summary>
+ Populate the properties of the event from a dictionary of name/value pairs
+ </summary>
+ <param name="valueDictionary">
+ A dictionary of name/value pairs describing the properties of the event
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventSerializer.SaveToStream(System.IO.Stream,System.Object)">
+ <summary>
+ Save the properties of this event instance into the given stream
+ </summary>
+ <param name="streamToWriteTo">
+ The stream into which to write the properties of this event
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventSerializer.FromStream(System.IO.Stream)">
+ <summary>
+ Read the event properties from the stream into this instance
+ </summary>
+ <param name="streamToRead">
+ The stream from which to read the properties of the event
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventSerializer`1.ToNameValuePairs(`0)">
+ <summary>
+ Turn the event into a dictionary of name/value pairs describing its properties
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventSerializer`1.FromNameValuePairs(System.Collections.Generic.IDictionary{System.String,System.Object})">
+ <summary>
+ Populate the properties of the event from a dictionary of name/value pairs
+ </summary>
+ <param name="valueDictionary">
+ A dictionary of name/value pairs describing the properties of the event
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventSerializer`1.SaveToStream(System.IO.Stream,`0)">
+ <summary>
+ Save the properties of this event instance into the given stream
+ </summary>
+ <param name="streamToWriteTo">
+ The stream into which to write the properties of this event
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventSerializer`1.FromStream(System.IO.Stream)">
+ <summary>
+ Read the event properties from the stream into this instance
+ </summary>
+ <param name="streamToRead">
+ The stream from which to read the properties of the event
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStream`2">
+ <summary>
+ A stream of zero or more events that have occured for a particular unique instance of an aggregate 
+ identifier
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate against which these events have been recorded
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that provides the unique identifier of this aggregate
+ </typeparam>
+ <remarks>
+ Ideally the aggregation key type should be a simple data type (integer, GUID etc.) rather than a compound class, 
+ to make the lookup process faster
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStream`2.Key">
+ <summary>
+ The unique key of the aggregation record this event stream pertains to
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStream`2.RecordCount">
+ <summary>
+ The number of record in this event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStream`2.LastAddition">
+ <summary>
+ When was the last record written to this event stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamDebugReader`2">
+ <summary>
+ A reader for an event stream that supports stepping through events one at a atime for diagnostic or demostration purposes
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate that identifies the event stream to read
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies the specific event stream instance to read
+ </typeparam>
+ <remarks>
+ This is intentionally kept separate to the core Event Stream Reader functionality to prevent it being used as part of the 
+ main production system
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamDebugReader`2.CurrentSequenceNumber">
+ <summary>
+ The current event sequence in the stream being read
+ </summary>
+ <remarks>
+ This is somewhat analoguous to an object pointer to the event in a memory based system
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamDebugReader`2.GetNextEventWithContext">
+ <summary>
+ Get the next event from the stream given the current sequence number
+ </summary>
+ <returns>
+ An event wrapped in the event context information
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamDebugReader`2.ResetToStart">
+ <summary>
+ Reset the event stream to the starting position 
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamInstanceProvider`2">
+ <summary>
+ Interface to be implemented by any class that provides an implementation of an individual event stream - for example anything 
+ that is a reader or writer
+ </summary>
+ <typeparam name="TaggregateKey">
+ The data type of the aggregate that identifies the event stream to read
+ </typeparam>
+ <remarks>
+ This allows for a common set of functionality against backing technologies that may have very different actual im[plementation
+ details
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamInstanceProvider`2.Key">
+ <summary>
+ The unique key of the aggregate whose event stream this reader is operating over
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamProvider`2">
+ <summary>
+ Interface to be implemented by any class that provides an implementation of a type of event stream - for example anything 
+ that is a reader or writer
+ </summary>
+ <typeparam name="TaggregateKey">
+ The data type of the aggregate that identifies the event stream to read
+ </typeparam>
+ <remarks>
+ This allows for a common set of functionality against backing technologies that may have very different actual implementation
+ details
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamProvider`2.AggregateClassName">
+ <summary>
+ The name of the class providing the event stream(s) over which this provider operates
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamProvider`2.GetAllStreamKeys(System.Nullable{System.DateTime})">
+ <summary>
+ Get all the known event streams' unique identifiers as at the given point in time (or currently)
+ </summary>
+ <param name="asOfDate">
+ if supplied, the point in time for which we want to know all the members (otherwise assumed to be as of now)
+ </param>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamProviderUntyped.AggregateClassName">
+ <summary>
+ The name of the class providing the event stream(s) over which this provider operates
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamProviderUntyped.GetAllStreamKeys(System.Nullable{System.DateTime})">
+ <summary>
+ Get all the known event streams' unique identifiers (as string) as at the given point in time (or currently)
+ </summary>
+ <param name="asOfDate">
+ if supplied, the point in time for which we want to know all the members (otherwise assumed to be as of now)
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamReader`2">
+ <summary>
+ Definition for any implementation that can read events from an event stream
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate that identifies the event stream to read
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies the specific event stream instance to read
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamReader`2.GetEvents">
+ <summary>
+ Get the event stream for a given aggregate
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamReader`2.GetEvents(System.UInt32,System.Nullable{System.DateTime})">
+ <summary>
+ Gets the event stream for a given aggregate from a given starting version
+ </summary>
+ <param name="StartingSequenceNumber">
+ The starting sequence number for our snapshot
+ </param>
+ <remarks>
+ This is used in scenario where we are starting from a given snapshot version
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamReader`2.GetEventsWithContext(System.UInt32,System.Nullable{System.DateTime})">
+ <summary>
+ Gets the event stream and the context information recorded for each event
+ </summary>
+ <param name="StartingSequenceNumber">
+ The starting sequence number for our snapshot
+ </param>
+ <remarks>
+ This is typically only used for audit trails as all business functionality should depend on the event data alone
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamReaderUntyped">
+ <summary>
+ Definition for any implementation that can read events from an event stream that is untyped
+ </summary>
+ <remarks>
+ This requires the domain name, aggregate type name and key to be explicitly set as they
+ cannot be derived from the aggregate identifier class
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamReaderUntyped.Key">
+ <summary>
+ The unique identifier of the instance for which we are reading the events 
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamReaderUntyped.GetEvents">
+ <summary>
+ Get the event stream for a given aggregate instance
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamReaderUntyped.GetEvents(System.UInt32,System.Nullable{System.DateTime})">
+ <summary>
+ Gets the event stream for a given aggregate from a given starting version
+ </summary>
+ <param name="StartingSequenceNumber">
+ The starting sequence number for our snapshot
+ </param>
+ <remarks>
+ This is used in scenario where we are starting from a given snapshot version
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamReaderUntyped.GetEventsWithContext(System.UInt32,System.Nullable{System.DateTime})">
+ <summary>
+ Gets the event stream and the context information recorded for each event
+ </summary>
+ <param name="StartingSequenceNumber">
+ The starting sequence number for our snapshot
+ </param>
+ <remarks>
+ This is typically only used for audit trails as all business functionality should depend on the event data alone
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamUntyped">
+ <summary>
+ A stream of zero or more events that have occured for a particular unique instance of an aggregate 
+ identifier
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamUntyped.RecordCount">
+ <summary>
+ The number of record in this event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamUntyped.LastAddition">
+ <summary>
+ When was the last record written to this event stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamUntypedIdentity">
+ <summary>
+ An interface that can be used to uniquely identify an event stream without knowing its aggregate class
+ </summary>
+ <remarks>
+ This can be used to access an event stream from a language or system that does not understand the .NET type system
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamUntypedIdentity.DomainName">
+ <summary>
+ The domain to which the aggregate belongs
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamUntypedIdentity.AggregateTypeName">
+ <summary>
+ The type of aggregate class the event stream belongs
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IEventStreamUntypedIdentity.InstanceKey">
+ <summary>
+ The unique identifier of the aggregate instance to which the event stream pertains
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamWriter`2">
+ <summary>
+ Interface for any class that appends events to the end of an event stream
+ </summary>
+ <remarks>
+ An event stream is an append-only data structure (regardless of if the underlying storage mechanism allows deletes and inserts)
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamWriter`2.AppendEvent(CQRSAzure.EventSourcing.IEvent{`0},System.Int64)">
+ <summary>
+ Save an event onto the end of the store
+ </summary>
+ <param name="EventInstance">
+ The specific event to append to the end of the store
+ </param>
+ <remarks>
+ The events store must be both immutable and forward-only so to cater for the concept of "delete" a 
+ reversal event needs to exist
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamWriter`2.AppendEvents(System.Int64,System.Collections.Generic.IEnumerable{CQRSAzure.EventSourcing.IEvent{`0}})">
+ <summary>
+ Save a set of events onto the end of the store
+ </summary>
+ <param name="StartingSequence">
+ The initial sequence number to start numbering the events from
+ </param>
+ <param name="Events">
+ The set of events to record agains this aggregate
+ </param>
+ <remarks>
+ The events store must be both immutable and forward-only so to cater for the concept of "delete" a 
+ reversal event needs to exist
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamWriter`2.SetContext(CQRSAzure.EventSourcing.IWriteContext)">
+ <summary>
+ Set the context under which the writer is currently writing to the file
+ </summary>
+ <param name="writerContext">
+ The additional context details that teh writer should write alongside the event when persisting it
+ </param>
+ <remarks>
+ This is a property applied to the writer rather than the event as the event may not know its context when it
+ is being passed to a writer (for example if it comes from a batch / IoT event producer)
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamFilteredReader`2">
+ <summary>
+ Definition for any implementation that can read events from an event stream with filtering applied
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate that identifies the event stream to read
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies the specific event stream instance to read
+ </typeparam>
+ <remarks>
+ This allows projection definitions and classifies which know the event types they handle in advance to only receive these 
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamFilteredReader`2.IsEventValid(System.Type)">
+ <summary>
+ Is the given event type valid for the currently set filter conditions
+ </summary>
+ <param name="eventType">
+ The type of the event read from the read stream
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IEventStreamWriterUntyped">
+ <summary>
+ Interface for any class that appends events to the end of an event stream, baserd only on the domain and aggregate
+ names (This is not type safe)
+ </summary>
+ <remarks>
+ An event stream is an append-only data structure (regardless of if the underlying storage mechanism allows deletes and inserts)
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamWriterUntyped.SetContext(CQRSAzure.EventSourcing.IWriteContext)">
+ <summary>
+ Set the context under which this event stream writer is writing events
+ </summary>
+ <param name="writerContext">
+ This can set the user id or commentary to tage the events with
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IEventStreamWriterUntyped.AppendEvent(CQRSAzure.EventSourcing.IEvent,System.Int64,System.UInt32)">
+ <summary>
+ Save an event onto the end of the store
+ </summary>
+ <param name="EventInstance">
+ The specific event to append to the end of the store
+ </param>
+ <remarks>
+ The events store must be both immutable and forward-only so to cater for the concept of "delete" a 
+ reversal event needs to exist
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IHandleEvent`1">
+ <summary>
+ The projection handles this particular type of event
+ </summary>
+ <typeparam name="TEvent">
+ The event being handled 
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IHandleEvent`1.HandleEvent(`0)">
+ <summary>
+ Handle the particular event as part of a projection
+ </summary>
+ <param name="eventHandled">
+ The specific event to handle
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ImplementationMap">
+ <summary>
+ Map between an aggregate and the actual implementation class for the events stream of instances of that aggregate
+ </summary>
+ <remarks>
+ This can be set on a per-aggregate-type basis or on a global basis in the application .config files
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ImplementationMap.SupportedEventStreamImplementations">
+ <summary>
+ The different backing technologies that can be used for an event stream in this library
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ImplementationMap.SupportedEventStreamImplementations.Default">
+ <summary>
+ Use whatever is set as the system default
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ImplementationMap.SupportedEventStreamImplementations.InMemory">
+ <summary>
+ In-memory event stream for unit testing and proof-of-concept work
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ImplementationMap.SupportedEventStreamImplementations.AzureBlob">
+ <summary>
+ Azure append-only blobs
+ </summary>
+ <remarks>
+ This is currentlythe most performant option
+</remarks>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ImplementationMap.SupportedEventStreamImplementations.AzureFile">
+ <summary>
+ Azure storage files
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ImplementationMap.SupportedEventStreamImplementations.AzureSQL">
+ <summary>
+ Azure hosted SQL Server database 
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ImplementationMap.SupportedEventStreamImplementations.AzureTable">
+ <summary>
+ Azure Table
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ImplementationMap.SupportedEventStreamImplementations.LocalFileSettings">
+ <summary>
+ Local machine file system
+ </summary>
+</member>
+<member name="F:CQRSAzure.EventSourcing.ImplementationMap.DefaultImplementation">
+ <summary>
+ If no implementation is specified we fall back to the default
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.InstanceWrappedEvent`1">
+ <summary>
+ An event wrapped in the information to connect it with an aggregation identifier
+ </summary>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies the aggregation this wrapped event is linked ot
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjection`2">
+ <summary>
+ Marker interface to denote anything as being a projection over the given aggregate identifier
+ </summary>
+ <remarks>
+ The type-safety is to ensure the projection only operates on events of one kind
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjection`2.LoadFromSnapshot(CQRSAzure.EventSourcing.IProjectionSnapshot{`0,`1})">
+ <summary>
+ Load the state of this projection from a saved snapshot
+ </summary>
+ <param name="snapshotToLoad">
+ The snapshot to load the projection state from
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjection`2.ToSnapshot">
+ <summary>
+ Turn the current state of this projection to a snapshot
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionUntyped.HandlesEventTypeByName(System.String)">
+ <summary>
+ Does the projection handle the data for the given event type
+ </summary>
+ <param name="eventTypeFullName">
+ The full name of the event containing the data that may or may not be handled
+ </param>
+ <returns>
+ True if this event type should get processed
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionUntyped.LoadFromSnapshot(CQRSAzure.EventSourcing.IProjectionSnapshot)">
+ <summary>
+ Load the state of this projection from a saved snapshot
+ </summary>
+ <param name="snapshotToLoad">
+ The snapshot to load the projection state from
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionUntyped.ToSnapshot">
+ <summary>
+ Turn the current state of this projection to a snapshot
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjection">
+ <summary>
+ Marker interface to denote anything as being a projection
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjection.SupportsSnapshots">
+ <summary>
+ Does this projection use snapshots to save the latest state or does it need to rebuild the entire 
+ projection every time?
+ </summary>
+ <returns>
+ True if the projection supports snapshots
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjection.HandlesEventType(System.Type)">
+ <summary>
+ Does the projection handle the data for the given event type
+ </summary>
+ <param name="eventType">
+ The type of the event containing the data that may or may not be handled
+ </param>
+ <returns>
+ True if this event type should get processed
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjection.CurrentSequenceNumber">
+ <summary>
+ The current sequence number of the projection class
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjection.MarkEventHandled(System.UInt32)">
+ <summary>
+ Called when a projection has handled an event 
+ </summary>
+ <param name="handledEventSequenceNumber">
+ The sequence number of the event that has been competed - this allows the projection to keep track of where
+ in the event stream it has got to
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjection.HandleEvent``1(``0)">
+ <summary>
+ Perform whatever processing is required to handle the specific event
+ </summary>
+ <param name="eventToHandle">
+ The specific event to handle and perform whatever processing is required
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjection.OnEventRead(System.UInt32,System.Nullable{System.DateTime})">
+ <summary>
+ An event was read by the underlying event reader (whether it is handled or not)
+ </summary>
+ <param name="sequenceNumber">
+ The sequence number of the event read
+ </param>
+ <param name="asOfDate">
+ If the event has an "effective date" this is 
+ </param>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjection.CurrentAsOfDate">
+ <summary>
+ The current as-of date for this projection
+ </summary>
+ <remarks>
+ This is only updated where an event is processed that has an as-of date field as part of its data properties
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjection.CurrentValues">
+ <summary>
+ The current set of values the projection has as at the current point in time
+ </summary>
+ <remarks>
+ These are the business-meaningful properties of the projection
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjectionProcessor`2">
+ <summary>
+ Interface for any class that can process projections over an event stream
+ </summary>
+ <typeparam name="TAggregate">
+ The aggregate type providing the underlying event stream
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type for the key that uniquely identifies an instance of thaqt aggregate type
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionProcessor`2.Process(CQRSAzure.EventSourcing.IProjection{`0,`1})">
+ <summary>
+ Process the given projection using the event stream reader we have set up
+ </summary>
+ <param name="projectionToProcess">
+ The class that defines the projection operation we are going to process
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionProcessorUntyped.Process(CQRSAzure.EventSourcing.IProjectionUntyped)">
+ <summary>
+ Process the given projection using the event stream reader we have set up
+ </summary>
+ <param name="projectionToProcess">
+ The class that defines the projection operation we are going to process
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjectionSnapshot`2">
+ <summary>
+ A snapshot of a projection as at a particular point in time
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjectionSnapshot">
+ <summary>
+ A snapshot of a projection as at a particular point in time
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjectionSnapshot.AsOfDate">
+ <summary>
+ The effective date/time for the snapshot
+ </summary>
+ <remarks>
+ This will require the underlying events in the stream to have some as-of date property 
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjectionSnapshot.Sequence">
+ <summary>
+ The sequence number of the last event that was part of the snapshot
+ </summary>
+ <returns>
+ If the event stream current max sequence is higher than this then the snapshot is not up to date and the 
+ snapshot processor should continue from this point
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjectionSnapshot.Values">
+ <summary>
+ The projection values as at this snapshot
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjectionSnapshot.RowCount">
+ <summary>
+ The number of rows of values in this snapshot
+ </summary>
+ <returns>
+ This will be 1 if this is a signle-row data set
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjectionSnapshotProperty`1">
+ <summary>
+ A single property from a projection snapshot
+ </summary>
+ <typeparam name="TValue">
+ 
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjectionSnapshotProperty`1.Value">
+ <summary>
+ The value of the property as it was as at the time of the snapshot
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotProperty`1.Copy">
+ <summary>
+ Create a deep copy of this property so it can be saved to an in-memory area without being still connected to the property it came from
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjectionSnapshotProperty.Name">
+ <summary>
+ The unique name of the property in the projection that is being saved in a snapshot
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjectionSnapshotProperty.RowNumber">
+ <summary>
+ The ordinal of the row of data 
+ </summary>
+ <remarks>
+ This can be -1 if this projection does not return multiple rows of data
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IProjectionSnapshotProperty.Value">
+ <summary>
+ The value of the property as it was as at the time of the snapshot
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotProperty.UpdateValue(System.Object)">
+ <summary>
+ Set the pro
+ </summary>
+ <param name="newValue">
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotProperty.Copy">
+ <summary>
+ Create a deep copy of this property so it can be saved to an in-memory area without being still connected to the property it came from
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjectionSnapshotReader`3">
+ <summary>
+ Interface for any implementation class that finds and reads cached projection snapshot records
+ </summary>
+ <typeparam name="TAggregate">
+ The data type that the projection is run against
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key which uniquely identifies an instance of the aggregate
+ </typeparam>
+ <typeparam name="TProjection">
+ The data type of the projection that is having a snapshot saved
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotReader`3.GetSnapshot(`1,System.UInt32)">
+ <summary>
+ Load the snapshot data to the backing storage technology
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are retrieving a projection snapshot for
+ </param>
+ <param name="OnOrBeforeSequence">
+ if specified, get the latest snapshot prior to the given sequence number
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotReader`3.GetLatestSnapshotSequence(`1,System.UInt32)">
+ <summary>
+ Gets the sequence number of the latest snapshot held for a given aggregate instance
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are retrieving a projection snapshot for
+ </param>
+ <param name="OnOrBeforeSequence">
+ if specified, get the latest snapshot prior to the given sequence number
+ </param>
+ <returns>
+ If zero, there are no snapshots found for this aggregate key
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjectionSnapshotReaderUntyped">
+ <summary>
+ Interface for any implementation class that finds and reads untyped cached projection snapshot records
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotReaderUntyped.GetSnapshot(System.String,System.UInt32)">
+ <summary>
+ Load the snapshot data to the backing storage technology
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are retrieving a projection snapshot for
+ </param>
+ <param name="OnOrBeforeSequence">
+ if specified, get the latest snapshot prior to the given sequence number
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotReaderUntyped.GetLatestSnapshotSequence(System.String,System.UInt32)">
+ <summary>
+ Gets the sequence number of the latest snapshot held for a given aggregate instance
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are retrieving a projection snapshot for
+ </param>
+ <param name="OnOrBeforeSequence">
+ if specified, get the latest snapshot prior to the given sequence number
+ </param>
+ <returns>
+ If zero, there are no snapshots found for this aggregate key
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjectionSnapshotWriter`3">
+ <summary>
+ Interface for any implementation class that writes cached projection snapshot records
+ </summary>
+ <typeparam name="TAggregate">
+ The data type that the projection is run against
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key which uniquely identifies an instance of the aggregate
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotWriter`3.SaveSnapshot(`1,CQRSAzure.EventSourcing.IProjectionSnapshot{`0,`1})">
+ <summary>
+ Save the snapshot data to the backing storage technology
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are storing a projection snapshot for
+ </param>
+ <param name="snapshotToSave">
+ The specific projection snapshot to save
+ </param>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IProjectionSnapshotWriterUntyped">
+ <summary>
+ Interface for any implementation class that writes untyped cached projection snapshot records
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.IProjectionSnapshotWriterUntyped.SaveSnapshot(System.String,CQRSAzure.EventSourcing.IProjectionSnapshot)">
+ <summary>
+ Save the snapshot data to the backing storage technology
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are storing a projection snapshot for
+ </param>
+ <param name="snapshotToSave">
+ The specific projection snapshot to save
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ISnapshotProcessor`2.SaveSnapshot(CQRSAzure.EventSourcing.IProjectionSnapshot{`0,`1})">
+ <summary>
+ Save the given projection snapshot to the underlying storage technology
+ </summary>
+ <param name="snapshotToSave">
+ The projection snapshot to be saved to the backing storage
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ISnapshotProcessor`2.GetLatestSnapshot(System.UInt32)">
+ <summary>
+ Get the most recent projection snapshot from the underlying storage technology
+ </summary>
+ <param name="priorToSequence">
+ if this is non zero get the snapshot record closest to the prior-to sequence number (inclusive)
+ </param>
+ <returns>
+ The most recent snapshot available if one has been saved - or Nothing (null) if none exists
+ </returns>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ISnapshotProcessorUntyped.SaveSnapshot(CQRSAzure.EventSourcing.IProjectionSnapshot)">
+ <summary>
+ Save the given projection snapshot to the underlying storage technology
+ </summary>
+ <param name="snapshotToSave">
+ The projection snapshot to be saved to the backing storage
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ISnapshotProcessorUntyped.GetLatestSnapshot(System.UInt32)">
+ <summary>
+ Get the most recent projection snapshot from the underlying storage technology
+ </summary>
+ <param name="priorToSequence">
+ if this is non zero get the snapshot record closest to the prior-to sequence number (inclusive)
+ </param>
+ <returns>
+ The most recent snapshot available if one has been saved - or Nothing (null) if none exists
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.IStateChangeTracking">
+ <summary>
+ An interface for implementing by any entity types for which we wish to track whether or not the state has changed
+ as a result of events processed
+ </summary>
+ <remarks>
+ This is to enable an architecture based on the propagation of changes
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IStateChangeTracking.StateChanges">
+ <summary>
+ The set of state changes occuring in the entity when event(s) processed
+ </summary>
+ <returns>
+ Dictionary key is the property name that has changed
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IStateChange`1.OldValue">
+ <summary>
+ The value in the field prior to event(s) being processed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IStateChange`1.NewValue">
+ <summary>
+ The value in the field subsequent to event(s) being processed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IStateChange.OldValue">
+ <summary>
+ The value in the field prior to event(s) being processed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.IStateChange.NewValue">
+ <summary>
+ The value in the field subsequent to event(s) being processed
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionBase`2.LoadFromSnapshot(CQRSAzure.EventSourcing.IProjectionSnapshot{`0,`1})">
+ <summary>
+ Load the state of this projection from a saved snapshot
+ </summary>
+ <param name="snapshotToLoad">
+ The snapshot to load the projection state from
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionBase`2.ToSnapshot">
+ <summary>
+ Turn the current state of this projection to a snapshot
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionBaseUntyped.LoadFromSnapshot(CQRSAzure.EventSourcing.IProjectionSnapshot)">
+ <summary>
+ Load the state of this projection from a saved snapshot
+ </summary>
+ <param name="snapshotToLoad">
+ The snapshot to load the projection state from
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionBaseUntyped.ToSnapshot">
+ <summary>
+ Turn the current state of this projection to a snapshot
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionBase">
+ <summary>
+ Base class providing common functionality for any projection
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionBase.IncrementValue``1(System.String,``0,System.Int32)">
+ <summary>
+ If the property exists, increment it by the value given, otherwise add it with the value given
+ </summary>
+ <typeparam name="TValue">
+ The underlying data type of the property
+ </typeparam>
+ <param name="propertyName">
+ The name of the property to increment
+ </param>
+ <param name="incrementByValue">
+ The amount by which to increment the value
+ </param>
+ <param name="rowNumber">
+ (Optional) The row of data to update the property for by incrfementing it
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionBase.CreateProperty``1(System.String)">
+ <summary>
+ Create a property for use in the projection processing
+ </summary>
+ <typeparam name="TValue">
+ The underlying data type to use to store the property
+ </typeparam>
+ <param name="propertyName">
+ The unique name of the property
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.ProjectionBase.ProjectionValuesChanged">
+ <summary>
+ Have any of the values of this projection changed
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Projections.IProjectionInstanceIdentifier`1">
+ <summary>
+ The identifier by which a single unique instance of a projection is known
+ </summary>
+ <typeparam name="TAggregateIdentifier">
+ The data type that is used to uniquely identify the event stream instance over which the projection is run
+ </typeparam>
+ <remarks>
+ This is used to identify the event stream underlying the projection
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionInstanceIdentifier`1.AggregateIdentifier">
+ <summary>
+ The unique identifier of the aggregate over whose event stream the projection will run
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionInstanceIdentifier.DomainName">
+ <summary>
+ The name of the domain (per DDD) containing this projection
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionInstanceIdentifier.ProjectionName">
+ <summary>
+ The unique name of this projection (unique within the domain)
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Projections.IProjectionRequestedEvent">
+ <summary>
+ A  specific projection was requested (by a query or identity group classifier for example)
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionRequestedEvent.RequestSource">
+ <summary>
+ Where did the source of this projection request come from
+ </summary>
+ <remarks>
+ This can be used to decide where to post the result
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionRequestedEvent.AsOfDate">
+ <summary>
+ The effective date to run the projection up until
+ </summary>
+ <returns>
+ If not set this will run to the current head of the aggregate event stream
+ as identified by the unique identifier
+ </returns>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Projections.IProjectionResultsReturnedEvent">
+ <summary>
+ The results for a projection were returned to a query or identity group classifier that asked for them
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionResultsReturnedEvent.AsOfSequence">
+ <summary>
+ The sequence number as of which the returned result is applicable
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionResultsReturnedEvent.AsOfDate">
+ <summary>
+ The effective date of the last event of the result projection
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionResultsReturnedEvent.ProjectionLocation">
+ <summary>
+ Where the returned data are stored
+ </summary>
+ <remarks>
+ This could be an URL or the raw results themselves 
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Projections.IProjectionSnapshotWrittenEvent">
+ <summary>
+ A snapshot of the state of this projection as at a particular event sequence was taken
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionSnapshotWrittenEvent.AsOfSequence">
+ <summary>
+ The sequence number as of which the snapshot was written
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionSnapshotWrittenEvent.WriterType">
+ <summary>
+ What technology was used to persiste the snapshot
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionSnapshotWrittenEvent.AsOfDate">
+ <summary>
+ The effective date of the snapshot
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.IProjectionSnapshotWrittenEvent.SnapshotLocation">
+ <summary>
+ Where the snapshot data are stored
+ </summary>
+ <remarks>
+ This could be an URL or the raw results themselves 
+ </remarks>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Projections.ProjectionEventBase.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+ <summary>
+ Force all projection events to have a serialisation constructor
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Projections.ProjectionRequestedEvent">
+ <summary>
+ A  specific projection was requested (by a query or identity group classifier for example)
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.ProjectionRequestedEvent.AsOfDate">
+ <summary>
+ The effective date to run the projection up until
+ </summary>
+ <returns>
+ If not set this will run to the current head of the aggregate event stream
+ as identified by the unique identifier
+ </returns>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.ProjectionRequestedEvent.RequestSource">
+ <summary>
+ Where did the source of this projection request come from
+ </summary>
+ <remarks>
+ This can be used to decide where to post the result
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Projections.ProjectionResultsReturnedEvent">
+ <summary>
+ The results for a projection were returned to a query or identity group classifier that asked for them
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Projections.ProjectionResultsReturnedEvent.ProjectionLocation">
+ <summary>
+ Where the returned data are stored
+ </summary>
+ <remarks>
+ This could be an URL or the raw results themselves 
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Projections.ProjectionSnapshotWrittenEvent">
+ <summary>
+ A snapshot of the state of this projection as at a particular event sequence was taken
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionNameAttribute">
+ <summary>
+ An attribute to tag a projection implementation class with a specific name
+ </summary>
+ <remarks>
+ If a projection is not explicitly named then the class name is returned
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.ProjectionNameAttribute.ProjectionName">
+ <summary>
+ The name of the projection that this class implements
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionSnapshot`2">
+ <summary>
+ A stock snapshot object that can be used to populate a projection from a snapshot taken at a point in time
+ </summary>
+ <typeparam name="TAggregate"></typeparam>
+ <typeparam name="TAggregateKey"></typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionSnapshotProcessor`3">
+ <summary>
+ Standard class for implementing a snapshot reader/writer for storing snapshots of a projection as it is run
+ </summary>
+ <typeparam name="TAggregate">
+ The type of aggregate that has the event stream over which the aggregate is run
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an unique instance of that aggregate type is identified
+ </typeparam>
+ <typeparam name="TProjection">
+ The projection for which the snapshot processor works
+ </typeparam>
+ <remarks>
+ If there is no snapshot processor all projections will always run over the entire event stream.  Deciding whether or not to snapshot the projection 
+ is a performance consideration that is best decided by experimentation.
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.ProjectionSnapshotProcessorFactory">
+ <summary>
+ Factory pattern for creating instances of the projection snapshot processor 
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryAggregateIdentifier">
+ <summary>
+ Identifier for an individual instance of a query
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryCompletedEvent">
+ <summary>
+ The query processing completed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCompletedEvent.CompletionDate">
+ <summary>
+ The date/time the query processing completed
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCompletedEvent.SuccessMessage">
+ <summary>
+ The human readable description of the completion state
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCompletedEvent.ResultRecordCount">
+ <summary>
+ The number of results from the query
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryCreatedEvent">
+ <summary>
+ A new query instance was created
+ </summary>
+ <remarks>
+ The initial parameters passed to the query are attached at this point
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCreatedEvent.QueryUniqueIdentifier">
+ <summary>
+ The unique identifier given to the query to identify it
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCreatedEvent.QueryName">
+ <summary>
+ The name of the type of query issued
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCreatedEvent.CreationDate">
+ <summary>
+ The date/time the query was created
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCreatedEvent.Source">
+ <summary>
+ Where was the query request sent from
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCreatedEvent.Username">
+ <summary>
+ The user who requested a query
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCreatedEvent.IdentityGroupName">
+ <summary>
+ The target identity group over which the query is to be run
+ </summary>
+ <remarks>
+ This may be blank if the query type only applies to one identity group or if the identity group 
+ information is passed as parameters
+ </remarks>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryCreatedEvent.QueryParameters">
+ <summary>
+ The additional Query Parameters for the query 
+ </summary>
+ <remarks>
+ This could be the raw parameters (e.g. in JSON) or a URI to a location containing the parameters - 
+ depends on implementation.
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryEventContext">
+ <summary>
+ Interface for any common element to be shared by all query instance related events
+ </summary>
+ <remarks>
+ In the current implementation there is no identified need for a common context
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryFatalErrorOccuredEvent">
+ <summary>
+ A query was terminated with an unrecoverable error 
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryFatalErrorOccuredEvent.ErrorDate">
+ <summary>
+ The date/time the query was stopped with a fatal error
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryFatalErrorOccuredEvent.ErrorMessage">
+ <summary>
+ The human readable description of the error
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupMemberReturnedEvent`1">
+ <summary>
+ A single member of an identity group was returned to a query that requested them
+ </summary>
+ <typeparam name="TAggregateIdentifier">
+ The data type by which members of the aggregate group are uniquely identified
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupMemberReturnedEvent`1.IdentityGroupName">
+ <summary>
+ The unique name of the identity group that was requested
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupMemberReturnedEvent`1.MemberUniqueIdentifier">
+ <summary>
+ The unique identifier of the member of the identity group
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupMemberReturnedEvent`1.AsOfDate">
+ <summary>
+ The efective date as of which we got this identity group membership
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupRequestedEvent">
+ <summary>
+ A query requested the members of an identity group (to process the underlying 
+ projection against)
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupRequestedEvent.IdentityGroupName">
+ <summary>
+ The unique name of the identity group to get the members of
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupRequestedEvent.AsOfDate">
+ <summary>
+ The efective date as of which we want the identity group members
+ </summary>
+ <remarks>
+ If not set then we want the latest possible view of the identity group members
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupReturnedEvent">
+ <summary>
+ The members of an identity group were returned to a query that requested them
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupReturnedEvent.IdentityGroupName">
+ <summary>
+ The unique name of the identity group that was requested
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryIdentityGroupReturnedEvent.AsOfDate">
+ <summary>
+ The efective date as of which we got the identity group members
+ </summary>
+ <remarks>
+ This can be used to determine if the group membership is too aged to use
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryProjectionRequestedEvent`1">
+ <summary>
+ The query requested to run the given projection for the given aggregate instance
+ </summary>
+ <typeparam name="TAggregateIdentifier">
+ The data type by which the aggregate over which the projection will run is uniquely identified
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryProjectionRequestedEvent`1.ProjectionpName">
+ <summary>
+ The unique name of the projection to run
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryProjectionRequestedEvent`1.AggregateUniqueIdentifier">
+ <summary>
+ The unique identifier of the event stream over which the projection will be run
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryProjectionRequestedEvent`1.AsOfDate">
+ <summary>
+ The efective date as of which we want the projection run until
+ </summary>
+ <remarks>
+ If not set then we want the latest possible view of the projection
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryProjectionReturnedEvent`1">
+ <summary>
+ A query requested projection was run and the results returned to the query
+ </summary>
+ <typeparam name="TAggregateIdentifier">
+ The data type of the event stream identifier that the projection was run over
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryProjectionReturnedEvent`1.ProjectionName">
+ <summary>
+ The unique name of the projection that was run
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryProjectionReturnedEvent`1.AggregateUniqueIdentifier">
+ <summary>
+ The unique identifier of the event stream over which the projection was run
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryProjectionReturnedEvent`1.AsOfDate">
+ <summary>
+ The efective date as of which was the projection run until
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryProjectionReturnedEvent`1.ResultsLocation">
+ <summary>
+ Location from which the results can be read 
+ </summary>
+ <remarks>
+ This could be an URL or the raw results themselves 
+ </remarks>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryStartedEvent">
+ <summary>
+ A query was taken off the queue and processing started on it
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryStartedEvent.ProcessingStartDate">
+ <summary>
+ The date/time the processing of the query was started
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryStartedEvent.Processor">
+ <summary>
+ The name of the host processing the query
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.IQueryTransientFaultOccuredEvent">
+ <summary>
+ A transient fault (unavaliable resource etc.) has occured while processing a 
+ query.  It may be possible to resume from this fault - or, depending on the 
+ business need it may need to be reissued as a new query.
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryTransientFaultOccuredEvent.FaultDate">
+ <summary>
+ The date/time the query was stopped with a transient error
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Queries.IQueryTransientFaultOccuredEvent.FaultMessage">
+ <summary>
+ The human readable description of the fault
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.QueryAggregate">
+ <summary>
+ Aggregate identifier specifically for queries that are passed into the domain
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Queries.QueryEventBase.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+ <summary>
+ Force all query events to have a serialisation constructor
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.QueryProjectionReturnedEvent`1">
+ <summary>
+ The result of a prohection has been returned to the query that asked for it
+ </summary>
+ <typeparam name="TAggregateIdentifier">
+ The data type by which the event stream over which the projection is run is uniquely identified
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Queries.QueryStatusProjection">
+ <summary>
+ Projection to get the status of a query
+ </summary>
+</member>
+</members>
+</doc>

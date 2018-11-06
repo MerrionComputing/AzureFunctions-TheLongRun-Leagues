@@ -1,0 +1,1650 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+CQRSAzure.IdentifierGroup
+</name>
+</assembly>
+<members>
+<member name="T:CQRSAzure.IdentifierGroup.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Commands.CompletedCommandsIdentityGroup">
+ <summary>
+ The set of all commands that have completed
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Commands.CompletedCommandsIdentityGroupClassifier">
+ <summary>
+ A classifier to use to get the set of completed commands for the completed commands identity group
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.Commands.CompletedCommandsIdentityGroupClassifier.ClassifierDataSource">
+ <summary>
+ This classifier comes from a projection
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Commands.FatalErroredCommandsIdentityGroup">
+ <summary>
+ The set of all commands that have failed due to a fatal error
+ </summary>
+ <remarks>
+ Because we consider any re-issue of a command after a fatal error to be a new command this means we can use an
+ evenyt stream classifier to select commands in fatal error state
+ </remarks>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Commands.FatalErroredCommandsIdentityGroupClassifier">
+ <summary>
+ A classifier to use to get the set of fatally failed commands for the completed commands identity group
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupAggregateMapElement">
+ <summary>
+ Maps an aggregation class to the identifier group persistence implementation
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupAggregateMapElement.AggregateDomainQualifiedName">
+ <summary>
+ The domain-qualified name of the aggregate class that uses the given implementation 
+ for it's event stream backing store
+ </summary>
+ <remarks>
+ This must be unqiue within the CQRSAzureIdentifierGroupAggregateMapElementCollection
+ </remarks>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupAggregateMapElement.ImplementationName">
+ <summary>
+ The name of the implementation to use - this allows different configuration properties per identifier group
+ </summary>
+ <remarks>
+ The name relates to the XXXXSettingsElement identified by the name
+ </remarks>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupAggregateMapElement.SnapshotSettingsName">
+ <summary>
+ The name of the snapshot settings to use - this allows different configuration properties per identifier group
+ </summary>
+ <remarks>
+ The name relates to the XXXXSnapshotSettingElement identified by the name
+ </remarks>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupAggregateMapElementCollection">
+ <summary>
+ The set of mapped aggregate to identifier group persistence implementations in the application
+ </summary>
+ <remarks>
+ These are uniquely keyed by domain qualified aggregate name
+ </remarks>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupConfigurationSection">
+ <summary>
+ Wrapper class for the possible configuration elements and element collections that affect how the 
+ identifier group part of the event sourcing library operates.
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupConfigurationSection.DefaultConfiguration">
+ <summary>
+ An empty configuration that can be used as a default if Null/Nothing is not allowed
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupClassifierSnapshotSettingsElement">
+ <summary>
+ Top level for all the common parts of an classifier snapshot's backing store
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupClassifierSnapshotSettingsElement.Name">
+ <summary>
+ The unique name of this specific implementation
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupClassifierSnapshotSettingsElement.ImplementationType">
+ <summary>
+ The specific type of the underlying implementation 
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupClassifierSnapshotSettingsElement.BlobSettings">
+ <summary>
+ The settings specific to an Azure Blob backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupClassifierSnapshotSettingsElement.FileSettings">
+ <summary>
+ The settings specific to an Azure Blob backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupClassifierSnapshotSettingsElement.TableSettings">
+ <summary>
+ The settings specific to an Azure Table backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupClassifierSnapshotSettingsElement.InMemorySettings">
+ <summary>
+ The settings specific to an in-memory backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupClassifierSnapshotSettingsElement.LocalFileSettings">
+ <summary>
+ The settings specific to a local file system backed event stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupImplementationSettingsElementCollection">
+ <summary>
+ The set of implementation settings properties in the &lt;Implementations&gt; section
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElement">
+ <summary>
+ A single setting to use for persisting projection snapshots against a backing storage technology
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElement.Name">
+ <summary>
+ The unique name of this specific snapshot setting
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElement.ImplementationType">
+ <summary>
+ The specific type of the underlying implementation 
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElement.BlobSettings">
+ <summary>
+ The settings specific to an Azure Blob backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElement.FileSettings">
+ <summary>
+ The settings specific to an Azure Blob backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElement.TableSettings">
+ <summary>
+ The settings specific to an Azure Table backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElement.InMemorySettings">
+ <summary>
+ The settings specific to an in-memory backed event stream
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElement.LocalFileSettings">
+ <summary>
+ The settings specific to a local file system backed event stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.CQRSAzureIdentifierGroupSnapshotSettingsElementCollection">
+ <summary>
+ The set of implementation settings properties in the &lt;Implementations&gt; section
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.AllIdentityGroup`2">
+ <summary>
+ An identity group that represents all of the instances of a given aggregate identifier known to the system
+ </summary>
+ <typeparam name="TAggregateIdentifier">
+ The type of aggregate identifier for which we are getting the group of all instances
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.AllIdentityGroup`2.Name">
+ <summary>
+ Always use the name "All" for the group name of all aggregate identifiers
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.AllIdentityGroup`2.#ctor(CQRSAzure.IdentifierGroup.IClassifier{`0,`1},CQRSAzure.IdentifierGroup.IIdentifierGroup{`0,`1})">
+ <summary>
+ Constructor that takes the classifier to use and parent group
+ </summary>
+ <param name="classifierToUse">
+ The classifier process to use to classify members of the group
+ </param>
+ <param name="parentGroup">
+ The parent group of which all members of this group must be members
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.AllClassifier`2">
+ <summary>
+ A classifier that always includes the members in an event 
+ </summary>
+ <typeparam name="TAggregateIdentifier">
+ The aggregate type which we are classifying
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type by which the aggregate is uniquely identified
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.AllClassifier`2.SupportsSnapshots">
+ <summary>
+ This classifier should support snapshots  
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.AllClassifier`2.EvaluateEvent``1(``0)">
+ <summary>
+ Everything is included in the group of "All"
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.AllClassifier`2.EvaluateProjection``1(``0)">
+ <summary>
+ Everything is included in the group of "All"
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.ClassifierBase`2">
+ <summary>
+ Base class for a classifier the decides if an aggregate is in or out of a business meaningful identity group
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate we are grouping
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type that is used to uniquely identify an instance of the aggregate
+ </typeparam>
+ <remarks>
+ The class derived from this will need to implement the IClassifierEventHandler interface for each event it handles
+ </remarks>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.ClassifierBase`2.ClassifierDataSource">
+ <summary>
+ How does the classifier get the data it uses to perform a classification
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.ClassifierBase`2.#ctor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1})">
+ <summary>
+ Create a new classifier that can use the given event stream reader to decide if an aggregate is in or out of an identity group
+ </summary>
+ <param name="streamReader">
+ The aggregate event stream reader to use to ghet teh events in order to evaluate if an aggregate is in or out of the identity group
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IdentityGroupBase`2">
+ <summary>
+ Base class to be implemented by any class that supplies an identity group for an aggregate identifier
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IdentityGroupBase`2.ParentGroupName">
+ <summary>
+ The name of the outer parent group of which all members must be members of to be checked for membership
+ of this group
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IdentityGroupBase`2.Classifier">
+ <summary>
+ The classifier to run to (re)generate this identity group
+ </summary>
+ <remarks>
+ This may be null for "Identity" or "All" identity groups as these do not need a 
+ projection to decide if any entity is in or out of the group
+ </remarks>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentityGroupBase`2.GetMembers(System.DateTime)">
+ <summary>
+ Get the list of aggregate identifiers in the group as at the given date (or as of now if no date is passed in)
+ </summary>
+ <param name="AsOfDate">
+ The effective date for which we want to know thwe group membership.
+ (If this is not passed in then as of current date and time is assumed)
+ </param>
+ <returns>
+ A collection of aggregate identifiers considered to be "inside" the group
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IdentityGroupBaseUntyped">
+ <summary>
+ Base class to be implemented by any class that supplies an identity group for an aggregate identifier
+ using an untyped aggregate event stream
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentityGroupBaseUntyped.GetMembers(System.DateTime)">
+ <summary>
+ Get all the members of the identity group using the classifier
+ </summary>
+ <param name="AsOfDate">
+ Date/time up until which to run the classifiers
+ </param>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IdentityGroupBaseUntyped.ParentGroupName">
+ <summary>
+ The name of the outer parent group of which all members must be members of to be checked for membership
+ of this group
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IdentityGroupBase.Name">
+ <summary>
+ The class implementing the identity group must provide its name
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IdentityGroupBase.ParentGroupName">
+ <summary>
+ The name of the outer parent group of which all members must be members of to be checked for membership
+ of this group
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.InstanceIdentityGroup`2">
+ <summary>
+ An identity group that represents one (and only one) instance of the aggregate identifier
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.InstanceIdentityGroup`2.Name">
+ <summary>
+ Always use the name "Instance" for this group of one and only one aggregate identifier
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.InstanceIdentityGroup`2.Classifier">
+ <summary>
+ There is no projection for this group as only the specified identifier can be in the group
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.InstanceIdentityGroup`2.GetMembers(System.DateTime)">
+ <summary>
+ Returns the one instance this group contains
+ </summary>
+ <param name="AsOfDate">
+ This is meaningless for the instance group and is ignored
+ </param>
+ <returns>
+ A collection of just the one defiend instance of the aggregate identifier
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Exceptions.ClassifierProcessorFactoryMissingException">
+ <summary>
+ There was a problem starting the classifier process factory
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Exceptions.ClassifierProcessorException">
+ <summary>
+ Base class for all classifier related exceptions
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Exceptions.IdentifierGroupProcessorFactoryMissingException">
+ <summary>
+ There was a problem starting the classifier process factory
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Exceptions.IdentifierGroupProcessorException">
+ <summary>
+ Base class for all identifier group related exceptions
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Exceptions.SnapshotWriteOutOfSequenceException">
+ <summary>
+ A snapshot write is attempted but an existing higher-sequence snapshot
+ already exists
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.Exceptions.SnapshotWriteOutOfSequenceException.CurrentTopSequenceNumber">
+ <summary>
+ The highest sequence number for which a snapshot already exists
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.Exceptions.SnapshotWriteOutOfSequenceException.SnapshotSequenceNumber">
+ <summary>
+ The sequence number of the snapshot we attempted to write
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IdentifierGroup">
+ <summary>
+ Common functionality that needs to be available throughout the library
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.IdentifierGroup.IdentifierGroupTraceSwitch">
+ <summary>
+ This switch controls the tracing of the common parts of the event sourcing
+ library.  
+ </summary>
+ <remarks>
+ Individual implementations will have their own trace switches which add fine grain
+ tracing control for each 
+ </remarks>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentifierGroup.LogError(System.String)">
+ <summary>
+ Log an error to the trace listener(s)
+ </summary>
+ <param name="errorMessage">
+ The message to log
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentifierGroup.LogWarning(System.String)">
+ <summary>
+ Log a warning to the trace listener(s)
+ </summary>
+ <param name="warningMessage">
+ The warning message to log
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentifierGroup.LogInfo(System.String)">
+ <summary>
+ Log information to the trace listener(s)
+ </summary>
+ <param name="infoMessage">
+ The warning message to log
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentifierGroup.LogVerboseInfo(System.String)">
+ <summary>
+ Log verbose information to the trace listener(s)
+ </summary>
+ <param name="infoMessage">
+ The warning message to log
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.AggregateEventStreamImplementationMap`2.CreateClassifierProcessor``1(`0,`1,``0)">
+ <summary>
+ Create a classifier processor to run over event streams of this aggregate
+ </summary>
+ <param name="aggregate">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <param name="key">
+ The unique identifier of the instance of the aggregate for which we want to run projections
+ </param>
+ <param name="classifier">
+ The classifier to process
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.AggregateEventStreamImplementationMap`2.CreateIdentifierGroupProcessor">
+ <summary>
+ Create an identifier group processor to be used to identify members of an identifier group
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentityGroupAggregateMapBuilder.CreateImplementationMap(System.Type)">
+ <summary>
+ Using the implementations configurations put together an implementation map to allow 
+ rapid creation of reader/writer streams for the given aggregate
+ </summary>
+ <param name="aggregateType">
+ The type (implementing IAggregate) that events can be recorded for in an event stream
+ </param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentityGroupAggregateMapBuilder.MapAggregateClassByType(System.Type)">
+ <summary>
+ Add an entry to the internal map such that the class can be used to find an appropriate persistence 
+ class instance to read or write to its back end storage mechanism
+ </summary>
+ <param name="AggregateType">
+ The type (implementing IAggregate) that events can be recorded for in an event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentityGroupAggregateMapBuilder.#ctor(CQRSAzure.EventSourcing.AggregateMapBuilderCore.MapCreationOption,CQRSAzure.EventSourcing.CQRSAzureEventSourcingConfigurationSection)">
+ <summary>
+ Create a new aggregate map builder using the "Create on demand" method by default unless told otherwise
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IdentityGroupAggregateMapBuilderFactory">
+ <summary>
+ Factory to use to create new instances of the identity group aggregate maps
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentityGroupAggregateMapBuilderFactory.CreateImplementationMap(System.Type,CQRSAzure.EventSourcing.CQRSAzureEventSourcingImplementationSettingsElement,CQRSAzure.EventSourcing.CQRSAzureEventSourcingProjectionSnapshotSettingsElement)">
+ <summary>
+ Create a new implementation map to use for a specific 
+ </summary>
+ <param name="aggregateType"></param>
+ <param name="implementationToUse"></param>
+ <param name="snapshotSettingsToUse"></param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IdentityGroupAggregateMapBuilderFactory.CreateDefaultAggregateMaps">
+ <summary>
+ Create the default collection of implementation maps including any "hard coded" ones
+ </summary>
+ <remarks>
+ </remarks>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Azure.Blob.AzureBlobIdentifierGroupProcessor`2">
+ <summary>
+ An identifier group processor that runs off Azure AppendBlob based event streams
+ </summary>
+ <typeparam name="TAggregate">
+ The aggregate class for which we are getting identifier group members
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which instances of that aggregate are uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.Blob.AzureBlobIdentifierGroupProcessor`2.GetAll(System.Nullable{System.DateTime})">
+ <summary>
+ Get all of the identifiers of this aggregate type in existance as at the given time
+ </summary>
+ <param name="effectiveDateTime">
+ </param>
+ <remarks>
+ If the effective date/time is not specified get all the members as of now
+ </remarks>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.Blob.AzureBlobIdentifierGroupProcessor`2.CreateDefaultClassifierProvider">
+ <summary>
+ Create the default classifier provider to use for this group processor
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Azure.Blob.BlobWrappedIdentifierGroupSnapshot`1">
+ <summary>
+ A wrapper for a snapshot of the aggregate identifiers in a given group as at a given date/time
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.Azure.Blob.BlobWrappedIdentifierGroupSnapshot`1.Members">
+ <summary>
+ The individual keys that are members of this identifier group
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Azure.Blob.BlobWrappedIdentifierGroupSnapshot">
+ <summary>
+ A wrapper for a snapshot of the aggregate identifiers in a given group as at a given date/time
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.Azure.Blob.BlobWrappedIdentifierGroupSnapshot.AsOfDate">
+ <summary>
+ The effective date/time for which this collection of identifiers are in the group
+ </summary>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.Blob.AzureBlobClassifier`3.CreateClassifierProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings,System.Collections.Generic.IEnumerable{System.Type},`2,CQRSAzure.EventSourcing.IEventStreamReader{`0,`1},CQRSAzure.IdentifierGroup.IClassifierSnapshotReader{`0,`1,`2},CQRSAzure.IdentifierGroup.IClassifierSnapshotWriter{`0,`1,`2})">
+ <summary>
+ Create a classifier processor that works off an azure blob backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run classifications
+ </param>
+ <param name="settings">
+ (Optional) Settings used to read the event stream from a blob
+ </param> 
+ <param name="eventFilter">
+ (Optional) Filter to only read certain events from the blob event stream
+ </param>
+ <param name="classifier">
+ (Optional) The classifier used to test if the instance is in the group or not
+ </param>
+ <param name="snapshotReader">
+ (Optional) Class to read snapshots for the classifier
+ </param>
+ <param name="snapshotWriter">
+ (Optional) Class to write snapshots for the classifier
+ </param>
+ <returns>
+ A classification processor that can run classifiers over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.Blob.AzureBlobClassifierUntyped.CreateClassifierProcessor(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,CQRSAzure.IdentifierGroup.IClassifierUntyped,CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings,CQRSAzure.EventSourcing.IEventStreamReaderUntyped,CQRSAzure.IdentifierGroup.IClassifierSnapshotReaderUntyped,CQRSAzure.IdentifierGroup.IClassifierSnapshotWriterUntyped)">
+ <summary>
+ Create a classifier processor to run the given classifier over the event stream
+ </summary>
+ <param name="identifier">
+ The unique identifier of the thing we are going to run the classifier over the event stream of
+ </param>
+ <param name="classifier">
+ The classifier logic to run over the event stream
+ </param>
+ <param name="settings">
+ Configuration settings to use to access the underlying blob
+ </param>
+ <param name="streamReader">
+ A created stream reader to use to read the event stream
+ (if this is not passed in a default stream reader will be created)
+ </param>
+ <param name="snapshotReader">
+ (Optional) A reader to use to load snapshots of this classifier 
+ </param>
+ <param name="snapshotWriter">
+ (Optional) A writer to use to save snapshots of this classifier
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Azure.File.AzureFileIdentifierGroupProcessor`2">
+ <summary>
+ An identifier group processor that runs off Azure file based event streams
+ </summary>
+ <typeparam name="TAggregate">
+ The aggregate class for which we are getting identifier group members
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which instances of that aggregate are uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.File.AzureFileIdentifierGroupProcessor`2.CreateDefaultClassifierProvider">
+ <summary>
+ Create the default classifier provider to use for this group processor
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.File.AzureFileClassifier`3.CreateClassifierProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings,System.Collections.Generic.IEnumerable{System.Type},`2,CQRSAzure.IdentifierGroup.IClassifierSnapshotReader{`0,`1,`2},CQRSAzure.IdentifierGroup.IClassifierSnapshotWriter{`0,`1,`2})">
+ <summary>
+ Create a classifier processor that works off an azure file backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run classifications
+ </param>
+ <param name="settings">
+ (Optional) Settings used to read the event stream from an Azure file
+ </param> 
+ <param name="eventsToFilter">
+ (Optional) Filter to only read certain events from the blob event stream
+ </param>
+ <param name="classifier">
+ (Optional) The classifier used to test if the instance is in the group or not
+ </param>
+ <param name="snapshotReader">
+ (Optional) Class to read snapshots for the classifier
+ </param>
+ <param name="snapshotWriter">
+ (Optional) Class to write snapshots for the classifier
+ </param>
+ <returns>
+ A classification processor that can run classifiers over this event stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Azure.SQL.AzureSQLIdentifierGroupProcessor`2">
+ <summary>
+ An identifier group processor that runs off Azure SQL server based event streams
+ </summary>
+ <typeparam name="TAggregate">
+ The aggregate class for which we are getting identifier group members
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which instances of that aggregate are uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.SQL.AzureSQLIdentifierGroupProcessor`2.CreateDefaultClassifierProvider">
+ <summary>
+ Create the default classifier provider to use for this group processor
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.SQL.AzureSQLClassifier`3.CreateClassifierProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.SQL.ISQLSettings,System.Collections.Generic.IEnumerable{System.Type},`2,CQRSAzure.IdentifierGroup.IClassifierSnapshotReader{`0,`1,`2},CQRSAzure.IdentifierGroup.IClassifierSnapshotWriter{`0,`1,`2})">
+ <summary>
+ Create a classifier processor that works off an azure SQL backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run classifications
+ </param>
+ <param name="settings">
+ (Optional) Settings used to read the event stream from an Azure SQL database
+ </param> 
+ <param name="eventsToFilter">
+ (Optional) Filter to only read certain events from the blob event stream
+ </param>
+ <param name="classifier">
+ (Optional) The classifier used to test if the instance is in the group or not
+ </param>
+ <param name="snapshotReader">
+ (Optional) Class to read snapshots for the classifier
+ </param>
+ <param name="snapshotWriter">
+ (Optional) Class to write snapshots for the classifier
+ </param>
+ <returns>
+ A classification processor that can run classifiers over this event stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Azure.Table.AzureTableIdentifierGroupProcessor`2">
+ <summary>
+ An identifier group processor that runs off Azure file based event streams
+ </summary>
+ <typeparam name="TAggregate">
+ The aggregate class for which we are getting identifier group members
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which instances of that aggregate are uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.Table.AzureTableIdentifierGroupProcessor`2.CreateDefaultClassifierProvider">
+ <summary>
+ Create the default classifier provider to use for this group processor
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.Table.AzureTableClassifier`3.CreateClassifierProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Azure.Table.ITableSettings,System.Collections.Generic.IEnumerable{System.Type},`2,CQRSAzure.IdentifierGroup.IClassifierSnapshotReader{`0,`1,`2},CQRSAzure.IdentifierGroup.IClassifierSnapshotWriter{`0,`1,`2})">
+ <summary>
+ Create a classifier processor that works off an azure table backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run classifications
+ </param>
+ <returns>
+ A classification processor that can run classifiers over this event stream
+ </returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Azure.Table.AzureTableClassifierUntyped.CreateClassifierProcessor(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,CQRSAzure.IdentifierGroup.IClassifierUntyped,System.String,CQRSAzure.EventSourcing.Azure.Table.ITableSettings,CQRSAzure.EventSourcing.IEventStreamReaderUntyped,CQRSAzure.IdentifierGroup.IClassifierSnapshotReaderUntyped,CQRSAzure.IdentifierGroup.IClassifierSnapshotWriterUntyped)">
+ <summary>
+ Create a classifier processor to run the given classifier over the event stream
+ </summary>
+ <param name="identifier">
+ The unique identifier of the thing we are going to run the classifier over the event stream of
+ </param>
+ <param name="classifier">
+ The classifier logic to run over the event stream
+ </param>
+ <param name="settings">
+ Configuration settings to use to access the underlying blob
+ </param>
+ <param name="streamReader">
+ A created stream reader to use to read the event stream
+ (if this is not passed in a default stream reader will be created)
+ </param>
+ <param name="snapshotReader">
+ (Optional) A reader to use to load snapshots of this classifier 
+ </param>
+ <param name="snapshotWriter">
+ (Optional) A writer to use to save snapshots of this classifier
+ </param>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.ClassifierSnapshot`3.Key">
+ <summary>
+ The unique identifier of the aggregate to which this is a classifier snapshot
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.ClassifierSnapshot.EffectiveSequenceNumber">
+ <summary>
+ The event stream sequence number as of which the snapshot was taken
+ </summary>
+ <returns></returns>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.ClassifierSnapshot.EvaluationState">
+ <summary>
+ The evaluation state of the classifier as-at the time the snapshot was taken
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IdentifierGroupFunctions">
+ <summary>
+ Function delegates to allow the different implementations to be used to spin up a processor to perform the 
+ classification and group membership evaluation process
+ </summary>
+ <remarks>
+ This is required to segregate the business functionality (projections, classifiers, query definitions etc.) from the 
+ implementation functionality (readers, writers, snapshots etc.) so each can be tested independently
+ </remarks>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IdentifierGroupFunctions.CreateDefaultClassifierProcessor`3">
+ <summary>
+ Function to create a classifier processor for the given aggregate and classifier given the unique identifier of the aggregate
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate that owns the event stream that is being read to run the classifier
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which that aggregate can be uniquely identified
+ </typeparam>
+ <typeparam name="TClassifier">
+ The classifier function being run to decide if an instance is inside or outside the group
+ </typeparam>
+ <param name="instance">
+ The key by which the unique instance we are testing is identified
+ </param>
+ <returns>
+ A function that creates the classifier processor that would be needed to run this classification over the given aggregate isnatnce's
+ event stream to classify it.
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IdentifierGroupFunctions.CreateDefaultIdentifierGroupProcessor`3">
+ <summary>
+ Function to create an identifier group processor for the 
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate that owns the event stream that is being read to run the classifier
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which that aggregate can be uniquely identified
+ </typeparam> 
+ <typeparam name="TGroup">
+ The class of the group that we are processing
+ </typeparam>
+ <param name="groupInstance">
+ The specific instance of the group to create a processor for
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IdentifierGroupProcessor">
+ <summary>
+ Class for the common parts of an identifier group classifier that do not need to know about the 
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.IdentifierGroupProcessor.IDENTIFIER_GROUP_NAME_ALL">
+ <summary>
+ Identity group name that represents all the existing instances of an aggregate type (at a given point in time)
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.IdentifierGroupProcessor.IDENTIFIER_GROUP_NAME_UNITY">
+ <summary>
+ identity group name that represents just one instance of an aggregate type
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.ClassifierProcessor`3">
+ <summary>
+ Class to run defined classifiers over an event stream to classify an aggregate instance as being 
+ inside or outside of the identity group the classifier pertains to
+ </summary>
+ <typeparam name="TAggregate">
+ The class of the aggregate of which this is an instance 
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type of the key that uniquely identifies an instance of this aggregate
+ </typeparam>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.ClassifierProcessor`3.m_streamReader">
+ <summary>
+ The stream reader instance that will be used to run the projections
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.ClassifierProcessor`3.Classify(CQRSAzure.IdentifierGroup.IClassifier{`0,`1},System.Nullable{System.DateTime},System.Boolean,CQRSAzure.EventSourcing.IProjection{`0,`1})">
+ <summary>
+ Run this classifier over the event stream using the reader set up
+ </summary>
+ <param name="classifierToProcess">
+ The classifier function to run over the event stream
+ </param>
+ <param name="forceExclude">
+ If true then if we don't find a reason to include then make this exclude
+ </param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.ClassifierProcessor`3.#ctor(CQRSAzure.EventSourcing.IEventStreamReader{`0,`1},CQRSAzure.IdentifierGroup.IClassifier{`0,`1},CQRSAzure.IdentifierGroup.IClassifierSnapshotReader{`0,`1,`2},CQRSAzure.IdentifierGroup.IClassifierSnapshotWriter{`0,`1,`2})">
+ <summary>
+ Create a new classifer processor that will use the given event stream reader to do its processing
+ </summary>
+ <param name="readerTouse">
+ The event stream processor to use
+ </param>
+ <param name="classifier">
+ (Optional) The classifier class that does the actual evaluation
+ </param>
+ <param name="snapshotReader">
+ (Optional) A class to read snapshots for this classifier running over the instance event stream
+ </param>
+ <param name="snapshotWriter">
+ (Optional) A class to write snapshots for this classifier running over the instance event stream
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.ClassifierProcessorUntyped">
+ <summary>
+ Class to run defined classifiers over an event stream to classify an aggregate instance as being 
+ inside or outside of the identity group the classifier pertains to from an untyped event stream reader
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.ClassifierProcessorUntyped.m_streamReader">
+ <summary>
+ The stream reader instance that will be used to run the projections
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.ClassifierProcessorUntyped.#ctor(CQRSAzure.EventSourcing.IEventStreamReaderUntyped,CQRSAzure.IdentifierGroup.IClassifierUntyped,CQRSAzure.IdentifierGroup.IClassifierSnapshotReaderUntyped,CQRSAzure.IdentifierGroup.IClassifierSnapshotWriterUntyped)">
+ <summary>
+ Create a new classifer processor that will use the given event stream reader to do its processing
+ </summary>
+ <param name="readerTouse">
+ The event stream processor to use
+ </param>
+ <param name="classifier">
+ (Optional) The classifier class that does the actual evaluation
+ </param>
+ <param name="snapshotReader">
+ (Optional) A class to read snapshots for this classifier running over the instance event stream
+ </param>
+ <param name="snapshotWriter">
+ (Optional) A class to write snapshots for this classifier running over the instance event stream
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.InMemory.InMemoryClassifier`3.CreateClassifierProcessor(`1,CQRSAzure.EventSourcing.InMemory.IInMemorySettings,CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction,`2,CQRSAzure.IdentifierGroup.IClassifierSnapshotReader{`0,`1,`2},CQRSAzure.IdentifierGroup.IClassifierSnapshotWriter{`0,`1,`2})">
+ <summary>
+ Create a classifier processor that works off an in memory backed event stream
+ </summary>
+ <param name="instance">
+ The unique identifier of the instance of the aggregate for which we want to run classifications
+ </param>
+ <param name="settings">
+ (Optional) Settings used to read the event stream from  in memory
+ </param> 
+ <param name="eventsFilterFunction">
+ (Optional) Filter function to only read certain events from the in-memory event stream
+ </param>
+ <param name="classifier">
+ (Optional) The classifier used to test if the instance is in the group or not
+ </param>
+ <param name="snapshotReader">
+ (Optional) Class to read snapshots for the classifier
+ </param>
+ <param name="snapshotWriter">
+ (Optional) Class to write snapshots for the classifier
+ </param>
+ <returns>
+ A classification processor that can run classifiers over this event stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.InMemory.InMemoryClassifierProcessorFactory`3">
+ <summary>
+ Interface to create classifier processors over an in-memory event stream
+ </summary>
+ <remarks>
+ This can be passed to the classifier filter provider to classify identifier groups on demand
+ </remarks>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.InMemory.InMemoryClassifierSnapshotReader`3">
+ <summary>
+ Snapshot reader for classifier snapshots stored inmemory
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.InMemory.InMemoryClassifierSnapshotReader`3.#ctor(`1,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Create a new in-memory classifier snapshot reader to get the snapshots for the given aggregate's unique key
+ </summary>
+ <param name="aggregateIdentityKey">
+ The key by which the aggregate is usniquely identified
+ </param>
+ <param name="settings">
+ The settings specific to how event streams/snapshots are stored in memory
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.InMemory.InMemoryClassifierSnapshotWriter`3">
+ <summary>
+ Snapshot writer for classifier snapshots stored inmemory
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.InMemory.InMemoryClassifierSnapshotWriter`3.SaveSnapshot(`1,CQRSAzure.IdentifierGroup.IClassifierSnapshot{`0,`1,`2})">
+ <summary>
+ Save this snapshot to the in-memory collection
+ </summary>
+ <param name="key">
+ Unique identifier of the aggregate the classifier ran over
+ </param>
+ <param name="snapshotToSave">
+ Snapshot to save for the classifier at the given point in time
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.InMemory.InMemoryClassifierSnapshotWriter`3.#ctor(`1,CQRSAzure.EventSourcing.InMemory.IInMemorySettings)">
+ <summary>
+ Create a new in-memory classifier snapshot writer to get the snapshots for the given aggregate's unique key
+ </summary>
+ <param name="aggregateIdentityKey">
+ The key by which the aggregate is uniquely identified
+ </param>
+ <param name="settings">
+ The settings specific to how event streams/snapshots are stored in memory
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.InMemory.InMemoryIdentifierGroupProcessor`2">
+ <summary>
+ An identifier group processor that runs off in-memory based event streams
+ </summary>
+ <typeparam name="TAggregate">
+ The aggregate class for which we are getting identifier group members
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which instances of that aggregate are uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.InMemory.InMemoryIdentifierGroupProcessor`2.CreateDefaultClassifierProvider">
+ <summary>
+ Create the default classifier provider to use for this group processor
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.InMemory.InMemoryIdentifierGroupSnapshotBase`2">
+ <summary>
+ Base class for storing an identifier group snapshot in-memory
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.LocalClassifierFilterProvider`3">
+ <summary>
+ A class to perform the classifier filter provider functionality locally - i.e. all the classifiers are run in the same process as the 
+ identifier group processor that is using them to get the group membership
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Local.File.LocalFileClassifier`3.CreateClassifierProcessor(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},CQRSAzure.EventSourcing.Local.File.ILocalFileSettings,CQRSAzure.EventSourcing.FilterFunctions.EventFilterFunction,`2,CQRSAzure.EventSourcing.IEventStreamReader{`0,`1},CQRSAzure.IdentifierGroup.IClassifierSnapshotReader{`0,`1,`2},CQRSAzure.IdentifierGroup.IClassifierSnapshotWriter{`0,`1,`2})">
+ <summary>
+ Create a classifier processor that works off an in memory backed event stream
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to run classifications
+ </param>
+ <param name="settings">
+ (Optional) Settings used to read the event stream from a local file
+ </param> 
+ <param name="eventsFilterFunction">
+ (Optional) Filter function to only read certain events from the in-memory event stream
+ </param>
+ <param name="classifier">
+ (Optional) The classifier used to test if the instance is in the group or not
+ </param>
+ <param name="snapshotReader">
+ (Optional) Class to read snapshots for the classifier
+ </param>
+ <param name="snapshotWriter">
+ (Optional) Class to write snapshots for the classifier
+ </param>
+ <returns>
+ A classification processor that can run classifiers over this event stream
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Local.File.LocalFileClassifierSnapshotBase`3">
+ <summary>
+ Base class for the functionality shred by readers and writers of classifier snapshots which use the local
+ file system to store snapshots
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate that owns the event stream being used for the classification
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an instance of this aggregate class is uniquely identified
+ </typeparam>
+ <typeparam name="TClassifier">
+ The data type of the classifier function being run over the event stream
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Local.File.LocalFileClassifierSnapshotBase">
+ <summary>
+ Base class for common functionality that is independent of the aggregate of classifier type being persisted
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Local.File.LocalFileClassifierSnapshotBase.MakeHomeDirectory(System.String,System.String,System.String)">
+ <summary>
+ Create a directory reference for where we are going to store the event streams for this aggregate
+ </summary>
+ <param name="rootPath"></param>
+ <param name="aggregateClassName"></param>
+ <returns>
+ {root}\{domain}\{aggregate name}\classifiers\{name}.snapshot.{as-of-date}
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Local.File.LocalFileClassifierSnapshotReader`3">
+ <summary>
+ Class to read point-in-time (or latest) snapshots of a classifier from a local file backed storage
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate that owns the event stream being used for the classification
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an instance of this aggregate class is uniquely identified
+ </typeparam>
+ <typeparam name="TClassifier">
+ The data type of the classifier function being run over the event stream
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Local.File.LocalFileClassifierSnapshotReader`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},`2,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Local.File.LocalFileClassifierSnapshotWriter`3">
+ <summary>
+ Class to save point-in-time snapshots of a classifier in a local file backed storage
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate that owns the event stream being used for the classification
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which an instance of this aggregate class is uniquely identified
+ </typeparam>
+ <typeparam name="TClassifier">
+ The data type of the classifier function being run over the event stream
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Local.File.LocalFileClassifierSnapshotWriter`3.Create(CQRSAzure.EventSourcing.IAggregationIdentifier{`1},`2,CQRSAzure.EventSourcing.Local.File.ILocalFileSettings)">
+ <summary>
+ Creates an local file storage based event stream reader for the given aggregate
+ </summary>
+ <param name="instance">
+ The instance of the aggregate for which we want to read the event stream
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Local.File.LocalFileIdentifierGroupProcessor`2">
+ <summary>
+ An identifier group processor that runs off local file based event streams
+ </summary>
+ <typeparam name="TAggregate">
+ The aggregate class for which we are getting identifier group members
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which instances of that aggregate are uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Local.File.LocalFileIdentifierGroupProcessor`2.CreateDefaultClassifierProvider">
+ <summary>
+ Create the default classifier provider to use for this group processor
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Local.File.LocalFileIdentifierGroupSnapshotBase`2">
+ <summary>
+ Base class for readers or writers using local file storage for snapshots of identifier group membership
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate whose members are in the group
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which these aggregate instances are uniquely identified
+ </typeparam>
+ <remarks>
+ Snapshots go in e.g. :-
+ {root}\{domain}\{aggregate name}\identifiergroups\{name}.snapshot.{as-of-date}
+ as a simple array
+ </remarks>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Local.File.LocalFileIdentifierGroupSnapshotBase`2.MakeFilename(System.DateTime)">
+ <summary>
+ Make the filename which will be used to store a group snapshot as at the given point in time
+ </summary>
+ <param name="asOfDate"></param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Local.File.LocalFileIdentifierGroupSnapshotBase.MakeHomeDirectory(System.String,System.String,System.String)">
+ <summary>
+ Create a directory reference for where we are going to store the event streams for this aggregate
+ </summary>
+ <param name="rootPath"></param>
+ <param name="aggregateClassName"></param>
+ <returns>
+ {root}\{domain}\{aggregate name}\identifiergroups\{name}.snapshot.{as-of-date}
+ </returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Local.File.LocalFileIdentifierGroupSnapshotReader`2">
+ <summary>
+ Class for reader using local file storage for snapshots of identifier group membership
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate whose members are in the group
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which these aggregate instances are uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.Local.File.LocalFileIdentifierGroupSnapshotReader`2.GetSnapshot(CQRSAzure.IdentifierGroup.IIdentifierGroup,System.Nullable{System.DateTime})">
+ <summary>
+ Gets the latest snapshot of the identifier group members 
+ </summary>
+ <param name="group"></param>
+ <param name="OnOrBeforeTimestamp"></param>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.Local.File.LocalFileIdentifierGroupSnapshotWriter`2">
+ <summary>
+ Class for reader using local file storage for snapshots of identifier group membership
+ </summary>
+ <typeparam name="TAggregate">
+ The data type of the aggregate whose members are in the group
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which these aggregate instances are uniquely identified
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IAggregateImplementationMap`2.CreateClassifierProcessor``1(`0,`1,``0)">
+ <summary>
+ Create a classifier processor to run over event streams of this aggregate
+ </summary>
+ <param name="aggregate">
+ The instance of the aggregate for which we want to run projections
+ </param>
+ <param name="key">
+ The unique identifier of the instance of the aggregate for which we want to run projections
+ </param>
+ <param name="classifier">
+ The classifier to process
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IAggregateImplementationMap`2.CreateIdentifierGroupProcessor">
+ <summary>
+ Create an identifier group processor to be used to identify members of an identifier group
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifier`2">
+ <summary>
+ An interface for any class that decides if an aggregate is in or our of an identity group
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate identifier which is to be evaluated
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifier`2.HandlesEventType(System.Type)">
+ <summary>
+ Does the projection handle the data for the given event type
+ </summary>
+ <param name="eventType">
+ The type of the event containing the data that may or may not be handled
+ </param>
+ <returns>
+ True if this event type should get processed
+ </returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifier`2.EvaluateEvent``1(``0)">
+ <summary>
+ Perform whatever evaluation is required to handle the specific event
+ </summary>
+ <param name="eventToHandle">
+ The specific event to handle and perform whatever processing is required in order to 
+ evaluate the status of the aggregate instance in relation to the identity group
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifier`2.LoadFromSnapshot``1(CQRSAzure.IdentifierGroup.IClassifierSnapshot{`0,`1,``0})">
+ <summary>
+ Load the starting point of this classifier from the given classifier snapshot
+ </summary>
+ <typeparam name="TClassifier">
+ Th eclassifier type (the type of this interface's implementing class)
+ </typeparam>
+ <param name="latestSnapshot">
+ The classifier snapshot saved away by an earlier evaluation
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifier`2.ToSnapshot``1">
+ <summary>
+ Turn the current state of this projection to a snapshot
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierUntyped.HandlesEventType(System.String)">
+ <summary>
+ Does the projection handle the data for the given event type
+ </summary>
+ <param name="eventTypeName">
+ The name of the type of the event containing the data that may or may not be handled
+ </param>
+ <returns>
+ True if this event type should get processed
+ </returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierUntyped.EvaluateEvent(System.String,Newtonsoft.Json.Linq.JObject)">
+ <summary>
+ Perform whatever evaluation is required to handle the specific event
+ </summary>
+ <param name="eventClassName">
+ The class name of the event stored as JSON
+ </param>
+ <param name="eventToHandle">
+ The specific event to handle and perform whatever processing is required in order to 
+ evaluate the status of the aggregate instance in relation to the identity group
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierUntyped.EvaluateProjection``1(``0)">
+ <summary>
+ Use a projection to decide if an aggregate instance is in or outside an identifier group
+ </summary>
+ <param name="projection">
+ The projection which can be used to decide if the instance is in or not
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierUntyped.LoadFromSnapshot(CQRSAzure.IdentifierGroup.IClassifierSnapshotUntyped)">
+ <summary>
+ Load the starting point of this classifier from the given classifier snapshot
+ </summary>
+ <param name="latestSnapshot">
+ The classifier snapshot saved away by an earlier evaluation
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierUntyped.ToSnapshot">
+ <summary>
+ Turn the current state of this projection to a snapshot
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifier.ClassifierDataSourceType">
+ <summary>
+ How does the classifier get the data it uses to perform a classification
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.IClassifier.ClassifierDataSourceType.EventHandler">
+ <summary>
+ Directly processing the event stream with an event handler
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.IClassifier.ClassifierDataSourceType.Projection">
+ <summary>
+ Running a projection and analysing the result from that
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IClassifier.SupportsSnapshots">
+ <summary>
+ Does this classifier use snapshots to save the latest state or does it need to evaluate the entire 
+ event stream every time?
+ </summary>
+ <returns>
+ True if the classifier supports snapshots
+ </returns>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IClassifier.ClassifierDataSource">
+ <summary>
+ How does the classifier get the data it uses to perform a classification
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifierDataSourceHandler.EvaluationResult">
+ <summary>
+ The evaluation result of evaluating this given event
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.IClassifierDataSourceHandler.EvaluationResult.Unchanged">
+ <summary>
+ The in/out analysis is not changed by the evaluation of this event
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.IClassifierDataSourceHandler.EvaluationResult.Include">
+ <summary>
+ The in/out analysis is set to include this item in the group
+ </summary>
+</member>
+<member name="F:CQRSAzure.IdentifierGroup.IClassifierDataSourceHandler.EvaluationResult.Exclude">
+ <summary>
+ The in/out analysis is set to exclude this item according to this event
+ </summary>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifierEventHandler`1">
+ <summary>
+ An interface for a class that handles a specific event to decide if an aggregate is in or out of an identity group
+ </summary>
+ <typeparam name="TEvent">
+ The specific event being evaluated
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifierProcessor`3">
+ <summary>
+ An interface for any processor that can execute classifiers over an event stream
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierProcessor`3.Classify(CQRSAzure.IdentifierGroup.IClassifier{`0,`1},System.Nullable{System.DateTime},System.Boolean,CQRSAzure.EventSourcing.IProjection{`0,`1})">
+ <summary>
+ Perform the classification function over the event stream
+ </summary>
+ <param name="classifierToProcess">
+ (Optional) An existing instance of the classifier to use to process the event stream 
+ </param>
+ <param name="effectiveDateTime">
+ The date/time up until which we are running the classification.
+ </param>
+ <param name="forceExclude">
+ If set to true then if no reason is found to classify the aggregate instance as in the group 
+ then classify it as excluded from the group
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifierProcessorUntyped">
+ <summary>
+ An interface for any processor that can execute classifiers over an untyped event stream
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierProcessorUntyped.Classify(CQRSAzure.IdentifierGroup.IClassifierUntyped,System.Nullable{System.DateTime},System.Boolean,CQRSAzure.EventSourcing.IProjectionUntyped)">
+ <summary>
+ Perform the classification function over the event stream
+ </summary>
+ <param name="classifierToProcess">
+ (Optional) An existing instance of the classifier to use to process the event stream 
+ </param>
+ <param name="effectiveDateTime">
+ The date/time up until which we are running the classification.
+ </param>
+ <param name="forceExclude">
+ If set to true then if no reason is found to classify the aggregate instance as in the group 
+ then classify it as excluded from the group
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifierProcessorFactory`3">
+ <summary>
+ Interface to create classifier processors 
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierProcessorFactory`3.GetClassifierFilterProvider(`1)">
+ <summary>
+ Get a classifier filter provider to use to create classifiers for a group membership function
+ </summary>
+ <param name="key">
+ The unique key of the aggregate over which the classifier will be executed
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifierProjectionHandler`1">
+ <summary>
+ Interface for any classifier that gets its source data from a projection rather than directly by handling events
+ </summary>
+ <typeparam name="TProjection">
+ The type of the projection the classifier can handle
+ </typeparam>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifierFilterProvider`3">
+ <summary>
+ An interface for a provider that performs the classifier process for an identifier group processor to decide if the 
+ requested members are inside or outside of the identifier group
+ </summary>
+ <remarks>
+ This allows the provision of classifiers to be injected into the identifier group processor which allows for them, for example to be
+ scaled across machines or tested locally without altering and recompiling code.
+ Each identifier group processor will need to provide a default implementation in case there is no implementation passed in 
+ </remarks>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierFilterProvider`2.GetMembers(System.Collections.Generic.IEnumerable{`1},System.Nullable{System.DateTime})">
+ <summary>
+ Get all of the members of the input group that are classified as in the identifier group 
+ </summary>
+ <param name="setToFilter"></param>
+ <returns></returns>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierFilterProvider`2.IsMember(`1,System.Nullable{System.DateTime})">
+ <summary>
+ Is the given unique identifier a member of the identifier group 
+ </summary>
+ <param name="identifierToTest"></param>
+ <param name="effectiveDateTime"></param>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IClassifierSnapshot`3">
+ <summary>
+ A snapshot of the state of a particular classifier for an aggregate as at a given point in time
+ </summary>
+ <typeparam name="TAggregate">
+ The data type that has the event stream being evaluated
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The data type by which unique instances of the aggregate are identified
+ </typeparam>
+ <typeparam name="TClassifier">
+ The classifier function being used to classify the unique instance iof the aggregate
+ </typeparam>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IClassifierSnapshot`3.Key">
+ <summary>
+ The unique identifier by which the aggregate identifier is known
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IClassifierSnapshotUntyped.Key">
+ <summary>
+ The unique identifier by which the aggregate identifier is known
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IClassifierSnapshot.EffectiveDateTime">
+ <summary>
+ The effective date/time of the classifier snapshot
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IClassifierSnapshot.EffectiveSequenceNumber">
+ <summary>
+ The sequence number of the last event included in the classification of which this was the 
+ resulting snapshot state
+ </summary>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IClassifierSnapshot.EvaluationState">
+ <summary>
+ The classifier evaluation state as at the point in time that the snapshot was taken
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierSnapshotReader`3.GetSnapshot(`1,System.Nullable{System.DateTime})">
+ <summary>
+ Load the snapshot data from the backing storage technology
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are retrieving an identity group snapshot for
+ </param>
+ <param name="OnOrBeforeTimestamp">
+ if specified, get the latest snapshot prior to the given timestamp
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierSnapshotReaderUntyped.GetSnapshot(System.String,System.Nullable{System.DateTime})">
+ <summary>
+ Load the snapshot data from the backing storage technology
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are retrieving an identity group snapshot for
+ </param>
+ <param name="OnOrBeforeTimestamp">
+ if specified, get the latest snapshot prior to the given timestamp
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierSnapshotWriter`3.SaveSnapshot(`1,CQRSAzure.IdentifierGroup.IClassifierSnapshot{`0,`1,`2})">
+ <summary>
+ Save the snapshot data to the backing storage technology
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are storing a classifier snapshot for
+ </param>
+ <param name="snapshotToSave">
+ The specific classifier snapshot to save
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IClassifierSnapshotWriterUntyped.SaveSnapshot(System.String,CQRSAzure.IdentifierGroup.IClassifierSnapshotUntyped)">
+ <summary>
+ Save the snapshot data to the backing storage technology
+ </summary>
+ <param name="key">
+ The unique key of the aggregate we are storing a classifier snapshot for
+ </param>
+ <param name="snapshotToSave">
+ The specific classifier snapshot to save
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IIdentifierGroupProcessor`2">
+ <summary>
+ Interface to be implemented by any class that can process identifier groups to determine what entites are in the group as at a given point 
+ in time
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate whose members may be in this group
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type by which such instances are uniquely identifiable
+ </typeparam>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IIdentifierGroupProcessor`2.GetMembers(CQRSAzure.IdentifierGroup.IIdentifierGroup{`0},System.Nullable{System.DateTime},CQRSAzure.IdentifierGroup.IIdentifierGroupProcessor{`0,`1})">
+ <summary>
+ Get the set of unique identifiers of the aggregates that are in this group as at a given point in time, or as at now if no
+ given point in time is specified
+ </summary>
+ <param name="IdentifierGroup">
+ The specific identifier group for which we are getting the membership set
+ </param>
+ <param name="effectiveDateTime">
+ If specified the date/time for which we want to get the members of the group
+ </param>
+ <param name="parentGroupProcessor">
+ If this is a "nested" identifier group, this is the processor to get the the members 
+ </param>
+ <remarks>
+ If the rules of a classifier are invariant (which they should be) it is possible to cache group members as at a given point in 
+ time so as to speed up the resolving of group membership
+ </remarks>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IIdentifierGroupProcessor`2.GetAll(System.Nullable{System.DateTime})">
+ <summary>
+ Get the set of unique identifiers of the all of the aggregates that are in the system as at a given point in time, or as at now if no
+ given point in time is specified
+ </summary>
+ <param name="effectiveDateTime">
+ If specified the date/time for which we want to get the members of the group
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IIdentifierGroupSnapshot`2">
+ <summary>
+ A snapshot of the membership of an identifier group as at a given point in time
+ </summary>
+ <typeparam name="TAggregate">
+ The type of the aggregate whose members may be in this group
+ </typeparam>
+ <typeparam name="TAggregateKey">
+ The type by which such instances are uniquely identifiable
+ </typeparam>
+ <remarks>
+ Note that this cannot rely on the event stream sequence number as different event streams may be at a different
+ sequence as at any given point in time.  
+ If the event streams have no effective-date properties in their events then the snapshots are qualified with an
+ "as of snapshot generated" time stamp.
+ </remarks>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IIdentifierGroupSnapshot`2.AsOfDate">
+ <summary>
+ The effective date/time for the snapshot
+ </summary>
+ <remarks>
+ This will require the underlying events in the stream to have some as-of date property 
+ </remarks>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IIdentifierGroupSnapshot`2.Members">
+ <summary>
+ The set of unique identifiers that were in the identity group as at the point in time when the snapshot 
+ was taken
+ </summary>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IIdentifierGroupSnapshotReader`2.GetSnapshot(CQRSAzure.IdentifierGroup.IIdentifierGroup,System.Nullable{System.DateTime})">
+ <summary>
+ Load the snapshot data from the backing storage technology
+ </summary>
+ <param name="group">
+ The identifier of the group we are retrieving an identity group snapshot for
+ </param>
+ <param name="OnOrBeforeTimestamp">
+ if specified, get the latest snapshot prior to the given timestamp
+ </param>
+</member>
+<member name="M:CQRSAzure.IdentifierGroup.IIdentifierGroupSnapshotWriter`2.SaveSnapshot(CQRSAzure.IdentifierGroup.IIdentifierGroup,CQRSAzure.IdentifierGroup.IIdentifierGroupSnapshot{`0,`1})">
+ <summary>
+ Save the snapshot data to the backing storage technology
+ </summary>
+ <param name="group">
+ The identifier of the group we are retrieving an identity group snapshot for
+ </param>
+ <param name="snapshotToSave">
+ The specific identity group snapshot to save
+ </param>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IIdentifierGroup">
+ <summary>
+ A collection of zero or more aggregate identifiers over which the projection underlying a query
+ definition is to be run
+ </summary>
+ <remarks>
+ The group is uniquely named per aggregate identifier type, and is populated by its own projection which decides
+ if any given aggregate identifier is in or out of the group
+ </remarks>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IIdentifierGroup.Name">
+ <summary>
+ The unique name of the identity group
+ </summary>
+ <remarks>
+ This name can be passed as a parameter for a query definition.  There are two predefined names:-
+ "Identity" being the group of one specified aggregate identifier and "All" being the group of all 
+ instances of an aggregate identifier type.
+ </remarks>
+</member>
+<member name="P:CQRSAzure.IdentifierGroup.IIdentifierGroup.ParentGroupName">
+ <summary>
+ The name of the outer parent group of which all members must be members of to be checked for membership
+ of this group
+ </summary>
+ <remarks>
+ This can be used to speed up evaluation of group membership by starting from a smaller intital group than "All"
+ If not set then "All" is assumed
+ </remarks>
+</member>
+<member name="T:CQRSAzure.IdentifierGroup.IIdentifierGroup`2">
+ <summary>
+ A collection of zero or more aggregate identifiers over which the projection underlying a query
+ definition is to be run
+ </summary>
+ <remarks>
+ The group is uniquely named per aggregate identifier type, and is populated by its own projection which decides
+ if any given aggregate identifier is in or out of the group
+ </remarks>
+</member>
+</members>
+</doc>

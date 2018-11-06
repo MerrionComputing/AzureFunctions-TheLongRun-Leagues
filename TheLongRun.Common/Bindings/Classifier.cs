@@ -75,9 +75,15 @@ namespace TheLongRun.Common.Bindings
             _aggregateTypeName = aggregateTypeName;
             _aggregateInstanceKey = aggregateInstanceKey;
             _classifierTypeName = classifierTypeName;
-
         }
 
+        /// <summary>
+        /// Create the classifier from the attribute assigned to it in the function 
+        /// parameters
+        /// </summary>
+        /// <param name="attribute">
+        /// The attribute that describes the classifier to use
+        /// </param>
         public Classifier(ClassifierAttribute attribute )
             : this(attribute.DomainName,
                   attribute.AggregateTypeName ,

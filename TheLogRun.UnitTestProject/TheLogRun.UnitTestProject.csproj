@@ -51,9 +51,6 @@
     <Reference Include="CQRSAzure.EventSourcing.Implementation">
       <HintPath>..\lib\CQRSAzure.EventSourcing.Implementation.dll</HintPath>
     </Reference>
-    <Reference Include="CQRSAzure.Hosting">
-      <HintPath>..\lib\CQRSAzure.Hosting.dll</HintPath>
-    </Reference>
     <Reference Include="CQRSAzure.IdentifierGroup">
       <HintPath>..\lib\CQRSAzure.IdentifierGroup.dll</HintPath>
     </Reference>
@@ -186,6 +183,30 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandDefinition.csproj">
+      <Project>{78ca307a-3bd4-4f8b-bea7-05463fce90f3}</Project>
+      <Name>Leagues.CommandDefinition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandHandler.csproj">
+      <Project>{cca97247-57ac-475f-80a1-3fc393da6451}</Project>
+      <Name>Leagues.CommandHandler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.EventSourcing.csproj">
+      <Project>{238be862-5208-4971-b2dc-903d57d5a4d0}</Project>
+      <Name>Leagues.EventSourcing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.IdentityGroup.csproj">
+      <Project>{4a20a8c0-662a-4189-8674-1d9b5b417d46}</Project>
+      <Name>Leagues.IdentityGroup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryDefinition.csproj">
+      <Project>{4d169ba4-e4a0-4ff2-8598-ed51ea8341f5}</Project>
+      <Name>Leagues.QueryDefinition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryHandler.csproj">
+      <Project>{73058010-5f92-40c9-97ce-ef6d5a44089a}</Project>
+      <Name>Leagues.QueryHandler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TheLongRun-League-Function\TheLongRun-League-Function.csproj">
       <Project>{645a8da3-54b6-4944-ab42-a824e5f925fb}</Project>
       <Name>TheLongRun-League-Function</Name>

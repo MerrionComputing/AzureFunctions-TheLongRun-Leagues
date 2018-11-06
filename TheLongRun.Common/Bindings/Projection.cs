@@ -101,6 +101,12 @@ namespace TheLongRun.Common.Bindings
         {
         }
 
+        /// <summary>
+        /// Create the projection from the attribute linked to the function parameter
+        /// </summary>
+        /// <param name="attribute">
+        /// The attribute describing which projection to run
+        /// </param>
         public Projection(ProjectionAttribute attribute)
         {
 

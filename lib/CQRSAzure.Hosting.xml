@@ -1,0 +1,834 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+CQRSAzure.Hosting
+</name>
+</assembly>
+<members>
+<member name="T:CQRSAzure.Hosting.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:CQRSAzure.Hosting.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:CQRSAzure.Hosting.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="T:CQRSAzure.Hosting.CQRSAzureCommandsConfigurationElement">
+ <summary>
+ Configuration settings for where a domain's commands come from
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.CQRSAzureDefinitionsConfigurationElement.FullName">
+ <summary>
+ The full name of the assembly that contains the  definitions for this command/query section
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.CQRSAzureEventSourcingConfigurationElement.FullName">
+ <summary>
+ The full name of the assembly that contains the event sourcing definitions for this domain
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.CQRSAzureHandlersConfigurationElement.FullName">
+ <summary>
+ The full name of the assembly that contains the handlers for this command/query section
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.CQRSAzureHostConfigurationSection">
+ <summary>
+ Top level configuration settings for a CQRS Azure host
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.CQRSAzureHostConfigurationSection.Name">
+ <summary>
+ Unique name of the host
+ </summary>
+ <remarks>
+ This is conceptually similar to a server name in SQL server 
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.CQRSAzureHostConfigurationSection.LoadDomainsOnStartup">
+ <summary>
+ Should this host load all its known domains on startup?
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.CQRSAzureHostedDomainElement">
+ <summary>
+ Settings for an individual CQRS Azure domain hosted on this host
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.CQRSAzureHostedDomainElement.Name">
+ <summary>
+ The unique name of the domain
+ </summary>
+ <remarks>
+ This must be unqiue within the CQRSAzureHostedDomainElementCollection
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.CQRSAzureHostedDomainElement.Description">
+ <summary>
+ The description of the domain for use in logging messages etc.
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.CQRSAzureHostedDomainElementCollection">
+ <summary>
+ The set of hosted domains known to a CQRS Azure host
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.CQRSAzureIdentifierGroupsConfigurationElement">
+ <summary>
+ Configuration settings for where a domain's identifier groups come from
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.CQRSAzureIdentifierGroupsConfigurationElement.FullName">
+ <summary>
+ The full name of the assembly that contains the identifier groups definitions for this domain
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.CQRSAzureQueriesConfigurationElement">
+ <summary>
+ The configuration settings that define where a domain's query definitions and handlers come from
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Configuration.IHostHandlerSettings">
+ <summary>
+ Base settings for hosts
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.DomainAlreadyLoadedException">
+ <summary>
+ An attempt was made to load a domain that was already loaded
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.DomainAlreadyLoadedException.DomainName">
+ <summary>
+ The name of the domain we want to operate on
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.Hosting.DomainNotFoundException">
+ <summary>
+ An attempt was made to perform an operation on a named domain that was not found
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.DomainNotFoundException.DomainName">
+ <summary>
+ The name of the domain we want to operate on
+ </summary>
+ <returns></returns>
+</member>
+<member name="T:CQRSAzure.Hosting.Host">
+ <summary>
+ A host is a container responsible for one or more hosted domain.  It is responsible for all interaction 
+ between them and the outside world, and for their monitoring and maintenance
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.Host.Name">
+ <summary>
+ Unique name by which the host is known
+ </summary>
+ <remarks>
+ Ideally a human readable unique name should be used to aid debugging/logging
+ </remarks>
+</member>
+<member name="M:CQRSAzure.Hosting.Host.ValidateCommandAuthority(System.String,System.String,System.String)">
+ <summary>
+ Determine if the issuer of a command is authorised to issue it
+ </summary>
+ <param name="commandName">
+ The name of the command being issued
+ </param>
+ <param name="commandSource">
+ The source of the command
+ </param>
+ <param name="commandToken">
+ A token to use to validate that the command came from an authorised source
+ </param>
+ <returns>
+ True if the issue is allowed to issue the given command
+ </returns>
+</member>
+<member name="M:CQRSAzure.Hosting.Host.ShutDown(System.String,System.Boolean,System.String,System.String)">
+ <summary>
+ Force the host operation to shutdown completely
+ </summary>
+ <param name="shutDownMessage">
+ The message to be logged as to why the shutdown is being performed
+ </param>
+ <param name="forceClose">
+ If true, close even if there are commands in process
+ </param>
+ <param name="commandSource">
+ The source of the shutdown command
+ </param>
+ <param name="commandToken">
+ A token to use to validate that the command came from an authorised source
+ </param>
+</member>
+<member name="M:CQRSAzure.Hosting.Host.OnControlMessage(System.String,System.String)">
+ <summary>
+ A control message has occured and should be logged / notified
+ </summary>
+ <param name="messageType">
+ The type of control message
+ </param>
+ <param name="messageDetail">
+ (Optional) Additional message details 
+ </param>
+</member>
+<member name="M:CQRSAzure.Hosting.Host.LoadDomain(System.String,System.String,System.String,CQRSAzure.Hosting.IHostedDomainModel)">
+ <summary>
+ Load the named domain and start reading work from its various queues
+ </summary>
+ <param name="domainNameToLoad">
+ The unique name of the domain to load into the host
+ </param>
+ <param name="commandSource">
+ The source of the domain load command
+ </param>
+ <param name="commandToken">
+ A token to use to validate that the command came from an authorised source
+ </param>
+ <param name="domainConfiguration">
+ (Optional) Configuration information to use when loading the domain.  If not set then the host will read the 
+ configuration settings from the .config file
+ </param>
+</member>
+<member name="M:CQRSAzure.Hosting.Host.LoadDomainConfigurationSettings(System.String)">
+ <summary>
+ Load the hosted domain settings from the .config file for the given named domain
+ </summary>
+ <param name="domainNameToLoad">
+ The name of the domain we wish to load
+ </param>
+</member>
+<member name="T:CQRSAzure.Hosting.HostedDomainModel">
+ <summary>
+ A single domain model that is hosted by this host
+ </summary>
+ <remarks>
+ A single host may host multiple domains (in a conceptually similar manner to a single 
+ database server might host multiple databases) but equally a domain may be hosted by 
+ more than one host instance so as to allow for scaling across machines 
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.HostedDomainModel.Name">
+ <summary>
+ The unique name fo the domain model
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostedDomainModel.CommandDefinitionNamespace">
+ <summary>
+ The namespace to load the command definitions for this model from
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostedDomainModel.CommandHandlerNamespace">
+ <summary>
+ The namespace containing the command handlers that handle the commands for this domain
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostedDomainModel.EventSourceingNamespace">
+ <summary>
+ The namespace to load the model's event definitions from
+ </summary>
+ <remarks>
+ This is the event definitions and projections
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.HostedDomainModel.IdentifierGroupNamespace">
+ <summary>
+ The namespace to load the identifier group implementations from
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostedDomainModel.QueryDefinitionNamespace">
+ <summary>
+ The namespace containing the query definitions for this domain model
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostedDomainModel.QueryHandlerNamespace">
+ <summary>
+ The namespace containing the query handlers for this domain model
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.HostMessageBase">
+ <summary>
+ Base class for any communication between hosts
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.HostMessageBase.MessageCategory.Notification">
+ <summary>
+ The message is a broadcast notification of state
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.HostMessageBase.MessageCategory.Request">
+ <summary>
+ The message is a request for the target host to perform some action
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.HostMessageBase.MessageCategory.Response">
+ <summary>
+ The message is a response to a request
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostMessageBase.Hops">
+ <summary>
+ The number of times this message has been passed along 
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostMessageBase.Category">
+ <summary>
+ The type of inter-host communication that this message is
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostMessageBase.Originator">
+ <summary>
+ The host that originated the message
+ </summary>
+ <remarks>
+ This will be the same as the sender for a new message
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.HostMessageBase.Sender">
+ <summary>
+ The sender of this instance of the inter-host communication
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostMessageBase.Target">
+ <summary>
+ The target that the inter-host communication is sent to
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.HostMessageBase.MessageUniqueIdentifier">
+ <summary>
+ The unique identifier of this message between hosts
+ </summary>
+</member>
+<member name="M:CQRSAzure.Hosting.HostMessageBase.#ctor(CQRSAzure.Hosting.HostMessageBase.MessageCategory,CQRSAzure.Hosting.IHost,CQRSAzure.Hosting.IHost,CQRSAzure.Hosting.IHost,System.Guid,System.Int32)">
+ <summary>
+ Create a new host message to send
+ </summary>
+ <param name="categoryIn">
+ The type of message to create
+ </param>
+ <param name="originatorIn">
+ The originator of the message
+ </param>
+ <param name="senderIn">
+ The sender of this hop of the message
+ </param>
+ <param name="targetIn">
+ The target of the message
+ </param>
+ <param name="uniqueIdentifierIn">
+ The unique identifier of that message
+ </param>
+</member>
+<member name="M:CQRSAzure.Hosting.HostMessageBase.#ctor(CQRSAzure.Hosting.HostMessageBase.MessageCategory,CQRSAzure.Hosting.IHost,CQRSAzure.Hosting.IHost,CQRSAzure.Hosting.IHost,System.Int32)">
+ <summary>
+ Create a new host message to send
+ </summary>
+ <param name="categoryIn">
+ The type of message to create
+ </param>
+ <param name="originatorIn">
+ The originator of the message
+ </param>
+ <param name="senderIn">
+ The sender of this hop of the message
+ </param>
+ <param name="targetIn">
+ The target of the message
+ </param>
+</member>
+<member name="T:CQRSAzure.Hosting.IHostControl">
+ <summary>
+ Interface for control messages that a host should react to
+ </summary>
+ <remarks>
+ Each command must be accompanied by a source and a token - to allow validation that it comes from a known,
+ authorised command sender
+ </remarks>
+</member>
+<member name="M:CQRSAzure.Hosting.IHostControl.ValidateCommandAuthority(System.String,System.String,System.String)">
+ <summary>
+ Determine if the issuer of a command is authorised to issue it
+ </summary>
+ <param name="commandName">
+ The name of the command being issued
+ </param>
+ <param name="commandSource">
+ The source of the command
+ </param>
+ <param name="commandToken">
+ A token to use to validate that the command came from an authorised source
+ </param>
+ <returns>
+ True if the issue is allowed to issue the given command
+ </returns>
+</member>
+<member name="M:CQRSAzure.Hosting.IHostControl.ShutDown(System.String,System.Boolean,System.String,System.String)">
+ <summary>
+ Force the host operation to shutdown completely
+ </summary>
+ <param name="shutDownMessage">
+ The message to be logged as to why the shutdown is being performed
+ </param>
+ <param name="forceClose">
+ If true, close even if there are commands in process
+ </param>
+ <param name="commandSource">
+ The source of the shutdown command
+ </param>
+ <param name="commandToken">
+ A token to use to validate that the command came from an authorised source
+ </param>
+</member>
+<member name="M:CQRSAzure.Hosting.IHostControl.LoadDomain(System.String,System.String,System.String,CQRSAzure.Hosting.IHostedDomainModel)">
+ <summary>
+ Load the named domain and start reading work from its various queues
+ </summary>
+ <param name="domainNameToLoad">
+ The unique name of the domain to load into the host
+ </param>
+ <param name="commandSource">
+ The source of the domain load command
+ </param>
+ <param name="commandToken">
+ A token to use to validate that the command came from an authorised source
+ </param>
+ <param name="domainConfiguration">
+ (Optional) Configuration information to use when loading the domain.  If not set then the host will read the 
+ configuration settings from the .config file
+ </param>
+</member>
+<member name="M:CQRSAzure.Hosting.IHostControl.UnloadDomain(System.String,System.String,System.String)">
+ <summary>
+ Unload the named domain safely
+ </summary>
+ <param name="domainNameToUnload">
+ The name of the domain to unload
+ </param>
+ <param name="commandSource">
+ The source of the domain unload command
+ </param>
+ <param name="commandToken">
+ A token to use to validate that the command came from an authorised source
+ </param>
+</member>
+<member name="T:CQRSAzure.Hosting.IHostedDomainModel">
+ <summary>
+ A single CQRS domain model hosted by this host
+ </summary>
+ <remarks>
+ A single host may host multiple domains (in a conceptually similar manner to a single 
+ database server might host multiple databases) but equally a domain may be hosted by 
+ more than one host instance so as to allow for scaling across machines 
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.IHostedDomainModel.Name">
+ <summary>
+ The unique name fo the domain model
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.IHostedDomainModel.EventSourceingNamespace">
+ <summary>
+ The namespace to load the model's event definitions from
+ </summary>
+ <remarks>
+ This is the event definitions and projections
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.IHostedDomainModel.IdentifierGroupNamespace">
+ <summary>
+ The namespace to load the identifier group implementations from
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.IHostedDomainModel.CommandDefinitionNamespace">
+ <summary>
+ The namespace to load the command definitions for this model from
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.IHostedDomainModel.CommandHandlerNamespace">
+ <summary>
+ The namespace containing the command handlers that handle the commands for this domain
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.IHostedDomainModel.QueryDefinitionNamespace">
+ <summary>
+ The namespace containing the query definitions for this domain model
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.IHostedDomainModel.QueryHandlerNamespace">
+ <summary>
+ The namespace containing the query handlers for this domain model
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.IHostMonitoring">
+ <summary>
+ Interface providing the functionality by which the host monitoring is implemented
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.IHostStatus">
+ <summary>
+ Interface for the status messages that a host should be able respond to
+ </summary>
+ <remarks>
+ Note that this is the status of the host itself, not any underlying VM, CPU, memory etc as such monitoring
+ is best performed by the built in tools
+ </remarks>
+</member>
+<member name="T:CQRSAzure.Hosting.Notification.HighUsageNotification">
+ <summary>
+ Notify that this host node is currently under high usage and should be left alone for a while
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Notification.HostClosingNotification">
+ <summary>
+ A host is having to shut down
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.Notification.HostClosingNotification.Graceful">
+ <summary>
+ Is the host shutting down gracefully 
+ </summary>
+ <remarks>
+ Graceful shutdown means any requests in flight will be serviced but no new requests can be accepted
+ </remarks> 
+</member>
+<member name="T:CQRSAzure.Hosting.Notification.HostJoiningNotification">
+ <summary>
+ A host is starting up and joining the hosts network
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Notification.HostJoiningNotification.RequestCapabilities">
+ <summary>
+ The types if request this host is able to respond to
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostJoiningNotification.RequestCapabilities.None">
+ <summary>
+ Host has no capabilities (used for message testing)
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostJoiningNotification.RequestCapabilities.ExecuteCommands">
+ <summary>
+ Host can execute commands
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostJoiningNotification.RequestCapabilities.ExecuteQueries">
+ <summary>
+ Host can run queries and return results
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostJoiningNotification.RequestCapabilities.GetIdentityGroupMembers">
+ <summary>
+ Host can return the members of an identity group
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostJoiningNotification.RequestCapabilities.RunProjection">
+ <summary>
+ Host can run specific projections
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostJoiningNotification.RequestCapabilities.RunClassifier">
+ <summary>
+ Host can run a specific classifier
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Notification.HostNotificationBase">
+ <summary>
+ A notification sent from one host to another
+ </summary>
+ <remarks>
+ Because each specific type of host notification can have different payload requirements, this 
+ class is an abstract base class
+ </remarks>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostNotificationBase.NotificationCategories.NotSet">
+ <summary>
+ This notification message can be ignored
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostNotificationBase.NotificationCategories.HostJoining">
+ <summary>
+ A new host has started up and can be used going forward
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostNotificationBase.NotificationCategories.HostClosing">
+ <summary>
+ A host is disconnecting and no new requests should be sent its way
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostNotificationBase.NotificationCategories.HighUsage">
+ <summary>
+ A host is very busy and should not be sent any new requests for a while
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Notification.HostNotificationBase.NotificationCategories.Unreliable">
+ <summary>
+ A host should be regarded as unreliable and not sent any new requests
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.Notification.HostNotificationBase.NotificationCategory">
+ <summary>
+ The type of notification message this is
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Notification.UnreliableNotification">
+ <summary>
+ A host is to be considered unreliable 
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Request.ExecuteCommandRequest">
+ <summary>
+ A request to execute a given command
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Request.ExecuteQueryRequest">
+ <summary>
+ A request to execute a given query
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Request.GetIdentityGroupMembersRequest">
+ <summary>
+ Request to get all the members of an aggregate identity group
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Request.HostRequestBase">
+ <summary>
+ Base class for any request sent from one host to another
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Request.HostRequestBase.RequestCategories.NotSet">
+ <summary>
+ Unknown request typoe - should be ignored
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Request.HostRequestBase.RequestCategories.ExecuteCommand">
+ <summary>
+ Run a given command
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Request.HostRequestBase.RequestCategories.ExecuteQuery">
+ <summary>
+ Run a query and send the results back to me
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Request.HostRequestBase.RequestCategories.GetIdentityGroupMembers">
+ <summary>
+ Get the set of members of a given identety group as of now
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Request.HostRequestBase.RequestCategories.RunProjection">
+ <summary>
+ Run a single projection only
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Request.HostRequestBase.RequestCategories.RunClassifier">
+ <summary>
+ Run a single classifier only
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.Request.HostRequestBase.RequestCategory">
+ <summary>
+ The type of request this host message pertains to
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.Request.HostRequestBase.RequestIdentifier">
+ <summary>
+ The unique identifier of an individual request
+ </summary>
+ <remarks>
+ This is used in any response in orderto uniquely identify the request being responded to
+ </remarks>
+</member>
+<member name="T:CQRSAzure.Hosting.Request.RunClassifierRequest">
+ <summary>
+ Request to run a single classifier for an aggregate instance
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Request.RunProjectionRequest">
+ <summary>
+ Request to run a single projection for an aggregate instance
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.AcknowledgementResponse">
+ <summary>
+ A response to acknowledge receipt of a request
+ </summary>
+ <remarks>
+ An acknowledgement is always sent straight to the originator :. no need to have a separate "Sender" in the notification
+ </remarks>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.AcknowledgementResponse.AcknowledgementStatuses">
+ <summary>
+ The different responses acknowledging a request
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.AcknowledgementResponse.AcknowledgementStatuses.Processing">
+ <summary>
+ This host will process the request and get the results back to you
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.AcknowledgementResponse.AcknowledgementStatuses.HandingOn">
+ <summary>
+ This host is passing the request on to another host which will get back to you
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.AcknowledgementResponse.AcknowledgementStatuses.WillNotProcess">
+ <summary>
+ This host will not process the request - you need to try a different host (or throw an error)
+ </summary>
+</member>
+<member name="M:CQRSAzure.Hosting.Response.AcknowledgementResponse.#ctor(CQRSAzure.Hosting.IHost,CQRSAzure.Hosting.IHost,System.Guid,System.Guid,CQRSAzure.Hosting.Response.AcknowledgementResponse.AcknowledgementStatuses)">
+ <summary>
+ Create an acknowledgement that we received a request
+ </summary>
+ <param name="responderIn">
+ The host (me) responding to acknowledge the request
+ </param>
+ <param name="requesterIn">
+ The host which originated the request
+ </param>
+ <param name="uniqueIdentifierIn">
+ Unique identifier of the acknowledgement
+ </param>
+ <param name="requestIdentifierIn">
+ The unique identifier of the request being responded to
+ </param>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.ExecuteCommandResponse">
+ <summary>
+ This host executed the command that it was requested to do
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.ExecuteQueryResponse">
+ <summary>
+ This host executed the query that it was requested to do
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.FailureResponse">
+ <summary>
+ This host was unable to perform the request passed to it
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.FailureResponse.FailureClassifications">
+ <summary>
+ The differentpossible causes of a failure response
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.FailureResponse.FailureClassifications.HostError">
+ <summary>
+ The host processing the request has an error 
+ </summary>
+ <remarks>
+ The request should be passed on to another host to process
+ </remarks>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.FailureResponse.FailureClassifications.RequestError">
+ <summary>
+ The request itself had an error
+ </summary>
+ <remarks>
+ It probably doesn't make sense to try another host
+ </remarks>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.FailureResponse.FailureClassifications.RequestAlreadyComplete">
+ <summary>
+ The request has already been done by some other process
+ </summary>
+ <remarks>
+ No action needs to be taken otehr than logging this
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.Response.FailureResponse.FailureClassification">
+ <summary>
+ What type of a failure report this is
+ </summary>
+</member>
+<member name="M:CQRSAzure.Hosting.Response.FailureResponse.#ctor(CQRSAzure.Hosting.IHost,CQRSAzure.Hosting.IHost,System.Guid,System.Guid,CQRSAzure.Hosting.Response.FailureResponse.FailureClassifications)">
+ <summary>
+ Create an acknowledgement that we received a request
+ </summary>
+ <param name="responderIn">
+ The host (me) responding to acknowledge the request
+ </param>
+ <param name="requesterIn">
+ The host which originated the request
+ </param>
+ <param name="uniqueIdentifierIn">
+ Unique identifier of the acknowledgement
+ </param>
+ <param name="requestIdentifierIn">
+ The unique identifier of the request being responded to
+ </param>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.GetIdentityGroupMembersResponse">
+ <summary>
+ This host executed the "get identity group" and returned the resulting list
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.HostResponseBase">
+ <summary>
+ Base class for any request sent from one host to another
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.HostResponseBase.ResponseCategories.Acknowledgement">
+ <summary>
+ Acknowledge that a request has been received
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.HostResponseBase.ResponseCategories.Failure">
+ <summary>
+ An error occured while trying to process this request
+ </summary>
+</member>
+<member name="F:CQRSAzure.Hosting.Response.HostResponseBase.ResponseCategories.Results">
+ <summary>
+ A command or query was executed and these are the results
+ </summary>
+ <remarks>
+ For a command this will just return the command execution status
+ </remarks>
+</member>
+<member name="P:CQRSAzure.Hosting.Response.HostResponseBase.ResponseUniqueIdentifier">
+ <summary>
+ Unique identifier of this host response
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.Response.HostResponseBase.RequestIdentifier">
+ <summary>
+ The unique identifier of the request to which this the response
+ </summary>
+ <remarks>
+ This is used in any response in orderto uniquely identify the request being responded to
+ </remarks>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.RunClassifierResponse">
+ <summary>
+ This host executed the classifier and returned the resulting list
+ </summary>
+</member>
+<member name="T:CQRSAzure.Hosting.Response.RunProjectionResponse">
+ <summary>
+ This host executed the projection and returned the resulting list
+ </summary>
+</member>
+<member name="P:CQRSAzure.Hosting.IHost.Name">
+ <summary>
+ Unique name by which the host is known
+ </summary>
+ <remarks>
+ Ideally a human readable unique name should be used to aid debugging/logging
+ </remarks>
+</member>
+</members>
+</doc>

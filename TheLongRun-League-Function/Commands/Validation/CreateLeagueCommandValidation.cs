@@ -180,9 +180,9 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 }
 
                                 // The incoporation date may not be in the future
-                                if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.Date_Incorporated)))
+                                if (cmdProjection.ParameterIsSet(nameof(ICreate_New_League_Definition.Date_Incorporated)))
                                 {
-                                    DateTime dateIncorporated = cmdProjection.GetParameter<DateTime>(nameof(Create_New_League_Definition.Date_Incorporated));
+                                    DateTime dateIncorporated = cmdProjection.GetParameter<DateTime>(nameof(ICreate_New_League_Definition.Date_Incorporated));
                                     if (dateIncorporated > DateTime.UtcNow)
                                     {
                                         CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Incorporation date is in the future");

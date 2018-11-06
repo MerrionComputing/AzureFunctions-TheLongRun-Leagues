@@ -12,7 +12,7 @@ using TheLongRun.Common.Bindings;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
 
-namespace TheLongRunLeaguesFunction.Queries
+namespace TheLongRunLeaguesFunction
 {
     public static partial class Command
     {

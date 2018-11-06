@@ -2,9 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.EventGrid" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Azure.EventGrid" Version="3.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.1" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="1.6.2" />
@@ -15,8 +16,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandDefinition.csproj" />
     <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandHandler.csproj" />
     <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.EventSourcing.csproj" />
+    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.IdentityGroup.csproj" />
     <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryDefinition.csproj" />
     <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryHandler.csproj" />
     <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />

@@ -37,28 +37,32 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CQRSAzure.CommandDefinition">
+    <Reference Include="CQRSAzure.CommandDefinition, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CQRSAzure.CommandDefinition.dll</HintPath>
     </Reference>
-    <Reference Include="CQRSAzure.CommandHandler">
+    <Reference Include="CQRSAzure.CommandHandler, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CQRSAzure.CommandHandler.dll</HintPath>
     </Reference>
-    <Reference Include="CQRSAzure.EventSourcing">
+    <Reference Include="CQRSAzure.EventSourcing, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CQRSAzure.EventSourcing.dll</HintPath>
     </Reference>
-    <Reference Include="CQRSAzure.EventSourcing.Implementation">
+    <Reference Include="CQRSAzure.EventSourcing.Implementation, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CQRSAzure.EventSourcing.Implementation.dll</HintPath>
     </Reference>
-    <Reference Include="CQRSAzure.Hosting">
-      <HintPath>..\lib\CQRSAzure.Hosting.dll</HintPath>
-    </Reference>
-    <Reference Include="CQRSAzure.IdentifierGroup">
+    <Reference Include="CQRSAzure.IdentifierGroup, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CQRSAzure.IdentifierGroup.dll</HintPath>
     </Reference>
-    <Reference Include="CQRSAzure.QueryDefinition">
+    <Reference Include="CQRSAzure.QueryDefinition, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CQRSAzure.QueryDefinition.dll</HintPath>
     </Reference>
-    <Reference Include="CQRSAzure.QueryHandler">
+    <Reference Include="CQRSAzure.QueryHandler, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CQRSAzure.QueryHandler.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic">
