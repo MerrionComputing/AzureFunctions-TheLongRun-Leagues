@@ -60,11 +60,11 @@
     <Reference Include="CQRSAzure.QueryHandler">
       <HintPath>..\lib\CQRSAzure.QueryHandler.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Azure.WebJobs, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Azure.WebJobs.Core.3.0.1\lib\netstandard2.0\Microsoft.Azure.WebJobs.dll</HintPath>
+    <Reference Include="Microsoft.Azure.WebJobs, Version=3.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Azure.WebJobs.Core.3.0.2\lib\netstandard2.0\Microsoft.Azure.WebJobs.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Azure.WebJobs.Host, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Azure.WebJobs.3.0.1\lib\netstandard2.0\Microsoft.Azure.WebJobs.Host.dll</HintPath>
+    <Reference Include="Microsoft.Azure.WebJobs.Host, Version=3.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Azure.WebJobs.3.0.2\lib\netstandard2.0\Microsoft.Azure.WebJobs.Host.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Configuration.2.1.1\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>

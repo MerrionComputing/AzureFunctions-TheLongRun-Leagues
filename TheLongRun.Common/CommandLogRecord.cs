@@ -1,8 +1,6 @@
-﻿using System;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage;
-using System.Configuration;
+﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.File;
+using System;
 using System.Threading.Tasks;
 
 namespace TheLongRun.Common
@@ -83,48 +81,6 @@ namespace TheLongRun.Common
         /// The parameters of the command instance - these will be saved as JSON
         /// </summary>
         public TCommandParameters Parameters { get; set; }
-
-        /// <summary>
-        /// Save to command to a log file 
-        /// </summary>
-        /// <remarks>
-        /// This is required for audit and debug purposes as no command may be executed 
-        /// unless it is logged
-        /// </remarks>
-        public async Task<bool> SaveToFile()
-        {
-
-            bool success = false;
-            Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
-
-            string commandConnection = System.Configuration.ConfigurationManager.ConnectionStrings[DEFAULT_CONNECTION ].ConnectionString;
-            if (! string.IsNullOrWhiteSpace(commandConnection ) )
-            {
-                CloudStorageAccount commandAccount = CloudStorageAccount.Parse(commandConnection);
-                CloudFileClient commandClient = commandAccount.CreateCloudFileClient ();
-                if (null != commandClient )
-                {
-                    CloudFileShare commandFileShare = commandClient.GetShareReference(Constants.Container_Command_Log );
-                    if (null != commandFileShare )
-                    {
-                        await commandFileShare.CreateIfNotExistsAsync();
-                        CloudFile commandFile = commandFileShare.GetRootDirectoryReference().GetFileReference(MakeFilename(this));
-                        if (null != commandFile )
-                        {
-                            string commandText = Newtonsoft.Json.JsonConvert.SerializeObject(this);  
-                            
-                            if (! string.IsNullOrWhiteSpace(commandText))
-                            {
-                                await commandFile.UploadTextAsync (commandText);
-                                success = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return success;
-        }
 
 
         /// <summary>
