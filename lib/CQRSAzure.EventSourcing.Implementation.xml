@@ -703,7 +703,7 @@ CQRSAzure.EventSourcing.Implementation
 </member>
 <member name="T:CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamBaseUntyped">
  <summary>
- Common functionality that both untyped reader and untyped writer use to access the event store on the Azure storage
+ Common functionality that both untyped reader and untyped writer use to access the event store in a Blob on the Azure storage
  </summary>
  <remarks>
  Care must be taken to make sure this remains compatible with the type-safe implementation
@@ -1284,6 +1284,73 @@ CQRSAzure.EventSourcing.Implementation
  The instance of the aggregate for which we want to read the event stream
  </param>
  <param name="projection">
+ </param>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileBlockJSonWrappedEvent.EventName">
+ <summary>
+ The class name of the event
+ </summary>
+</member>
+<member name="P:CQRSAzure.EventSourcing.Azure.File.FileBlockJSonWrappedEvent.Sequence">
+ <summary>
+ The sequence number of this record
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileBlockJSonWrappedEvent.#ctor">
+ <summary>
+ Empty constructor for serialisation
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileEventStreamBaseUntyped">
+ <summary>
+ Common functionality that both untyped reader and untyped writer use to access the event store in a file on the Azure storage
+ </summary>
+ <remarks>
+ Care must be taken to make sure this remains compatible with the type-safe implementation
+ </remarks>
+</member>
+<member name="F:CQRSAzure.EventSourcing.Azure.File.FileEventStreamBaseUntyped.m_file">
+ <summary>
+ The file underlying the event stream
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileEventStreamReaderUntyped">
+ <summary>
+ Class to read events from an untyped event stream implemented as a windows Azure file
+ </summary>
+</member>
+<member name="T:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriterUntyped">
+ <summary>
+ Class to write events to an untyped event stream implemented as a windows Azure file
+ </summary>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriterUntyped.AppendEvent(CQRSAzure.EventSourcing.IEvent,System.Int64,System.UInt32)">
+ <summary>
+ Append an event to the end of this event stream
+ </summary>
+ <param name="EventInstance">
+ The event to append - this will be wrapped in the current 
+ </param>
+ <param name="ExpectedTopSequence">
+ The expected highest sequence number in the stream - if this is set it can be used to verify that no asynchronous writes have 
+ occured that should prevent this write from occuring
+ </param>
+ <param name="Version">
+ Event version number of the event being written
+ </param>
+</member>
+<member name="M:CQRSAzure.EventSourcing.Azure.File.FileEventStreamWriterUntyped.#ctor(CQRSAzure.EventSourcing.IEventStreamUntypedIdentity,System.String,CQRSAzure.EventSourcing.Azure.File.IFileStreamSettings)">
+ <summary>
+ Create a new stream writer to save events to an untyped Azure file
+ </summary>
+ <param name="identifier">
+ The unique identifier of the entity whose stream we will write to
+ </param>
+ <param name="connectionStringName">
+ The name of the connection string to use to write the 
+ </param>
+ <param name="settings">
+ Additional settings that control how a file is used as an event stream
  </param>
 </member>
 <member name="P:CQRSAzure.EventSourcing.Azure.SQL.SQLEventStreamBase`2.AggregateIdentifierField">
@@ -1954,27 +2021,6 @@ CQRSAzure.EventSourcing.Implementation
  <param name="settings">
  The settings to use to connect to the azure storage account to use
  </param>
-</member>
-<member name="T:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableJsonWrappedEvent">
- <summary>
- Turns an event serialised in an Azure table to a JSON version that can be processed 
- by the "untyped" event stream processors
- </summary>
-</member>
-<member name="P:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableJsonWrappedEvent.EventName">
- <summary>
- The class name of the event
- </summary>
-</member>
-<member name="P:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableJsonWrappedEvent.Sequence">
- <summary>
- The sequence number of this record
- </summary>
-</member>
-<member name="M:CQRSAzure.EventSourcing.Azure.Table.Untyped.TableJsonWrappedEvent.#ctor">
- <summary>
- Empty constructor for serialisation
- </summary>
 </member>
 <member name="T:CQRSAzure.EventSourcing.EventStreamBase">
  <summary>
