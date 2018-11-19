@@ -2,7 +2,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.WebJobs.Host;
 using System;
-using System.IO;
 
 
 using Leagues.League.commandDefinition;

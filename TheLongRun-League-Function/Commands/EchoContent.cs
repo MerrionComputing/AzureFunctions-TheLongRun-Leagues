@@ -1,11 +1,8 @@
-using System;
-using Leagues.League.commandDefinition;
-using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.WebJobs.Host;
-using TheLongRun.Common;
-using TheLongRun.Common.Bindings;
+using Microsoft.Azure.WebJobs.Extensions.EventGrid;
+using System;
+using Microsoft.Azure.EventGrid.Models;
 
 namespace TheLongRunLeaguesFunction.Commands
 {

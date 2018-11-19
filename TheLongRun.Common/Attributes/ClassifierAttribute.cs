@@ -1,10 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Description;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheLongRun.Common.Attributes
 {
@@ -26,7 +22,6 @@ namespace TheLongRun.Common.Attributes
         /// The domain name the aggregate instance belongs to
         /// </summary>
         private readonly string _domainName;
-        [AutoResolve]
         public string DomainName
         {
             get
@@ -51,7 +46,6 @@ namespace TheLongRun.Common.Attributes
         /// The unique identifier of the specific instance of the aggregate
         /// </summary>
         private readonly string _aggregateInstanceKey;
-        [AutoResolve]
         public string InstanceKey
         {
             get

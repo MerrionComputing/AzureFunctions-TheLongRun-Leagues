@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CQRSAzure.EventSourcing">
+      <HintPath>..\..\..\lib\CQRSAzure.EventSourcing.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.QueryDefinition">
+      <HintPath>..\..\..\lib\CQRSAzure.QueryDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="CQRSAzure.QueryDefinition" />
+    <Import Include="CQRSAzure.IdentifierGroup" />
+    <Import Include="CQRSAzure.EventSourcing" />
+    <Import Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IGet_League_Summary_Definition_queryDefinition.cs" />
+    <Compile Include="Get_League_Summary_Definition_queryDefinition.cs" />
+  </ItemGroup>
+</Project>

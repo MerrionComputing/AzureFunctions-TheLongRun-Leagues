@@ -25,7 +25,7 @@ namespace TheLongRunLeaguesFunction
             log.Info("C# HTTP trigger function processed a request.");
 
             // parse query parameter
-            string name = req.GetQueryNameValuePairs()[@"name"];
+            string name = req.GetQueryNameValuePairsExt()[@"name"];
 
             // Get request body
             dynamic data = await req.Content.ReadAsAsync<object>();

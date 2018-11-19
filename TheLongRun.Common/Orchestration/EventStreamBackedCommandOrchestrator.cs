@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CQRSAzure.EventSourcing;
+﻿using CQRSAzure.EventSourcing;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Orchestration.Attributes;
 

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>bin\Leagues.CommandHandler.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CQRSAzure.CommandDefinition">
+      <HintPath>..\..\..\lib\CQRSAzure.CommandDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.CommandHandler">
+      <HintPath>..\..\..\lib\CQRSAzure.CommandHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.EventSourcing">
+      <HintPath>..\..\..\lib\CQRSAzure.EventSourcing.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="CQRSAzure.CommandDefinition" />
+    <Import Include="CQRSAzure.CommandHandler" />
+    <Import Include="CQRSAzure.IdentifierGroup" />
+    <Import Include="CQRSAzure.EventSourcing" />
+    <Import Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ICreate_New_League_commandHandler.cs" />
+    <Compile Include="Create_New_League_commandHandler.cs" />
+    <Compile Include="ISet_Email_Address_commandHandler.cs" />
+    <Compile Include="Set_Email_Address_commandHandler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Command Definitions\Leagues.CommandDefinition.csproj" />
+  </ItemGroup>
+</Project>

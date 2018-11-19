@@ -9,6 +9,8 @@ using Leagues.League.queryDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
+
+using Newtonsoft.Json.Linq;
 using Microsoft.Azure.EventGrid.Models;
 
 namespace TheLongRunLeaguesFunction.Queries
@@ -21,7 +23,7 @@ namespace TheLongRunLeaguesFunction.Queries
         [QueryName("Get League Summary")]
         [EventTopicSourceName("Get-League-Summary-Query")]
         [FunctionName("OnGetLeagueSummaryQueryHandler")]
-        public static async void OnGetLeagueSummaryQueryHandler(
+        public static  void OnGetLeagueSummaryQueryHandler(
             [EventGridTrigger] EventGridEvent eventGridEvent,
             TraceWriter log
             )

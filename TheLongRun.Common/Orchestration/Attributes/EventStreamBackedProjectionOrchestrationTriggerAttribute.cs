@@ -5,7 +5,7 @@ using Microsoft.Azure.WebJobs.Description;
 namespace TheLongRun.Common.Orchestration.Attributes
 {
     [AttributeUsage(AttributeTargets.Parameter)]
-    [Binding(TriggerHandlesReturnValue = false)]
+    [Binding()]
     public sealed class EventStreamBackedProjectionOrchestrationTriggerAttribute
         : EventStreamBackedOrchestrationTriggerAttribute
     {

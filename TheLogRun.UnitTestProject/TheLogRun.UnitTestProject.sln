@@ -1,0 +1,15 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheLogRun.UnitTestProject", "TheLogRun.UnitTestProject.csproj", "{B95CB29A-86A5-45A2-9D8C-101F3B12C370}"
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8511D90F-57B7-47B0-B212-771B8E8FF16E}
+	EndGlobalSection
+EndGlobal

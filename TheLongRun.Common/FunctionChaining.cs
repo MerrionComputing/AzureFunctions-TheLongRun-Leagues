@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net.Http;
-using  Microsoft.Azure.WebJobs.Host ;
+using Microsoft.Azure.WebJobs.Host;
 
 namespace TheLongRun.Common
 {

@@ -44,7 +44,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
             #endregion
 
             // Get the command identifier
-            string commandId = req.GetQueryNameValuePairs()[@"CommandId"];
+            string commandId = req.GetQueryNameValuePairsExt()[@"CommandId"];
 
                 if (commandId == null)
                 {

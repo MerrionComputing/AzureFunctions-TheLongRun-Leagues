@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CQRSAzure.EventSourcing">
+      <HintPath>..\..\..\lib\CQRSAzure.EventSourcing.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="CQRSAzure.EventSourcing" />
+    <Import Include="System" />
+    <Import Include="System.Reflection" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ILeague.cs" />
+    <Compile Include="League.cs" />
+    <Compile Include="IFormed_eventDefinition.cs" />
+    <Compile Include="Formed_eventDefinition.cs" />
+    <Compile Include="Formed_0_eventSerialisation.cs" />
+    <Compile Include="FormedSerializer_0_eventSerializer.cs" />
+    <Compile Include="IContact_Details_Changed_eventDefinition.cs" />
+    <Compile Include="Contact_Details_Changed_eventDefinition.cs" />
+    <Compile Include="Contact_Details_Changed_0_eventSerialisation.cs" />
+    <Compile Include="Contact_Details_ChangedSerializer_0_eventSerializer.cs" />
+    <Compile Include="ILeague_Summary_Information_projection.cs" />
+    <Compile Include="League_Summary_Information_projection.cs" />
+    <Compile Include="ISeason.cs" />
+    <Compile Include="Season.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+</Project>

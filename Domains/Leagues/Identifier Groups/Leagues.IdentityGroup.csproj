@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CQRSAzure.EventSourcing">
+      <HintPath>..\..\..\lib\CQRSAzure.EventSourcing.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.IdentifierGroup">
+      <HintPath>..\..\..\lib\CQRSAzure.IdentifierGroup.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="CQRSAzure.IdentifierGroup" />
+    <Import Include="CQRSAzure.EventSourcing" />
+    <Import Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IOn_Twitter_identitygroup.cs" />
+    <Compile Include="On_Twitter_identitygroup.cs" />
+    <Compile Include="IHas_Twitter_Handle_classifier.cs" />
+    <Compile Include="Has_Twitter_Handle_classifier.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Event Sourcing\Leagues.EventSourcing.csproj" />
+  </ItemGroup>
+</Project>

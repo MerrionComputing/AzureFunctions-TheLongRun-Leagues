@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.WebJobs.Host.Bindings;
-using Microsoft.Azure.WebJobs.Extensions.Bindings;
 using System;
 using System.Reflection;
 using System.Threading;

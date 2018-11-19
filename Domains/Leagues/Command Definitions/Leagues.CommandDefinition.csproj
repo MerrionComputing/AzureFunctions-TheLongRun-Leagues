@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CQRSAzure.CommandDefinition">
+      <HintPath>..\..\..\lib\CQRSAzure.CommandDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.EventSourcing">
+      <HintPath>..\..\..\lib\CQRSAzure.EventSourcing.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="CQRSAzure.CommandDefinition" />
+    <Import Include="CQRSAzure.IdentifierGroup" />
+    <Import Include="CQRSAzure.EventSourcing" />
+    <Import Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Create_New_League_commandDefinition.cs" />
+    <Compile Include="ICreate_New_League_commandDefinition.cs" />
+    <Compile Include="ISet_Email_Address_commandDefinition.cs" />
+    <Compile Include="Set_Email_Address_commandDefinition.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+</Project>

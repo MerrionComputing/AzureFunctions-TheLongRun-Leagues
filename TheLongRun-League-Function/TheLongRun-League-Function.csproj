@@ -1,31 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
     <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
     <RootNamespace>TheLongRunLeaguesFunction</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.ConfigurationManager" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.2" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="3.0.1" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="1.6.2" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="3.0.1" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.24" />
-    <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.2.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="WindowsAzure.Storage" Version="9.3.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandDefinition.csproj" />
-    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.CommandHandler.csproj" />
-    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.EventSourcing.csproj" />
-    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.IdentityGroup.csproj" />
-    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryDefinition.csproj" />
-    <ProjectReference Include="..\..\..\..\Demo\The Long Run\Generated Code\Leagues.QueryHandler.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Command Definitions\Leagues.CommandDefinition.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Command Handlers\Leagues.CommandHandler.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Event Sourcing\Leagues.EventSourcing.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Identifier Groups\Leagues.IdentityGroup.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Query Definitions\Leagues.QueryDefinition.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Query Handlers\Leagues.QueryHandler.csproj" />
     <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />
   </ItemGroup>
   <ItemGroup>

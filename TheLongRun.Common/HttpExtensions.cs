@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheLongRun.Common
 {
     public static class HttpExtensions
     {
 
-        public static NameValueCollection GetQueryNameValuePairs(this HttpRequestMessage request)
+        public static NameValueCollection GetQueryNameValuePairsExt(this HttpRequestMessage request)
 
         {
             var values = new NameValueCollection(StringComparer.OrdinalIgnoreCase);

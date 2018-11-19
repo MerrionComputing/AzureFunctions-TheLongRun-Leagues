@@ -1,21 +1,15 @@
-using System;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Linq;
 using Leagues.League.commandDefinition;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-
-
-
-using Newtonsoft.Json;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Events.Command.Projections;
-using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace TheLongRunLeaguesFunction.Commands.Handlers
 {
@@ -41,7 +35,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
             #endregion
 
             // Get the command identifier
-            string commandId = req.GetQueryNameValuePairs()[@"CommandId"];
+            string commandId = req.GetQueryNameValuePairsExt()[@"CommandId"];
 
             if (commandId == null)
             {

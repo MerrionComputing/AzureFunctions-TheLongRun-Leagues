@@ -19,12 +19,11 @@ namespace TheLongRun.Common.Orchestration
     /// The domain, instance name and instance identity can auto-resolve
     /// </remarks>
     [AttributeUsage(AttributeTargets.Parameter)]
-    [Binding(TriggerHandlesReturnValue =false  )]
+    [Binding()]
     public abstract  class EventStreamBackedOrchestrationTriggerAttribute
         : Attribute
     {
 
-        [AutoResolve]
         public string DomainName { get; set; }
 
 
@@ -37,11 +36,9 @@ namespace TheLongRun.Common.Orchestration
             }
         }
 
-        [AutoResolve ]
         public string InstanceName { get; set; }
 
 
-        [AutoResolve ]
         public Guid InstanceIdentity { get; set; }
 
 

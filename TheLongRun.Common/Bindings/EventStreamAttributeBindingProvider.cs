@@ -1,7 +1,5 @@
-﻿using Microsoft.Azure.WebJobs.Extensions.Bindings;
-using Microsoft.Azure.WebJobs.Host.Bindings;
+﻿using Microsoft.Azure.WebJobs.Host.Bindings;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using TheLongRun.Common.Attributes;

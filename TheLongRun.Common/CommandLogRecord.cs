@@ -1,7 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.File;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace TheLongRun.Common
 {

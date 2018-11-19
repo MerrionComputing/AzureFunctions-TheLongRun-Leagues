@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Leagues.EventSourcing", "Leagues.EventSourcing.csproj", "{D59C84A2-4C32-4F13-BB62-508BA19B91C4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D59C84A2-4C32-4F13-BB62-508BA19B91C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D59C84A2-4C32-4F13-BB62-508BA19B91C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D59C84A2-4C32-4F13-BB62-508BA19B91C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D59C84A2-4C32-4F13-BB62-508BA19B91C4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9DDAFC0E-9A01-4348-ADBD-9A40E5A458DA}
+	EndGlobalSection
+EndGlobal
