@@ -160,20 +160,22 @@ namespace TheLongRunLeaguesFunction.Queries
                                             leagueNameParam,
                                             null);
 
+#if FUNCTION_CHAINING
                                         // Call the next query in the command chain to process projections
                                         FunctionChaining funcChain = new FunctionChaining(log);
                                         var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
                                         queryParams.Add(new Tuple<string, string>("queryId", queryGuid.ToString()));
                                         funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryQueryProjectionProcess", queryParams, null);
+#endif
                                     }
                                     else
                                     {
-                                        if (qryProjectionsRequested.UnprocessedRequests.Count > 0) 
+                                        if (qryProjectionsRequested.UnprocessedRequests.Count > 0)
                                         {
                                             #region Logging
                                             if (null != log)
                                             {
-                                                log.Warning ($"Query {QUERY_NAME} projection in progress for {queryGuid } ",
+                                                log.Warning($"Query {QUERY_NAME} projection in progress for {queryGuid } ",
                                                     source: "RequestProjectionsGetLeagueSummaryQuery");
                                             }
                                             #endregion

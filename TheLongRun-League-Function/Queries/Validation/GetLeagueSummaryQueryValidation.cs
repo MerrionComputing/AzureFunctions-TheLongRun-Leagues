@@ -149,10 +149,10 @@ namespace TheLongRunLeaguesFunction.Queries
                         // Validations - 1: Check league name is not empty
                         if (qryProjection.ParameterIsSet(nameof(Get_League_Summary_Definition.League_Name )))
                         {
-                            string leagueNameParam = qryProjection.GetParameter<string>(nameof(Get_League_Summary_Definition.League_Name)); 
-                            if (string.IsNullOrWhiteSpace(leagueNameParam) )
+                            string leagueNameParam = qryProjection.GetParameter<string>(nameof(Get_League_Summary_Definition.League_Name));
+                            if (string.IsNullOrWhiteSpace(leagueNameParam))
                             {
-                                QueryLogRecord.LogQueryValidationError(queryGuid , QUERY_NAME, true, "League name may not be blank");
+                                QueryLogRecord.LogQueryValidationError(queryGuid, QUERY_NAME, true, "League name may not be blank");
                                 #region Logging
                                 if (null != log)
                                 {
@@ -165,23 +165,25 @@ namespace TheLongRunLeaguesFunction.Queries
                             {
                                 // any additional validation could go here (?)..
 
+#if FUNCTION_CHAINING
                                 // Call the next query in the command chain to request projections
                                 FunctionChaining funcChain = new FunctionChaining(log);
                                 var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
                                 queryParams.Add(new Tuple<string, string>("queryId", queryGuid.ToString()));
                                 funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryQueryProjectionsRequest", queryParams, null);
+#endif
                             }
                         }
                         else
                         {
                             // Parameter is mandatory but may not be set yet so leave the query as is
-                            #region Logging
+#region Logging
                             if (null != log)
                             {
                                 log.Warning ($"Query { qryProjection.QueryName } has no value specified for the parameter {nameof(Get_League_Summary_Definition.League_Name)} ",
                                     source: "ValidateGetLeagueSummaryQuery");
                             }
-                            #endregion
+#endregion
                         }
                     }
 

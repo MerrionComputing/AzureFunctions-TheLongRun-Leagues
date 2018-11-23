@@ -204,24 +204,26 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 {
                                     CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
 
+#if FUNCTION_CHAINING
                                     // Call the next command in the command chain to process the valid command
                                     FunctionChaining funcChain = new FunctionChaining(log);
                                     var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
                                     queryParams.Add(new Tuple<string, string>("commandId", commandGuid.ToString()));
                                     funcChain.TriggerCommandByHTTPS(@"Leagues", "CreateLeagueCommandHandler", queryParams, null);
+#endif
                                 }
                             }
                         }
                         else
                         {
                             // No events were read into the projection so do nothing
-                            #region Logging
+#region Logging
                             if (null != log)
                             {
                                 log.Warning($"No command events read for {commandId} ",
                                     source: "ValidateCreateLeagueCommand");
                             }
-                            #endregion
+#endregion
                         }
                     }
                 }

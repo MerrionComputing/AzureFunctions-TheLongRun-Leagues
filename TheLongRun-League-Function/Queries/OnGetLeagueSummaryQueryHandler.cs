@@ -25,6 +25,7 @@ namespace TheLongRunLeaguesFunction.Queries
         [FunctionName("OnGetLeagueSummaryQueryHandler")]
         public static  void OnGetLeagueSummaryQueryHandler(
             [EventGridTrigger] EventGridEvent eventGridEvent,
+            [OrchestrationClient] DurableOrchestrationClient getLeagueSummaryQueryHandlerOrchestrationClient,
             TraceWriter log
             )
         {
@@ -102,35 +103,38 @@ namespace TheLongRunLeaguesFunction.Queries
                             queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.OutputLocationSet 
                                 ( qryRecord.ReturnPath , qryRecord.ReturnTarget ));
 
+#if FUNCTION_CHAINING
                             // Call the next query in the command chain
                             FunctionChaining funcChain = new FunctionChaining(log);
                             var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
                             queryParams.Add (new Tuple<string, string>("queryId" , qryRecord.QueryUniqueIdentifier.ToString()) );
                             funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryQueryValidation", queryParams, null );  
+#else
+#endif
                         }
 
                     }
                     else
                     {
-                        #region Logging
+#region Logging
                         if (null != log)
                         {
                             log.Error($"Query called with data that could not be converted to query log record",
                                 source: "OnGetLeagueSummaryQuery");
                         }
-                        #endregion
+#endregion
                     }
 
                 }
                 else
                 {
-                    #region Logging
+#region Logging
                     if (null != log)
                     {
                         log.Error($"Query called with data that could not be converted to parameters",
                             source: "OnGetLeagueSummaryQuery");
                     }
-                    #endregion
+#endregion
                 }
 
 

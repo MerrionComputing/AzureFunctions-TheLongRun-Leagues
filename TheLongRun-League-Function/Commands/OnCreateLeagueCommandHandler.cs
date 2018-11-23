@@ -37,6 +37,7 @@ namespace TheLongRunLeaguesFunction
         [FunctionName("OnCreateLeagueCommand")]
         public static async void OnCreateLeagueCommand(
             [EventGridTrigger] EventGridEvent eventGridEvent,
+            [OrchestrationClient] DurableOrchestrationClient createLeagueCommandHandlerOrchestrationClient,
             TraceWriter log
             )
         {
@@ -109,12 +110,13 @@ namespace TheLongRunLeaguesFunction
                     commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Twitter_Handle), 
                         parameters.Twitter_Handle ));
 
+#if FUNCTION_CHAINING 
                     // Call the next command in the command chain to validate the command
                     FunctionChaining funcChain = new FunctionChaining(log);
                     var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
                     queryParams.Add(new Tuple<string, string>("commandId", cmdRecord.CommandUniqueIdentifier.ToString()));
                     funcChain.TriggerCommandByHTTPS(@"Leagues", "CreateLeagueCommandValidation", queryParams, null);
-
+#endif 
 
 
                 }

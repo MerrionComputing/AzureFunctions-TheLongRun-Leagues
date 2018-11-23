@@ -177,33 +177,35 @@ namespace TheLongRunLeaguesFunction.Queries
                                                     }
                                                     #endregion
 
+#if FUNCTION_CHAINING
                                                     // Call the next query in the command chain to send output
                                                     FunctionChaining funcChain = new FunctionChaining(log);
                                                     var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
                                                     queryParams.Add(new Tuple<string, string>("queryId", queryGuid.ToString()));
                                                     funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryOutputResults", queryParams, null);
+#endif 
                                                 }
                                                 else
                                                 {
-                                                    #region Logging
+#region Logging
                                                     if (null != log)
                                                     {
                                                         log.Warning ($"Query {QUERY_NAME} running projection {nextProjectionRequest.ProjectionTypeName } for {queryGuid } returned no data",
                                                             source: "ProcessProjectionsGetLeagueSummaryQuery");
                                                     }
-                                                    #endregion
+#endregion
                                                 }
                                             }
                                         }
                                         else
                                         {
-                                            #region Logging
+#region Logging
                                             if (null != log)
                                             {
                                                 log.Error ($"Query {QUERY_NAME} unable to create event stream for projection {nextProjectionRequest.ProjectionTypeName } key {nextProjectionRequest.AggregateInstanceKey } ",
                                                     source: "ProcessProjectionsGetLeagueSummaryQuery");
                                             }
-                                            #endregion
+#endregion
                                         }
                                     }
 
@@ -213,23 +215,23 @@ namespace TheLongRunLeaguesFunction.Queries
                             {
                                 if (qryProjectionsRequested.UnprocessedRequests.Count == 0)
                                 {
-                                    #region Logging
+#region Logging
                                     if (null != log)
                                     {
                                         log.Warning($"Query {QUERY_NAME} projection not yet requested for {queryGuid } ",
                                             source: "ProcessProjectionsGetLeagueSummaryQuery");
                                     }
-                                    #endregion
+#endregion
                                 }
                                 if (qryProjectionsRequested.ProcessedRequests.Count == 1)
                                 {
-                                    #region Logging
+#region Logging
                                     if (null != log)
                                     {
                                         log.Warning($"Query {QUERY_NAME} projection already processed for {queryGuid } ",
                                             source: "ProcessProjectionsGetLeagueSummaryQuery");
                                     }
-                                    #endregion
+#endregion
                                 }
                             }
                         }
