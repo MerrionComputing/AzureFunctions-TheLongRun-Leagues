@@ -17,7 +17,6 @@
     <Reference Include="CQRSAzure.EventSourcing">
       <HintPath>..\..\..\lib\CQRSAzure.EventSourcing.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="CQRSAzure.CommandDefinition" />

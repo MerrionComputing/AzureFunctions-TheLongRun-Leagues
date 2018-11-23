@@ -35,11 +35,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\CQRSAzure.QueryHandler.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\AggregateRootAttribute.cs" />

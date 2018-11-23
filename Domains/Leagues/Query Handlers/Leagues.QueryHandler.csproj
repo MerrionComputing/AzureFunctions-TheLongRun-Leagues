@@ -19,7 +19,6 @@
     <Reference Include="CQRSAzure.QueryHandler">
       <HintPath>..\..\..\lib\CQRSAzure.QueryHandler.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="CQRSAzure.QueryDefinition" />

@@ -13,7 +13,6 @@
     <Reference Include="CQRSAzure.IdentifierGroup">
       <HintPath>..\..\..\lib\CQRSAzure.IdentifierGroup.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="CQRSAzure.IdentifierGroup" />
