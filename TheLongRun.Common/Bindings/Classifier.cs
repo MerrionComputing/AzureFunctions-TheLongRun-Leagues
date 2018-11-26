@@ -70,11 +70,12 @@ namespace TheLongRun.Common.Bindings
                             string aggregateTypeName,
                             string aggregateInstanceKey,
                             string classifierTypeName)
+           : this(new ClassifierAttribute(domainName ,
+               aggregateTypeName,
+               aggregateInstanceKey,
+               classifierTypeName ) )
         {
-            _domainName = domainName;
-            _aggregateTypeName = aggregateTypeName;
-            _aggregateInstanceKey = aggregateInstanceKey;
-            _classifierTypeName = classifierTypeName;
+
         }
 
         /// <summary>
@@ -85,12 +86,17 @@ namespace TheLongRun.Common.Bindings
         /// The attribute that describes the classifier to use
         /// </param>
         public Classifier(ClassifierAttribute attribute )
-            : this(attribute.DomainName,
-                  attribute.AggregateTypeName ,
-                  attribute.InstanceKey ,
-                  attribute.ClassifierTypeName )
         {
+            _domainName = attribute.DomainName ;
+            _aggregateTypeName = attribute.AggregateTypeName ;
+            _aggregateInstanceKey = attribute.InstanceKey ;
+            _classifierTypeName = attribute.ClassifierTypeName ;
 
+            if (null == _classifierProcessor)
+            {
+                // TODO : Cater for different backing technologies... currently just AppendBlob
+                //  _classifierProcessor = CQRSAzure.IdentifierGroup.Azure.Blob.AzureBlobClassifierUntyped.CreateClassifierProcessor(attribute )
+            }
         }
     }
 }

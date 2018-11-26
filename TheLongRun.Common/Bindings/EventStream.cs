@@ -60,11 +60,11 @@ namespace TheLongRun.Common.Bindings
         /// <param name="eventToAdd">
         /// The event to append to the aggregate instance
         /// </param>
-        public void AppendEvent(IEvent eventToAdd)
+        public async Task AppendEvent(IEvent eventToAdd)
         {
             if (null != _writer)
             {
-                _writer.AppendEvent(eventToAdd);
+                await _writer.AppendEvent(eventToAdd);
             }
         }
 

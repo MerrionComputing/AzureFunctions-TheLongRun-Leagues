@@ -66,11 +66,11 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
-        public void  Process(IProjectionUntyped projectionToProcess)
+        public async Task  Process(IProjectionUntyped projectionToProcess)
         {
             if (null != _projectionProcessor )
             {
-                _projectionProcessor.Process(projectionToProcess);
+               await _projectionProcessor.Process(projectionToProcess);
             }
         }
 
@@ -86,7 +86,7 @@ namespace TheLongRun.Common.Bindings
         public async Task<IProjectionResponse> ProcessAsync(IProjectionUntyped projectionToProcess,
             OrchestrationCallbackIdentity responseSource = null)
         {
-            await Task.Run(()=>  Process(projectionToProcess));
+            await  Process(projectionToProcess);
             return ProjectionResponse.Create(projectionToProcess, responseSource ); 
         }
 
