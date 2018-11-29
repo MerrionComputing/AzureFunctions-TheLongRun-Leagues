@@ -14,7 +14,7 @@ namespace TheLongRun.Common
         /// <summary>
         /// The connection string name to use to write to it
         /// </summary>
-        public const string DEFAULT_CONNECTION = @"CommandStorageConnectionAppSetting";
+        public const string DEFAULT_CONNECTION = @"CommandStorageConnectionString";
 
         /// <summary>
         /// The unique identifier of this instance of the command

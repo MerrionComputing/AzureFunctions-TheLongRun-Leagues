@@ -45,7 +45,7 @@ namespace TheLongRun.Common
         /// <param name="errorMessage">
         /// 
         /// </param>
-        public static void LogCommandValidationError(Guid commandGuid,
+        public static async Task LogCommandValidationError(Guid commandGuid,
             string CommandName,
             bool fatal,
             string errorMessage)
@@ -56,7 +56,7 @@ namespace TheLongRun.Common
                         commandGuid.ToString());
             if (null != commandEvents)
             {
-                commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ValidationErrorOccured(errorMessage,fatal ));
+                await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ValidationErrorOccured(errorMessage,fatal ));
             }
         }
 
@@ -69,7 +69,7 @@ namespace TheLongRun.Common
         /// <param name="commandName">
         /// The name of the command to mark as valid
         /// </param>
-        public static void LogCommandValidationSuccess(Guid commandGuid ,
+        public static async Task LogCommandValidationSuccess(Guid commandGuid ,
             string commandName)
         {
 
@@ -78,7 +78,7 @@ namespace TheLongRun.Common
                     commandGuid.ToString());
             if (null != commandEvents)
             {
-                commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ValidationSucceeded(DateTime.UtcNow ));
+                await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ValidationSucceeded(DateTime.UtcNow ));
             }
         }
 

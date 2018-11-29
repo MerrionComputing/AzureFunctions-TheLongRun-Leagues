@@ -254,7 +254,7 @@ namespace TheLongRun.Common.Orchestration
         /// <param name="eventToAppend">
         /// The event we are appending to the entity instance event stream
         /// </param>
-        public void AppendDomainEntityEvent(string domainName,
+        public async Task AppendDomainEntityEvent(string domainName,
             string entityTypeName,
             string entityInstanceKey,
             IEvent eventToAppend)
@@ -287,7 +287,7 @@ namespace TheLongRun.Common.Orchestration
 
             if (null != targetStream )
             {
-                targetStream.AppendEvent(eventToAppend); 
+                await targetStream.AppendEvent(eventToAppend); 
             }
 
 

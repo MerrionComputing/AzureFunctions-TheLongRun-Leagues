@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 
@@ -42,7 +43,7 @@ namespace TheLongRun.Common
         /// <summary>
         /// The connection string name to use to write to it
         /// </summary>
-        public const string DEFAULT_CONNECTION = @"QueryStorageConnectionAppSetting";
+        public const string DEFAULT_CONNECTION = @"QueryStorageConnectionString";
 
         /// <summary>
         /// The unique identifier of this instance of the query
@@ -116,7 +117,10 @@ namespace TheLongRun.Common
         /// <param name="errorMessage">
         /// Message for the validation error
         /// param>
-        public static void LogQueryValidationError(Guid queryGuid, string queryName, bool fatalError, string errorMessage)
+        public static async Task LogQueryValidationError(Guid queryGuid, 
+            string queryName, 
+            bool fatalError, 
+            string errorMessage)
         {
 
             EventStream qryEvents = new EventStream(@"Query",
@@ -124,11 +128,11 @@ namespace TheLongRun.Common
             queryGuid.ToString());
             if (null != qryEvents )
             {
-                qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValidationErrorOccured (queryName , fatalError, errorMessage ));
+                await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValidationErrorOccured (queryName , fatalError, errorMessage ));
             }
         }
 
-        public static void RequestProjection(Guid queryGuid,
+        public static async Task RequestProjection(Guid queryGuid,
             string queryName,
             string projectionName,
             string domainName,
@@ -141,7 +145,7 @@ namespace TheLongRun.Common
             queryGuid.ToString());
             if (null != qryEvents)
             {
-                qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRequested(domainName,
+                await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRequested(domainName,
                     aggregateTypeName ,
                     aggregateInstanceKey,
                     projectionName,
@@ -149,7 +153,7 @@ namespace TheLongRun.Common
             }
         }
 
-        public static void LogProjectionResult(Guid queryGuid, 
+        public static async Task LogProjectionResult(Guid queryGuid, 
             string queryName, 
             string projectionTypeName, 
             string domainName, 
@@ -164,7 +168,7 @@ namespace TheLongRun.Common
             queryGuid.ToString());
             if (null != qryEvents)
             {
-                qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionValueReturned (domainName,
+                await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionValueReturned (domainName,
                     aggregateTypeName,
                     aggregateInstanceKey,
                     projectionTypeName,
