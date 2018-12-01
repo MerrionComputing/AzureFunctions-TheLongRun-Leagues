@@ -12,6 +12,7 @@ using System;
 using Leagues.League.commandDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction.Commands.Validation
 {
@@ -32,14 +33,13 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         [FunctionName("CreateLeagueCommandValidation")]
         public static async Task<HttpResponseMessage> CreateLeagueCommandValidationRun(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, 
-            TraceWriter log)
+            ILogger log)
         {
 
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose("Function triggered HTTP ",
-                        source: "CreateLeagueCommandValidation");
+                    log.LogDebug("Function triggered HTTP in CreateLeagueCommandValidation");
                 }
             #endregion
 
@@ -53,7 +53,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                     commandId = data?.CommandId;
                 }
 
-                ValidateCreateLeagueCommand(commandId, log);
+                await ValidateCreateLeagueCommand(commandId, log);
 
                 return commandId == null
                     ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
@@ -66,8 +66,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         /// <param name="commandId">
         /// The unique identifier of the command to validate
         /// </param>
-        private static void ValidateCreateLeagueCommand(string commandId,
-            TraceWriter log = null)
+        private static async Task  ValidateCreateLeagueCommand(string commandId,
+            ILogger log = null)
         {
 
             const string COMMAND_NAME = @"create-league";
@@ -82,8 +82,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                     #region Logging
                     if (null != log)
                     {
-                        log.Verbose($"Validating command {commandId} ",
-                            source: "ValidateCreateLeagueCommand");
+                        log.LogDebug($"Validating command {commandId} in ValidateCreateLeagueCommand");
                     }
                     #endregion
 
@@ -99,15 +98,14 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                         #region Logging
                         if (null != log)
                         {
-                            log.Verbose($"Projection processor created",
-                                source: "ValidateCreateLeagueCommand");
+                            log.LogDebug($"Projection processor created in ValidateCreateLeagueCommand");
                         }
                         #endregion
 
                         Command_Summary_Projection cmdProjection =
                             new Command_Summary_Projection(log );
 
-                        getCommandState.Process(cmdProjection);
+                        await getCommandState.Process(cmdProjection);
 
                         if ( (cmdProjection.CurrentSequenceNumber > 0) || (cmdProjection.ProjectionValuesChanged()))
                         {
@@ -115,8 +113,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                             #region Logging
                             if (null != log)
                             {
-                                log.Verbose ($"Command { cmdProjection.CommandName} projection run for {commandGuid} ",
-                                    source: "ValidateCreateLeagueCommand");
+                                log.LogDebug ($"Command { cmdProjection.CommandName} projection run for {commandGuid} in ValidateCreateLeagueCommand");
                             }
                             #endregion
 
@@ -127,8 +124,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 #region Logging
                                 if (null != log)
                                 {
-                                    log.Warning($"Command {commandId} is complete so no need to validate ",
-                                        source: "ValidateCreateLeagueCommand");
+                                    log.LogWarning($"Command {commandId} is complete so no need to validate in ValidateCreateLeagueCommand");
                                 }
                                 #endregion
                                 return;
@@ -141,8 +137,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 #region Logging
                                 if (null != log)
                                 {
-                                    log.Warning($"Command {commandId} is validated so no need to validate again ",
-                                        source: "ValidateCreateLeagueCommand");
+                                    log.LogWarning($"Command {commandId} is validated so no need to validate again in ValidateCreateLeagueCommand");
                                 }
                                 #endregion
                                 return;
@@ -164,12 +159,11 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                     string leagueName = cmdProjection.GetParameter<string>(nameof(Create_New_League_Definition.LeagueName));
                                     if (string.IsNullOrWhiteSpace(leagueName))
                                     {
-                                        CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name may not be blank");
+                                        await CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name may not be blank");
                                         #region Logging
                                         if (null != log)
                                         {
-                                            log.Warning($"Command {COMMAND_NAME } :: {commandId} has a blank league name",
-                                                source: "ValidateCreateLeagueCommand");
+                                            log.LogWarning($"Command {COMMAND_NAME } :: {commandId} has a blank league name in ValidateCreateLeagueCommand");
                                         }
                                         #endregion
                                     }
@@ -185,12 +179,11 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                     DateTime dateIncorporated = cmdProjection.GetParameter<DateTime>(nameof(ICreate_New_League_Definition.Date_Incorporated));
                                     if (dateIncorporated > DateTime.UtcNow)
                                     {
-                                        CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Incorporation date is in the future");
+                                        await CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Incorporation date is in the future");
                                         #region Logging
                                         if (null != log)
                                         {
-                                            log.Warning($"Command {COMMAND_NAME } :: {commandId} has a future dated incorporation date",
-                                                source: "ValidateCreateLeagueCommand");
+                                            log.LogWarning($"Command {COMMAND_NAME } :: {commandId} has a future dated incorporation date in ValidateCreateLeagueCommand");
                                         }
                                         #endregion
                                     }
@@ -202,15 +195,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 
                                 if (incoporatedDateValid && leagueNameValid)
                                 {
-                                    CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
+                                    await CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
 
-#if FUNCTION_CHAINING
-                                    // Call the next command in the command chain to process the valid command
-                                    FunctionChaining funcChain = new FunctionChaining(log);
-                                    var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
-                                    queryParams.Add(new Tuple<string, string>("commandId", commandGuid.ToString()));
-                                    funcChain.TriggerCommandByHTTPS(@"Leagues", "CreateLeagueCommandHandler", queryParams, null);
-#endif
                                 }
                             }
                         }
@@ -220,8 +206,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 #region Logging
                             if (null != log)
                             {
-                                log.Warning($"No command events read for {commandId} ",
-                                    source: "ValidateCreateLeagueCommand");
+                                log.LogWarning($"No command events read for {commandId} in ValidateCreateLeagueCommand");
                             }
 #endregion
                         }

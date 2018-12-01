@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using TheLongRun.Common.Events.Query;
 
@@ -21,7 +22,7 @@ namespace TheLongRun.Common.Events.Query.Projections
     {
 
         #region Private members
-        private TraceWriter log = null;
+        private ILogger log = null;
         private List<ProjectionRequested> unprocessedRequests = new List<ProjectionRequested>();
         private List<ProjectionRunStarted> inflightRequests = new List<ProjectionRunStarted>();
         private List<ProjectionValueReturned> processedRequests = new List<ProjectionValueReturned>();
@@ -71,8 +72,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEventJSon({eventFullName})",
-                    nameof(Query_Summary_Projection));
+                log.LogDebug ($"HandleEventJSon({eventFullName}) in {nameof(Query_Summary_Projection)}");
             }
             #endregion
 
@@ -99,8 +99,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandlesEventTypeByName({eventTypeFullName})",
-                    nameof(Query_Projections_Projection ));
+                log.LogDebug ($"HandlesEventTypeByName({eventTypeFullName}) in {nameof(Query_Projections_Projection )}");
             }
             #endregion
 
@@ -129,8 +128,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent<{ typeof(TEvent).FullName  }>())",
-                    nameof(Query_Projections_Projection ));
+                log.LogDebug ($"HandleEvent<{ typeof(TEvent).FullName  }>()) in {nameof(Query_Projections_Projection )}");
             }
             #endregion
 
@@ -163,8 +161,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Query projection requested  {eventHandled.ProjectionTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
-                        nameof(Query_Projections_Projection ));
+                    log.LogDebug ($"Query projection requested  {eventHandled.ProjectionTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate}  in {nameof(Query_Projections_Projection )}");
                 }
                 #endregion
                 // add this to the unprocessed list
@@ -185,8 +182,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Query projection value returned  {eventHandled.ProjectionTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
-                        nameof(Query_Projections_Projection));
+                    log.LogDebug ($"Query projection value returned  {eventHandled.ProjectionTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} in { nameof(Query_Projections_Projection)}");
                 }
                 #endregion
                 // remove this from this to the unprocessed list
@@ -223,8 +219,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Query projection run started  {eventHandled.ProjectionTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
-                        nameof(Query_Projections_Projection));
+                    log.LogDebug ($"Query projection run started  {eventHandled.ProjectionTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} in {nameof(Query_Projections_Projection)}");
                 }
                 #endregion
 
@@ -244,7 +239,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             }
         }
 
-        public Query_Projections_Projection(TraceWriter logIn = null)
+        public Query_Projections_Projection(ILogger logIn = null)
         {
             if (null != logIn)
             {

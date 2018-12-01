@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using TheLongRun.Common.Events.Query;
 
@@ -22,7 +23,7 @@ namespace TheLongRun.Common.Events.Query.Projections
 
 
         #region Private members
-        private TraceWriter log = null;
+        private ILogger log = null;
         private List<string> keysToBeClassified = new List<string>();
         private List<string> keysBeingClassified = new List<string>();
         private Dictionary<string, UInt32> keysIncluded = new Dictionary<string, uint>();
@@ -40,7 +41,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent<{ typeof(TEvent).FullName  }>())",
+                log.LogDebug($"HandleEvent<{ typeof(TEvent).FullName  }>())",
                     nameof(Query_Classifications_Projection));
             }
             #endregion
@@ -69,7 +70,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Query classification requested  {eventHandled.ClassificationTypeName   } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
+                    log.LogDebug($"Query classification requested  {eventHandled.ClassificationTypeName   } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
                         nameof(Query_Classifications_Projection));
                 }
                 #endregion
@@ -85,7 +86,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Query classification run started  {eventHandled.ClassificationTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
+                    log.LogDebug($"Query classification run started  {eventHandled.ClassificationTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
                         nameof(Query_Classifications_Projection));
                 }
                 #endregion
@@ -105,7 +106,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Query classification results returned for  {eventHandled.ClassificationTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
+                    log.LogDebug($"Query classification results returned for  {eventHandled.ClassificationTypeName  } for { eventHandled.DomainName }.{eventHandled.AggregateType}.{eventHandled.AggregateInstanceKey } as at {eventHandled.AsOfDate} ",
                         nameof(Query_Classifications_Projection));
                 }
                 #endregion
@@ -134,7 +135,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEventJSon({eventFullName})",
+                log.LogDebug($"HandleEventJSon({eventFullName})",
                     nameof(Query_Classifications_Projection));
             }
             #endregion
@@ -167,7 +168,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandlesEventTypeByName({eventTypeFullName})",
+                log.LogDebug($"HandlesEventTypeByName({eventTypeFullName})",
                     nameof(Query_Projections_Projection));
             }
             #endregion
@@ -192,7 +193,7 @@ namespace TheLongRun.Common.Events.Query.Projections
         }
 
 
-        public Query_Classifications_Projection(TraceWriter logIn = null)
+        public Query_Classifications_Projection(ILogger logIn = null)
         {
             if (null != logIn)
             {

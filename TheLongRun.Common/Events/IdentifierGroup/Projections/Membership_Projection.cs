@@ -8,6 +8,7 @@ using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json.Linq;
 using TheLongRun.Common.Events.IdentifierGroup;
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRun.Common.Events.IdentifierGroup.Projections
 {
@@ -26,7 +27,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
         #region private members
         private Dictionary < string, uint > members = new Dictionary<string, uint> ();
         private Nullable<DateTime> asOfDateLimit; 
-        private TraceWriter log = null;
+        private ILogger log = null;
         #endregion
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent<{ typeof(TEvent).FullName  }>())",
+                log.LogDebug($"HandleEvent<{ typeof(TEvent).FullName  }>())",
                     nameof(Membership_Projection));
             }
             #endregion
@@ -71,7 +72,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEventJSon({eventFullName})",
+                log.LogDebug($"HandleEventJSon({eventFullName})",
                     nameof(Membership_Projection));
             }
             #endregion
@@ -109,7 +110,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandlesEventTypeByName({eventTypeFullName})",
+                log.LogDebug($"HandlesEventTypeByName({eventTypeFullName})",
                     nameof(Membership_Projection));
             }
             #endregion
@@ -139,7 +140,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( MemberExcluded ) : {eventHandled.AggregateInstanceKey} ",
+                log.LogDebug($"HandleEvent( MemberExcluded ) : {eventHandled.AggregateInstanceKey} ",
                     nameof(Membership_Projection));
             }
             #endregion
@@ -153,7 +154,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
                         #region Logging
                         if (null != log)
                         {
-                            log.Verbose($"Skipped MemberExcluded event as it is after the as of date limit : {eventHandled.AggregateInstanceKey} at {eventHandled.AsOfDate}  ",
+                            log.LogDebug($"Skipped MemberExcluded event as it is after the as of date limit : {eventHandled.AggregateInstanceKey} at {eventHandled.AsOfDate}  ",
                                 nameof(Membership_Projection));
                         }
                         #endregion
@@ -184,7 +185,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( MemberIncluded ) : {eventHandled.AggregateInstanceKey} ",
+                log.LogDebug($"HandleEvent( MemberIncluded ) : {eventHandled.AggregateInstanceKey} ",
                     nameof(Membership_Projection));
             }
             #endregion
@@ -198,7 +199,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
                         #region Logging
                         if (null != log)
                         {
-                            log.Verbose($"Skipped MemberIncluded event as it is after the as of date limit : {eventHandled.AggregateInstanceKey} at {eventHandled.AsOfDate}  ",
+                            log.LogDebug($"Skipped MemberIncluded event as it is after the as of date limit : {eventHandled.AggregateInstanceKey} at {eventHandled.AsOfDate}  ",
                                 nameof(Membership_Projection));
                         }
                         #endregion
@@ -229,7 +230,7 @@ namespace TheLongRun.Common.Events.IdentifierGroup.Projections
         /// <param name="logIn">
         /// Trace output writer (optional)
         /// </param>
-        public Membership_Projection(TraceWriter logIn = null)
+        public Membership_Projection(ILogger logIn = null)
         {
             if (null != logIn)
             {

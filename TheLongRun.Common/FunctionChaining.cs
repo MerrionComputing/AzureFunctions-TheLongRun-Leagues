@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRun.Common
 {
@@ -20,7 +21,7 @@ namespace TheLongRun.Common
         public const string APPLICATION_DOMAIN_RUNNERS = @"https://thelongrun-runners-function.azurewebsites.net/api/";
 
         #region Private members
-        private TraceWriter log;
+        private ILogger log;
         private static readonly HttpClient httpClient;
         #endregion
 
@@ -86,9 +87,8 @@ namespace TheLongRun.Common
                 #region Logging
                 if (null != log)
                 {
-                    log.Info($"Sending command to {DomainName }.{commandName }",
-                        "FunctionChaining");
-                    log.Verbose(cmdUri.Uri.ToString());
+                    log.LogInformation($"Sending command to {DomainName }.{commandName } in FunctionChaining");
+                    log.LogDebug(cmdUri.Uri.ToString());
                 }
                 #endregion
 
@@ -97,7 +97,7 @@ namespace TheLongRun.Common
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Command response - {response}");
+                    log.LogDebug($"Command response - {response}");
                 }
                 #endregion
             }
@@ -115,9 +115,8 @@ namespace TheLongRun.Common
             #region Logging
             if (null != log)
             {
-                log.Info($"Sending query results to {hookTarget  }",
-                    "FunctionChaining");
-                log.Verbose(cmdUri.Uri.ToString());
+                log.LogInformation($"Sending query results to {hookTarget} in FunctionChaining");
+                log.LogDebug(cmdUri.Uri.ToString());
             }
             #endregion
 
@@ -126,12 +125,12 @@ namespace TheLongRun.Common
             #region Logging
             if (null != log)
             {
-                log.Verbose($"Query webhook response - {response}");
+                log.LogDebug($"Query webhook response - {response}");
             }
             #endregion
         }
 
-        public FunctionChaining(TraceWriter logInput = null)
+        public FunctionChaining(ILogger logInput = null)
         {
             if (null != logInput )
             {

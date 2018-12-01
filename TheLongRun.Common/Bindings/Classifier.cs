@@ -68,6 +68,13 @@ namespace TheLongRun.Common.Bindings
         }
 
         private readonly string _connectionStringName;
+        public string ConnectionStringName
+        {
+            get
+            {
+                return _connectionStringName;
+            }
+        }
 
         /// <summary>
         /// Classify whether the aggregate instance is inside or outside the group as determined by the classifier
@@ -93,7 +100,9 @@ namespace TheLongRun.Common.Bindings
             _classifierProcessor = CQRSAzure.IdentifierGroup.Azure.Blob.AzureBlobClassifierUntyped.CreateClassifierProcessor(new ClassifierAttribute(_domainName,
                _aggregateTypeName,
                _aggregateInstanceKey,
-               _classifierTypeName), classifierToProcess);
+               _classifierTypeName), 
+               classifierToProcess,
+               ConnectionStringNameAttribute.DefaultBlobStreamSettings(_domainName, _aggregateTypeName));
 
             if (null != _classifierProcessor )
             {

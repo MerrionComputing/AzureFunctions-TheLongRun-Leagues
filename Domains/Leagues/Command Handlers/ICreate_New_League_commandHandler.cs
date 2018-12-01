@@ -11,9 +11,6 @@
 using CQRSAzure.CommandHandler;
 using Leagues.League.commandDefinition;
 
-/// <remarks>
-/// Each league will have an unique name
-/// </remarks>
 namespace Leagues.League.commandHandler
 {
     

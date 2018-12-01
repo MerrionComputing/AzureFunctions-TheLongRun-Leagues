@@ -13,7 +13,7 @@ using TheLongRun.Common.Events.Command.Projections;
 using System.Threading.Tasks;
 
 using Microsoft.Azure.WebJobs.Extensions.Http;
-
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction.Commands.Handlers
 {
@@ -46,13 +46,13 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
             [BlobTrigger("command-log/create-league/{name}", 
             Connection = "CommandStorageConnectionAppSetting")]Stream  myBlob, 
             string name,
-            TraceWriter log)
+            ILogger log)
         {
 
 #region Logging
             if (null != log)
             {
-                log.Info($"Command handler for [create-league] command called\n Payload file name:{name} \n Size: {myBlob.Length} Bytes", 
+                log.LogInfo($"Command handler for [create-league] command called\n Payload file name:{name} \n Size: {myBlob.Length} Bytes", 
                     source: "CreateLeagueCommandHandler");
             }
 #endregion
@@ -78,7 +78,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 #region Logging
                     if (null != log)
                     {
-                        log.Info($"Command read from file : {cmdRecord.CommandName} , Id: {cmdRecord.CommandUniqueIdentifier } issued at {cmdRecord.When } by {cmdRecord.Who } ",
+                        log.LogInfo($"Command read from file : {cmdRecord.CommandName} , Id: {cmdRecord.CommandUniqueIdentifier } issued at {cmdRecord.When } by {cmdRecord.Who } ",
                             source: "CreateLeagueCommandHandler");
                     }
 #endregion
@@ -111,7 +111,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
             // Log completion
             if (null != log)
             {
-                log.Verbose ($"Command handler for [create-league] command completed",
+                log.LogDebug ($"Command handler for [create-league] command completed",
                     source: "CreateLeagueCommandHandler");
             }
 
@@ -127,7 +127,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         [FunctionName("CreateLeagueCommandHandler")]
         public static async Task<HttpResponseMessage> CreateLeagueCommandHandlerRun(
     [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req,
-    TraceWriter log)
+    ILogger log)
         {
 
 
@@ -135,8 +135,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 #region Logging
             if (null != log)
             {
-                log.Verbose("Function triggered HTTP ",
-                    source: "CreateLeagueCommandHandler");
+                log.LogDebug("Function triggered HTTP in CreateLeagueCommandHandler");
             }
             #endregion
 
@@ -150,7 +149,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                 commandId = data?.CommandId;
             }
 
-            HandleCreateLeagueCommand(commandId, log);
+            await HandleCreateLeagueCommand(commandId, log);
 
             return commandId == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
@@ -163,8 +162,8 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         /// <param name="commandId">
         /// The unique identifier of the command to process
         /// </param>
-        private static void HandleCreateLeagueCommand(string commandId,
-            TraceWriter log = null)
+        private static async Task HandleCreateLeagueCommand(string commandId,
+            ILogger log = null)
         {
 
             const string COMMAND_NAME = @"create-league";
@@ -179,8 +178,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 #region Logging
                     if (null != log)
                     {
-                        log.Verbose($"Validating command {commandId} ",
-                            source: "HandleCreateLeagueCommand");
+                        log.LogDebug($"Validating command {commandId} in HandleCreateLeagueCommand");
                     }
 #endregion
 
@@ -196,15 +194,14 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 #region Logging
                         if (null != log)
                         {
-                            log.Verbose($"Projection processor created",
-                                source: "HandleCreateLeagueCommand");
+                            log.LogDebug($"Projection processor created in HandleCreateLeagueCommand");
                         }
 #endregion
 
                         Command_Summary_Projection cmdProjection =
                             new Command_Summary_Projection(log );
 
-                        getCommandState.Process(cmdProjection);
+                        await getCommandState.Process(cmdProjection);
 
                         if ( (cmdProjection.CurrentSequenceNumber > 0) || (cmdProjection.ProjectionValuesChanged()))
                         {
@@ -215,8 +212,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 #region Logging
                                 if (null != log)
                                 {
-                                    log.Warning($"Command {commandId} is complete so no need to process ",
-                                        source: "HandleCreateLeagueCommand");
+                                    log.LogWarning($"Command {commandId} is complete so no need to process in HandleCreateLeagueCommand");
                                 }
 #endregion
                                 return;
@@ -228,8 +224,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 #region Logging
                                 if (null != log)
                                 {
-                                    log.Warning($"Command {commandId} is not yet validated so cannot process ",
-                                        source: "HandleCreateLeagueCommand");
+                                    log.LogWarning($"Command {commandId} is not yet validated so cannot process in HandleCreateLeagueCommand");
                                 }
 #endregion
                                 return;
@@ -241,8 +236,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 #region Logging
                                 if (null != log)
                                 {
-                                    log.Warning($"Command {commandId} is not yet marked as invalid so cannot process ",
-                                        source: "HandleCreateLeagueCommand");
+                                    log.LogWarning($"Command {commandId} is not yet marked as invalid so cannot process in HandleCreateLeagueCommand");
                                 }
 #endregion
                                 return;
@@ -284,7 +278,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                                 if ((null != leagueEvents) && (null != formedEvent))
                                 {
-                                    leagueEvents.AppendEvent(formedEvent);
+                                    await leagueEvents.AppendEvent(formedEvent);
                                 }
 
                                 // if there is contact details, add an event for that
@@ -309,7 +303,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                                     if ((null != leagueEvents) && (null != contactDetailsEvent))
                                     {
-                                        leagueEvents.AppendEvent(contactDetailsEvent);
+                                        await leagueEvents.AppendEvent(contactDetailsEvent);
                                     }
 
                                 }
@@ -321,8 +315,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 #region Logging
                             if (null != log)
                             {
-                                log.Warning($"No command events read for {commandId} ",
-                                    source: "ValidateCreateLeagueCommand");
+                                log.LogWarning($"No command events read for {commandId} in ValidateCreateLeagueCommand");
                             }
 #endregion
                         }

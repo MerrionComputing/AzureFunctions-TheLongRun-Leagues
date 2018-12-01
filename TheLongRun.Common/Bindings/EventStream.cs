@@ -68,22 +68,44 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
+        private readonly string _connectionStringName;
+        public string ConnectionStringName
+        {
+            get
+            {
+                return _connectionStringName;
+            }
+        }
+
         public EventStream(string domainName,
             string aggregateTypeName,
-            string aggregateInstanceKey)
-            : this(new EventStreamAttribute(domainName, aggregateTypeName , aggregateInstanceKey  ) )
+            string aggregateInstanceKey,
+            string connectionStringName = "")
+            : this(new EventStreamAttribute(domainName, aggregateTypeName , aggregateInstanceKey  ), 
+                  connectionStringName  )
         {
         }
 
-        public EventStream(EventStreamAttribute attribute)
+        public EventStream(EventStreamAttribute attribute, 
+            string connectionStringName = "")
         {
             _domainName = attribute.DomainName;
             _aggregateTypeName = attribute.AggregateTypeName;
             _aggregateInstanceKey = attribute.InstanceKey;
 
+            if (string.IsNullOrWhiteSpace(connectionStringName))
+            {
+                _connectionStringName = ConnectionStringNameAttribute.DefaultConnectionStringName(attribute);
+            }
+            else
+            {
+                _connectionStringName = connectionStringName;
+            }
+
             // wire up the event stream writer 
             // TODO : Cater for different backing technologies... currently just AppendBlob
-            _writer = new CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamWriterUntyped(attribute); 
+            _writer = new CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamWriterUntyped(attribute, 
+                connectionStringName= _connectionStringName); 
 
         }
 

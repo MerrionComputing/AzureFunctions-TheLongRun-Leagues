@@ -11,14 +11,9 @@ using CQRSAzure.CommandHandler;
 using CQRSAzure.EventSourcing;
 using Leagues.League.commandDefinition;
 
-/// <remarks>
-/// Each league will have an unique name
-/// </remarks>
 namespace Leagues.League.commandHandler
 {
     
-
-
     /// <summary>
     /// Set the email address for the league
     /// </summary>

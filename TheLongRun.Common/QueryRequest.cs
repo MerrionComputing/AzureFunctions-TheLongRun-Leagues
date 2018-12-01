@@ -1,11 +1,18 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 
 namespace TheLongRun.Common
 {
 
     public class QueryRequest<TQueryParameters>
     {
+
+        /// <summary>
+        /// Text description of the current status of the query request
+        /// </summary>
+        public string Status { get; set; }
+
         /// <summary>
         /// Where to notify the requestor that this query has completed
         /// </summary>
@@ -31,5 +38,14 @@ namespace TheLongRun.Common
         /// </summary>
         public TQueryParameters Parameters { get;  set; }
 
+        /// <summary>
+        /// The name by which this type of query is known
+        /// </summary>
+        public string QueryName { get; set; }
+
+        /// <summary>
+        /// The system wide unique identifier by which this instance of a query request is known
+        /// </summary>
+        public Guid QueryUniqueIdentifier { get; set; }
     }
 }

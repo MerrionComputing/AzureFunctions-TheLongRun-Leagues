@@ -51,6 +51,9 @@
     <Compile Include="Attributes\ProjectionAttribute.cs" />
     <Compile Include="Attributes\ProjectionNameAttribute.cs" />
     <Compile Include="Attributes\QueryNameAttribute.cs" />
+    <Compile Include="Attributes\Settings\BlobStreamSettings.cs" />
+    <Compile Include="Attributes\Settings\FileStreamSettings.cs" />
+    <Compile Include="Attributes\Settings\TableStreamSettings.cs" />
     <Compile Include="AzureFunctionsResolveAssembly.cs" />
     <Compile Include="Bindings\Classifier.cs" />
     <Compile Include="Bindings\ClassifierAttributeBinding.cs" />

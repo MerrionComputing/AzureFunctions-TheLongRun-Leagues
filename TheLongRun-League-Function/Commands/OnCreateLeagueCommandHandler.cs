@@ -9,6 +9,7 @@ using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -38,7 +39,7 @@ namespace TheLongRunLeaguesFunction
         public static async void OnCreateLeagueCommand(
             [EventGridTrigger] EventGridEvent eventGridEvent,
             [OrchestrationClient] DurableOrchestrationClient createLeagueCommandHandlerOrchestrationClient,
-            TraceWriter log
+            ILogger log
             )
         {
 
@@ -47,8 +48,7 @@ namespace TheLongRunLeaguesFunction
             #region Logging
             if (null != log)
             {
-                log.Verbose("Function triggered ",
-                    source: "OnCreateLeagueCommand");
+                log.LogDebug("Function triggered in OnCreateLeagueCommand");
             }
 
             if (null == eventGridEvent )
@@ -56,8 +56,7 @@ namespace TheLongRunLeaguesFunction
                 // This function should not proceed if there is no event data
                 if (null != log)
                 {
-                    log.Error("Missing event grid trigger data",
-                        source: "OnCreateLeagueCommand"); 
+                    log.LogError ("Missing event grid trigger data in OnCreateLeagueCommand"); 
                 }
                 return;
             }
@@ -74,8 +73,7 @@ namespace TheLongRunLeaguesFunction
                 {
                     if (null == parameters )
                     {
-                        log.Verbose($"Unable to read parameters from {eventGridEvent.Data}",
-                        source: "OnCreateLeagueCommand");
+                        log.LogDebug($"Unable to read parameters from {eventGridEvent.Data} in OnCreateLeagueCommand");
                     }
                     
                 }
@@ -90,33 +88,28 @@ namespace TheLongRunLeaguesFunction
                     cmdRecord.CommandUniqueIdentifier.ToString());
                 if (null != commandEvents )
                 {
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.CommandCreated(COMMAND_NAME,
+                    await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.CommandCreated(COMMAND_NAME,
                         cmdRecord.CommandUniqueIdentifier));
 
                     // Log the parameters
                     #region Logging
                     if (null != log)
                     {
-                        log.Verbose($"Setting {nameof(parameters.LeagueName)} to { parameters.LeagueName} ",
-                            source: "OnCreateLeagueCommand");
+                        log.LogDebug($"Setting {nameof(parameters.LeagueName)} to { parameters.LeagueName} in OnCreateLeagueCommand");
                     }
                     #endregion
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.LeagueName),
-                        parameters.LeagueName));
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Email_Address ),
-                        parameters.Email_Address ));
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Date_Incorporated ),
-                        parameters.Date_Incorporated));
-                    commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Twitter_Handle), 
-                        parameters.Twitter_Handle ));
 
-#if FUNCTION_CHAINING 
-                    // Call the next command in the command chain to validate the command
-                    FunctionChaining funcChain = new FunctionChaining(log);
-                    var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
-                    queryParams.Add(new Tuple<string, string>("commandId", cmdRecord.CommandUniqueIdentifier.ToString()));
-                    funcChain.TriggerCommandByHTTPS(@"Leagues", "CreateLeagueCommandValidation", queryParams, null);
-#endif 
+                   await  commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.LeagueName),
+                        parameters.LeagueName));
+
+                   await  commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Email_Address ),
+                        parameters.Email_Address ));
+
+                   await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Date_Incorporated ),
+                        parameters.Date_Incorporated));
+
+                    await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Twitter_Handle), 
+                        parameters.Twitter_Handle ));
 
 
                 }
@@ -125,13 +118,13 @@ namespace TheLongRunLeaguesFunction
             }
             catch (Exception ex)
             {
-                log.Error(ex.ToString()); 
+                log.LogError(ex.ToString()); 
             }
 
             // Log that this step has completed
             if (null != log)
             {
-                log.Verbose ("Command passed on to handler",source : "OnCreateLeagueCommand");
+                log.LogDebug ("Command passed on to handler in OnCreateLeagueCommand");
             }
         }
     }   

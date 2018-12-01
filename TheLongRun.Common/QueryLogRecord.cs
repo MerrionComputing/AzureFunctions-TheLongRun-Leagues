@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
-
+using Microsoft.Extensions.Logging;
 using TheLongRun.Common.Bindings;
 
 namespace TheLongRun.Common
@@ -223,13 +223,13 @@ namespace TheLongRun.Common
         /// </param>
         private static void SendOutputToWebhook(string location, 
             string valueAsJson,
-            TraceWriter log = null)
+            ILogger log = null)
         {
 
             #region Logging
             if (null != log)
             {
-                log.Verbose($"Sending query results to webhook {location} ");
+                log.LogDebug($"Sending query results to webhook {location} ");
             }
             #endregion
 
@@ -291,10 +291,15 @@ namespace TheLongRun.Common
         public static QueryLogRecord<TQueryParameters> Create(string queryName,
             TQueryParameters parameters,
             QueryReturnTarget returnTarget,
-            string returnPath)
+            string returnPath,
+            Guid queryId )
         {
             QueryLogRecord< TQueryParameters> ret = new QueryLogRecord<TQueryParameters>();
-            ret.QueryUniqueIdentifier = System.Guid.NewGuid();
+            if (queryId.Equals(Guid.Empty ))
+            {
+                queryId = Guid.NewGuid();
+            }
+            ret.QueryUniqueIdentifier = queryId ;
             ret.QueryName  = queryName;
             ret.When = DateTime.UtcNow;
             if (null != parameters )

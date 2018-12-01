@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using TheLongRun.Common.Events.Query;
 
@@ -23,7 +24,7 @@ namespace TheLongRun.Common.Events.Query.Projections
     {
 
         #region Private members
-        private TraceWriter log = null;
+        private ILogger log = null;
         private Dictionary<string, QueryLogRecord.QueryReturnTarget> targets = new Dictionary<string, QueryLogRecord.QueryReturnTarget>();
         #endregion
 
@@ -45,7 +46,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEventJSon({eventFullName})",
+                log.LogDebug($"HandleEventJSon({eventFullName})",
                     nameof(Query_Summary_Projection));
             }
             #endregion
@@ -69,7 +70,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandlesEventTypeByName({eventTypeFullName})",
+                log.LogDebug($"HandlesEventTypeByName({eventTypeFullName})",
                     nameof(Query_Outputs_Projection));
             }
             #endregion
@@ -90,7 +91,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent<{ typeof(TEvent).FullName  }>())",
+                log.LogDebug($"HandleEvent<{ typeof(TEvent).FullName  }>())",
                     nameof(Query_Outputs_Projection ));
             }
             #endregion
@@ -106,7 +107,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( OutputLocationSet )",
+                log.LogDebug($"HandleEvent( OutputLocationSet )",
                     nameof(Query_Outputs_Projection ));
             }
             #endregion
@@ -117,7 +118,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Query output added  {eventHandled.Location  } Type: { eventHandled.TargetType }  ",
+                    log.LogDebug($"Query output added  {eventHandled.Location  } Type: { eventHandled.TargetType }  ",
                         nameof(Query_Outputs_Projection));
                 }
                 #endregion
@@ -134,14 +135,14 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning($"HandleEvent( QueryCreated ) - parameter was null",
+                    log.LogWarning($"HandleEvent( QueryCreated ) - parameter was null",
                         nameof(Query_Outputs_Projection));
                 }
                 #endregion
             }
         }
 
-        public Query_Outputs_Projection(TraceWriter logIn = null)
+        public Query_Outputs_Projection(ILogger logIn = null)
         {
             if (null != logIn)
             {

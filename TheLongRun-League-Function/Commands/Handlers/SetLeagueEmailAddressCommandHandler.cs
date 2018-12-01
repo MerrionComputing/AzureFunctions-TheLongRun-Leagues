@@ -2,6 +2,7 @@ using Leagues.League.commandDefinition;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -23,14 +24,13 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         [FunctionName("SetLeagueEmailAddressCommandHandler")]
         public static async Task<HttpResponseMessage> SetLeagueEmailAddressCommandHandlerRun(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req,
-            TraceWriter log)
+            ILogger log)
         {
 
             #region Logging
             if (null != log)
             {
-                log.Verbose("Function triggered HTTP ",
-                    source: "CreateLeagueCommandHandler");
+                log.LogDebug("Function triggered HTTP in CreateLeagueCommandHandler");
             }
             #endregion
 
@@ -44,7 +44,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                 commandId = data?.CommandId;
             }
 
-            HandleSetLeagueEmailAddressCommand(commandId, log);
+            await HandleSetLeagueEmailAddressCommand(commandId, log);
 
             return commandId == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
@@ -57,15 +57,15 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         [AggregateRoot("League")]
         [CommandName("Set League Email Address")]
         [FunctionName("SetLeagueEmailAddressCommandHandlerActivity")]
-        public static  void SetLeagueEmailAddressCommandHandlerActivity(
+        public static  async Task SetLeagueEmailAddressCommandHandlerActivity(
             [ActivityTrigger] DurableActivityContext setLeagueEmailAddressCommandContect,
-            TraceWriter log)
+            ILogger log)
         {
 
             string commandId = setLeagueEmailAddressCommandContect.GetInput<string>();
             if (!string.IsNullOrWhiteSpace(commandId))
             {
-                 HandleSetLeagueEmailAddressCommand(commandId, log);
+                 await HandleSetLeagueEmailAddressCommand(commandId, log);
             }
 
             return;
@@ -77,8 +77,8 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         /// <param name="commandId">
         /// The unique identifier of the command to process
         /// </param>
-        private static void HandleSetLeagueEmailAddressCommand(string commandId,
-            TraceWriter log = null)
+        private static async Task  HandleSetLeagueEmailAddressCommand(string commandId,
+            ILogger log = null)
         {
 
             const string COMMAND_NAME = @"set-league-email-address";
@@ -90,8 +90,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Validating command {commandId} ",
-                        source: "HandleSetLeagueEmailAddressCommand");
+                    log.LogDebug($"Validating command {commandId}  in HandleSetLeagueEmailAddressCommand");
                 }
                 #endregion
 
@@ -107,15 +106,14 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                     #region Logging
                     if (null != log)
                     {
-                        log.Verbose($"Projection processor created",
-                            source: "HandleSetLeagueEmailAddressCommand");
+                        log.LogDebug($"Projection processor created in HandleSetLeagueEmailAddressCommand");
                     }
                     #endregion
 
                     Command_Summary_Projection cmdProjection =
                         new Command_Summary_Projection(log);
 
-                    getCommandState.Process(cmdProjection);
+                    await getCommandState.Process(cmdProjection);
 
                     if ((cmdProjection.CurrentSequenceNumber > 0) || (cmdProjection.ProjectionValuesChanged()))
                     {
@@ -125,8 +123,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                             #region Logging
                             if (null != log)
                             {
-                                log.Warning($"Command {commandId} is complete so no need to process ",
-                                    source: "HandleSetLeagueEmailAddressCommand");
+                                log.LogWarning($"Command {commandId} is complete so no need to process in HandleSetLeagueEmailAddressCommand");
                             }
                             #endregion
                             return;
@@ -138,8 +135,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                             #region Logging
                             if (null != log)
                             {
-                                log.Warning($"Command {commandId} is not yet validated so cannot process ",
-                                    source: "HandleSetLeagueEmailAddressCommand");
+                                log.LogWarning($"Command {commandId} is not yet validated so cannot process in HandleSetLeagueEmailAddressCommand");
                             }
                             #endregion
                             return;
@@ -151,8 +147,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                             #region Logging
                             if (null != log)
                             {
-                                log.Warning($"Command {commandId} is not yet marked as invalid so cannot process ",
-                                    source: "HandleSetLeagueEmailAddressCommand");
+                                log.LogWarning($"Command {commandId} is not yet marked as invalid so cannot process in HandleSetLeagueEmailAddressCommand");
                             }
                             #endregion
                             return;
@@ -199,7 +194,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                             if ((null != leagueEvents) && (null != changedEvent))
                             {
-                                leagueEvents.AppendEvent(changedEvent);
+                                await leagueEvents.AppendEvent(changedEvent);
                             }
 
 
@@ -212,8 +207,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                     #region Logging
                     if (null != log)
                     {
-                        log.Warning($"No command events read for {commandId} ",
-                            source: "HandleSetLeagueEmailAddressCommand");
+                        log.LogWarning($"No command events read for {commandId} in HandleSetLeagueEmailAddressCommand");
                     }
                     #endregion
                 }

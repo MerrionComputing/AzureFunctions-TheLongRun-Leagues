@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using TheLongRun.Common.Events.Command;
 
@@ -26,7 +27,7 @@ namespace TheLongRun.Common.Events.Command.Projections
 
 
         private List<string> parameterNames = new List<string>();
-        private TraceWriter log = null;
+        private ILogger log = null;
 
         /// <summary>
         /// Is there a value set for the named parameter?
@@ -39,8 +40,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"ParameterIsSet({parameterName}) ",
-                    nameof(Command_Summary_Projection));
+                log.LogDebug($"ParameterIsSet({parameterName}) in {nameof(Command_Summary_Projection)}");
             }
             #endregion
             if (parameterNames.Contains(parameterName))
@@ -71,7 +71,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"CommandName - Get ",
+                    log.LogDebug($"CommandName - Get ",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -114,7 +114,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"CurrentState - Get ",
+                    log.LogDebug($"CurrentState - Get ",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -133,7 +133,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"AuthorisationToken - Get ",
+                    log.LogDebug($"AuthorisationToken - Get ",
                         nameof(Command_Summary_Projection ));
                 }
                 #endregion
@@ -148,7 +148,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"CorrelationIdentifier - Get ",
+                    log.LogDebug($"CorrelationIdentifier - Get ",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -196,7 +196,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent<{ typeof(TEvent).FullName  }>())",
+                log.LogDebug($"HandleEvent<{ typeof(TEvent).FullName  }>())",
                     nameof(Command_Summary_Projection));
             }
             #endregion
@@ -233,7 +233,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( CommandCreated )",
+                log.LogDebug($"HandleEvent( CommandCreated )",
                     nameof(Command_Summary_Projection));
             }
             #endregion
@@ -249,7 +249,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Event Handled {eventHandled.CommandName} id: { eventHandled.CommandIdentifier} logged on {eventHandled.Date_Logged }  ",
+                    log.LogDebug($"Event Handled {eventHandled.CommandName} id: { eventHandled.CommandIdentifier} logged on {eventHandled.Date_Logged }  ",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -259,7 +259,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning ($"HandleEvent( CommandCreated ) - parameter was null",
+                    log.LogWarning ($"HandleEvent( CommandCreated ) - parameter was null",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -273,7 +273,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( ParameterValueSet )",
+                log.LogDebug($"HandleEvent( ParameterValueSet )",
                     nameof(Command_Summary_Projection));
             }
             #endregion
@@ -285,7 +285,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($" Parameter set {parameterName}",
+                    log.LogDebug($" Parameter set {parameterName}",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -301,7 +301,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                     #region Logging
                     if (null != log)
                     {
-                        log.Verbose($" {eventHandled.Name} set to {eventHandled.Value}  ",
+                        log.LogDebug($" {eventHandled.Name} set to {eventHandled.Value}  ",
                             nameof(Command_Summary_Projection));
                     }
                     #endregion
@@ -320,7 +320,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning($"HandleEvent( ParameterValueSet ) - parameter was null",
+                    log.LogWarning($"HandleEvent( ParameterValueSet ) - parameter was null",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -357,7 +357,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( ValidationErrorOccured )",
+                log.LogDebug($"HandleEvent( ValidationErrorOccured )",
                     nameof(Command_Summary_Projection));
             }
             #endregion
@@ -372,7 +372,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning($"HandleEvent( ValidationErrorOccured ) - parameter was null",
+                    log.LogWarning($"HandleEvent( ValidationErrorOccured ) - parameter was null",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -384,7 +384,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( ValidationSucceeded )",
+                log.LogDebug($"HandleEvent( ValidationSucceeded )",
                     nameof(Command_Summary_Projection));
             }
             #endregion
@@ -399,7 +399,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning($"HandleEvent( ValidationSucceeded ) - parameter was null",
+                    log.LogWarning($"HandleEvent( ValidationSucceeded ) - parameter was null",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -411,7 +411,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( ProcessingCompleted )",
+                log.LogDebug($"HandleEvent( ProcessingCompleted )",
                     nameof(Command_Summary_Projection));
             }
             #endregion
@@ -426,7 +426,7 @@ namespace TheLongRun.Common.Events.Command.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning($"HandleEvent( ProcessingCompleted ) - parameter was null",
+                    log.LogWarning($"HandleEvent( ProcessingCompleted ) - parameter was null",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -438,7 +438,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEventJSon({eventFullName})",
+                log.LogDebug($"HandleEventJSon({eventFullName})",
                     nameof(Command_Summary_Projection));
             }
             #endregion
@@ -475,7 +475,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log )
             {
-                log.Verbose($"HandlesEventTypeByName({eventTypeFullName})",
+                log.LogDebug($"HandlesEventTypeByName({eventTypeFullName})",
                     nameof(Command_Summary_Projection)); 
             }
             #endregion
@@ -508,7 +508,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"{eventTypeFullName} was not handled",
+                log.LogDebug($"{eventTypeFullName} was not handled",
                     nameof(Command_Summary_Projection));
             }
             #endregion
@@ -516,7 +516,7 @@ namespace TheLongRun.Common.Events.Command.Projections
             return false;
         }
 
-        public Command_Summary_Projection(TraceWriter logIn = null)
+        public Command_Summary_Projection(ILogger logIn = null)
         {
             if (null != logIn )
             {

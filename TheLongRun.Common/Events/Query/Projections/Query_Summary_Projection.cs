@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using TheLongRun.Common.Events.Query;
 
@@ -24,7 +25,7 @@ namespace TheLongRun.Common.Events.Query.Projections
 
         #region Private members
         private List<string> parameterNames = new List<string>();
-        private TraceWriter log = null;
+        private ILogger log = null;
         #endregion
 
         /// <summary>
@@ -66,8 +67,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"ParameterIsSet({parameterName}) ",
-                    nameof(Query_Summary_Projection ));
+                log.LogDebug($"ParameterIsSet({parameterName}) in {nameof(Query_Summary_Projection )}");
             }
             #endregion
             if (parameterNames.Contains(parameterName))
@@ -135,8 +135,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"CommandName - Get ",
-                        nameof(Query_Summary_Projection ));
+                    log.LogDebug ($"QueryName - Get {nameof(Query_Summary_Projection )}");
                 }
                 #endregion
                 return base.GetPropertyValue<string>(nameof(QueryName));
@@ -150,8 +149,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"CurrentState - Get ",
-                        nameof(Query_Summary_Projection ));
+                    log.LogDebug ($"CurrentState - Get {nameof(Query_Summary_Projection)}");
                 }
                 #endregion
                 return base.GetPropertyValue<QueryState>(nameof(CurrentState));
@@ -169,8 +167,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"AuthorisationToken - Get ",
-                        nameof(Query_Summary_Projection));
+                    log.LogDebug ($"AuthorisationToken - Get {nameof(Query_Summary_Projection)}");
                 }
                 #endregion
                 return base.GetPropertyValue<string >(nameof(AuthorisationToken));
@@ -185,8 +182,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent<{ typeof(TEvent).FullName  }>())",
-                    nameof(Query_Summary_Projection ));
+                log.LogDebug($"HandleEvent<{ typeof(TEvent).FullName  }>()) in {nameof(Query_Summary_Projection )}");
             }
             #endregion
 
@@ -223,8 +219,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEventJSon({eventFullName})",
-                    nameof(Query_Summary_Projection ));
+                log.LogDebug($"HandleEventJSon({eventFullName}) in {nameof(Query_Summary_Projection )}");
             }
             #endregion
 
@@ -257,8 +252,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandlesEventTypeByName({eventTypeFullName})",
-                    nameof(Query_Summary_Projection));
+                log.LogDebug ($"HandlesEventTypeByName({eventTypeFullName}) in {nameof(Query_Summary_Projection)}");
             }
             #endregion
 
@@ -292,8 +286,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( QueryCreated )",
-                    nameof(Query_Summary_Projection ));
+                log.LogDebug ($"HandleEvent( QueryCreated ) in {nameof(Query_Summary_Projection )}");
             }
             #endregion
 
@@ -307,8 +300,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Event Handled {eventHandled.QueryName } id: { eventHandled.QueryIdentifier } logged on {eventHandled.Date_Logged }  ",
-                        nameof(Query_Summary_Projection ));
+                    log.LogDebug ($"Event Handled {eventHandled.QueryName } id: { eventHandled.QueryIdentifier } logged on {eventHandled.Date_Logged }  in {nameof(Query_Summary_Projection )}");
                 }
                 #endregion
             }
@@ -317,8 +309,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning($"HandleEvent( QueryCreated ) - parameter was null",
-                        nameof(Query_Summary_Projection ));
+                    log.LogWarning ($"HandleEvent( QueryCreated ) - parameter was null in {nameof(Query_Summary_Projection )}");
                 }
                 #endregion
             }
@@ -330,8 +321,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( ParameterValueSet )",
-                    nameof(Query_Summary_Projection));
+                log.LogDebug ($"HandleEvent( ParameterValueSet ) in {nameof(Query_Summary_Projection)}");
             }
             #endregion
 
@@ -342,8 +332,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($" Parameter set {parameterName}",
-                        nameof(Query_Summary_Projection));
+                    log.LogDebug ($" Parameter set {parameterName} in {nameof(Query_Summary_Projection)}");
                 }
                 #endregion
                 if (null != eventHandled.Value)
@@ -358,8 +347,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                     #region Logging
                     if (null != log)
                     {
-                        log.Verbose($" {eventHandled.Name} set to {eventHandled.Value}  ",
-                            nameof(Query_Summary_Projection));
+                        log.LogDebug ($" {eventHandled.Name} set to {eventHandled.Value} in {nameof(Query_Summary_Projection)}" );
                     }
                     #endregion
                 }
@@ -377,8 +365,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning($"HandleEvent( ParameterValueSet ) - parameter was null",
-                        nameof(Query_Summary_Projection ));
+                    log.LogWarning ($"HandleEvent( ParameterValueSet ) - parameter was null in {nameof(Query_Summary_Projection )} ");
                 }
                 #endregion
             }
@@ -389,8 +376,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             #region Logging
             if (null != log)
             {
-                log.Verbose($"HandleEvent( QueryParameterValidationErrorOccured )",
-                    nameof(Query_Summary_Projection));
+                log.LogDebug ($"HandleEvent( QueryParameterValidationErrorOccured ) in {nameof(Query_Summary_Projection)}");
             }
             #endregion
 
@@ -404,8 +390,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Parameter has an invalid value {eventHandled.Name  } Fatal: { eventHandled.Fatal  } Message: {eventHandled.Message  }  ",
-                        nameof(Query_Summary_Projection));
+                    log.LogDebug ($"Parameter has an invalid value {eventHandled.Name  } Fatal: { eventHandled.Fatal  } Message: {eventHandled.Message  }  in {nameof(Query_Summary_Projection)}");
                 }
                 #endregion
             }
@@ -414,8 +399,7 @@ namespace TheLongRun.Common.Events.Query.Projections
                 #region Logging
                 if (null != log)
                 {
-                    log.Warning($"HandleEvent( QueryParameterValidationErrorOccured ) - parameter was null",
-                        nameof(Query_Summary_Projection));
+                    log.LogWarning ($"HandleEvent( QueryParameterValidationErrorOccured ) - parameter was null in {nameof(Query_Summary_Projection)}");
                 }
                 #endregion
             }
@@ -423,11 +407,11 @@ namespace TheLongRun.Common.Events.Query.Projections
 
 
 
-        public Query_Summary_Projection(TraceWriter logIn = null)
+        public Query_Summary_Projection(ILogger logToUse = null)
         {
-            if (null!= logIn )
+            if (null!= logToUse)
             {
-                log = logIn;
+                log = logToUse;
             }
         }
     }

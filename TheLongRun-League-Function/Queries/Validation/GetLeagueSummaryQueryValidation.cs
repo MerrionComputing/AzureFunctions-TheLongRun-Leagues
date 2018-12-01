@@ -13,6 +13,7 @@ using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Events.Query;
 using TheLongRun.Common.Events.Query.Projections;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
@@ -25,14 +26,13 @@ namespace TheLongRunLeaguesFunction.Queries
         [FunctionName("GetLeagueSummaryQueryValidation")]
         public static async Task<HttpResponseMessage> GetLeagueSummaryQueryValidationRun(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            HttpRequestMessage req, TraceWriter log)
+            HttpRequestMessage req, ILogger log)
         {
 
             #region Logging
             if (null != log)
             {
-                log.Verbose("Function triggered HTTP ",
-                    source: "GetLeagueSummaryQueryValidationRun");
+                log.LogDebug("Function triggered HTTP in GetLeagueSummaryQueryValidationRun");
             }
             #endregion
 
@@ -46,11 +46,11 @@ namespace TheLongRunLeaguesFunction.Queries
                 queryId = data?.QueryId;
             }
 
-            ValidateGetLeagueSummaryQuery(queryId, log);
+            bool isValid = await ValidateGetLeagueSummaryQuery(queryId, log);
 
             return queryId == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a queryId on the query string or in the request body")
-                : req.CreateResponse(HttpStatusCode.OK, $"Validated query {queryId}");
+                : req.CreateResponse(HttpStatusCode.OK, $"Validated query {queryId} with the result : {isValid}");
         }
 
         /// <summary>
@@ -63,8 +63,8 @@ namespace TheLongRunLeaguesFunction.Queries
         /// <param name="log">
         /// If set, output progress to this trace writer
         /// </param>
-        private static void ValidateGetLeagueSummaryQuery(string queryId, 
-            TraceWriter log = null)
+        private static async Task<bool> ValidateGetLeagueSummaryQuery(string queryId, 
+            ILogger log = null)
         {
             const string QUERY_NAME = @"get-league-summary";
             Guid queryGuid;
@@ -84,8 +84,7 @@ namespace TheLongRunLeaguesFunction.Queries
                     #region Logging
                     if (null != log)
                     {
-                        log.Verbose($"Projection processor created",
-                            source: "ValidateGetLeagueSummaryQuery");
+                        log.LogDebug($"Projection processor created in ValidateGetLeagueSummaryQuery");
                     }
                     #endregion
 
@@ -93,7 +92,7 @@ namespace TheLongRunLeaguesFunction.Queries
                     Query_Summary_Projection qryProjection =
                             new Query_Summary_Projection(log);
 
-                    getQueryState.Process(qryProjection);
+                    await getQueryState.Process(qryProjection);
 
 
                     if ((qryProjection.CurrentSequenceNumber > 0) || (qryProjection.ProjectionValuesChanged()))
@@ -102,8 +101,7 @@ namespace TheLongRunLeaguesFunction.Queries
                         #region Logging
                         if (null != log)
                         {
-                            log.Verbose($"Query { qryProjection.QueryName } projection run for {queryGuid } ",
-                                source: "ValidateGetLeagueSummaryQuery");
+                            log.LogDebug($"Query { qryProjection.QueryName } projection run for {queryGuid} in ValidateGetLeagueSummaryQuery");
                         }
                         #endregion
 
@@ -113,11 +111,10 @@ namespace TheLongRunLeaguesFunction.Queries
                             #region Logging
                             if (null != log)
                             {
-                                log.Warning($"Query {queryGuid} is complete so no need to validate ",
-                                    source: "ValidateGetLeagueSummaryQuery");
+                                log.LogWarning($"Query {queryGuid} is complete so no need to validate in ValidateGetLeagueSummaryQuery");
                             }
                             #endregion
-                            return;
+                            return true ;
                         }
 
                         if (qryProjection.CurrentState == Query_Summary_Projection.QueryState.Invalid )
@@ -126,11 +123,10 @@ namespace TheLongRunLeaguesFunction.Queries
                             #region Logging
                             if (null != log)
                             {
-                                log.Warning($"Query {queryGuid} is already marked as invalid so no need to validate ",
-                                    source: "ValidateGetLeagueSummaryQuery");
+                                log.LogWarning($"Query {queryGuid} is already marked as invalid so no need to validate in ValidateGetLeagueSummaryQuery");
                             }
                             #endregion
-                            return;
+                            return false ;
                         }
 
                         if (qryProjection.CurrentState == Query_Summary_Projection.QueryState.Validated )
@@ -139,11 +135,10 @@ namespace TheLongRunLeaguesFunction.Queries
                             #region Logging
                             if (null != log)
                             {
-                                log.Warning($"Query {queryGuid} is already validated so no need to validate ",
-                                    source: "ValidateGetLeagueSummaryQuery");
+                                log.LogWarning($"Query {queryGuid} is already validated so no need to validate in ValidateGetLeagueSummaryQuery");
                             }
                             #endregion
-                            return;
+                            return true ;
                         }
 
                         // Validations - 1: Check league name is not empty
@@ -152,26 +147,19 @@ namespace TheLongRunLeaguesFunction.Queries
                             string leagueNameParam = qryProjection.GetParameter<string>(nameof(Get_League_Summary_Definition.League_Name));
                             if (string.IsNullOrWhiteSpace(leagueNameParam))
                             {
-                                QueryLogRecord.LogQueryValidationError(queryGuid, QUERY_NAME, true, "League name may not be blank");
+                                await QueryLogRecord.LogQueryValidationError(queryGuid, QUERY_NAME, true, "League name may not be blank");
                                 #region Logging
                                 if (null != log)
                                 {
-                                    log.Warning($"Query {QUERY_NAME} :: {queryGuid} has a blank league name",
-                                        source: "ValidateGetLeagueSummaryQuery");
+                                    log.LogWarning($"Query {QUERY_NAME} :: {queryGuid} has a blank league name in ValidateGetLeagueSummaryQuery");
                                 }
                                 #endregion
+                                return false;
                             }
                             else
                             {
                                 // any additional validation could go here (?)..
-
-#if FUNCTION_CHAINING
-                                // Call the next query in the command chain to request projections
-                                FunctionChaining funcChain = new FunctionChaining(log);
-                                var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
-                                queryParams.Add(new Tuple<string, string>("queryId", queryGuid.ToString()));
-                                funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryQueryProjectionsRequest", queryParams, null);
-#endif
+                                return true;
                             }
                         }
                         else
@@ -180,10 +168,10 @@ namespace TheLongRunLeaguesFunction.Queries
 #region Logging
                             if (null != log)
                             {
-                                log.Warning ($"Query { qryProjection.QueryName } has no value specified for the parameter {nameof(Get_League_Summary_Definition.League_Name)} ",
-                                    source: "ValidateGetLeagueSummaryQuery");
+                                log.LogWarning ($"Query { qryProjection.QueryName } has no value specified for the parameter {nameof(Get_League_Summary_Definition.League_Name)} in ValidateGetLeagueSummaryQuery");
                             }
-#endregion
+                            #endregion
+                            return false;
                         }
                     }
 
@@ -191,6 +179,26 @@ namespace TheLongRunLeaguesFunction.Queries
 
             }
 
+            return false;
+
+        }
+
+
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [QueryName("Get League Summary")]
+        [FunctionName("GetLeagueSummaryValidateActivity")]
+        public static async Task<bool> GetLeagueSummaryValidateActivity([ActivityTrigger] QueryRequest<Get_League_Summary_Definition> queryRequest,
+            ILogger log)
+        {
+
+            if (null != log )
+            {
+                log.LogInformation($"GetLeagueSummaryValidateActivity called for query : {queryRequest.QueryUniqueIdentifier}"); 
+            }
+
+            return await ValidateGetLeagueSummaryQuery(queryRequest.QueryUniqueIdentifier.ToString() );
         }
     }
 }

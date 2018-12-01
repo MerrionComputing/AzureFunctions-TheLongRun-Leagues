@@ -1,0 +1,10 @@
+﻿Settings
+========
+
+These classes allow the settings for the event sourcing back end(s) to be configured.
+
+They are external to the function app as it is possible (maybe even likely) that the same
+event streams might be used by a function app and maybe a more traditional app or service.
+
+The supported interfaces come from the [CQRSAzure.EventSourcing] project.
+

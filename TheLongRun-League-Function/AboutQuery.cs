@@ -6,6 +6,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using TheLongRun.Common;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -20,9 +21,9 @@ namespace TheLongRunLeaguesFunction
         [FunctionName("AboutQuery")]
         public static async Task<HttpResponseMessage> AboutQueryRun(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req, 
-            TraceWriter log)
+            ILogger log)
         {
-            log.Info("C# HTTP trigger function processed a request.");
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
             // parse query parameter
             string name = req.GetQueryNameValuePairsExt()[@"name"];

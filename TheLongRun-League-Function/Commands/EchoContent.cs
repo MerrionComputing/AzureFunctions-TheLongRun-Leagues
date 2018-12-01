@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using System;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction.Commands
 {
@@ -10,15 +11,15 @@ namespace TheLongRunLeaguesFunction.Commands
     {
         [FunctionName("EchoContent")]
         public static void EchoContent([EventGridTrigger] EventGridEvent eventGridEvent,
-               TraceWriter log)
+               ILogger log)
         {
-            log.Info($"Echo function executed at: {DateTime.Now}");
+            log.LogInformation ($"Echo function executed at: {DateTime.Now}");
 
-            log.Info($"Topic : {eventGridEvent.Topic} , Subject : {eventGridEvent.Subject } , Event Type: {eventGridEvent.EventType }  ");
-            log.Info($" Payload : { eventGridEvent.Data.ToString()} ");
-            log.Info($" Event time:  { eventGridEvent.EventTime}, Published: {eventGridEvent.EventTime} ");            
+            log.LogInformation($"Topic : {eventGridEvent.Topic} , Subject : {eventGridEvent.Subject } , Event Type: {eventGridEvent.EventType }  ");
+            log.LogInformation($" Payload : { eventGridEvent.Data.ToString()} ");
+            log.LogInformation($" Event time:  { eventGridEvent.EventTime}, Published: {eventGridEvent.EventTime} ");            
 
-            log.Info("=== Complete ============================="); 
+            log.LogInformation("=== Complete ============================="); 
         }
     }
 }

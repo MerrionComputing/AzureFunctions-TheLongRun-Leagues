@@ -90,6 +90,15 @@ namespace TheLongRun.Common.Bindings
             return ProjectionResponse.Create(projectionToProcess, responseSource ); 
         }
 
+        private readonly string _connectionStringName;
+        public string ConnectionStringName
+        {
+            get
+            {
+                return _connectionStringName;
+            }
+        }
+
         public Projection (string domainName,
                             string aggregateTypeName,
                             string aggregateInstanceKey,
@@ -107,7 +116,8 @@ namespace TheLongRun.Common.Bindings
         /// <param name="attribute">
         /// The attribute describing which projection to run
         /// </param>
-        public Projection(ProjectionAttribute attribute)
+        public Projection(ProjectionAttribute attribute,
+            string connectionStringName = "")
         {
 
             _domainName = attribute.DomainName ;
@@ -115,10 +125,22 @@ namespace TheLongRun.Common.Bindings
             _aggregateInstanceKey = attribute.InstanceKey;
             _projectionTypeName = attribute.ProjectionTypeName;
 
+
+            if (string.IsNullOrWhiteSpace(connectionStringName))
+            {
+                _connectionStringName = ConnectionStringNameAttribute.DefaultConnectionStringName(attribute);
+            }
+            else
+            {
+                _connectionStringName = connectionStringName;
+            }
+
             if (null == _projectionProcessor)
             {
-                // TODO : Cater for different backing technologies... currently just AppendBlob
-                _projectionProcessor = CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamReaderUntyped.CreateProjectionProcessor(attribute);
+
+                // TODO : Allow for different backing technologies... currently just AppendBlob
+                _projectionProcessor = CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamReaderUntyped.CreateProjectionProcessor(attribute, 
+                    ConnectionStringNameAttribute.DefaultBlobStreamSettings(_domainName,_aggregateTypeName)  );
             }
 
         }

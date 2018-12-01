@@ -12,6 +12,7 @@ using System;
 using Leagues.League.commandDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
+using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction.Commands.Validation
 {
@@ -25,13 +26,12 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         [FunctionName("SetLeagueEmailAddressCommandValidation")]
         public static async Task<HttpResponseMessage> SetLeagueEmailAddressCommandValidationRun(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, 
-            TraceWriter log)
+            ILogger log)
         {
             #region Logging
             if (null != log)
             {
-                log.Verbose("Function triggered HTTP ",
-                    source: "SetLeagueEmailAddressCommandValidation");
+                log.LogDebug("Function triggered HTTP in SetLeagueEmailAddressCommandValidation");
             }
             #endregion
 
@@ -46,18 +46,9 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
             }
 
             bool valid = false;
-            if (ValidateSetLeagueEmailAddressCommand(commandId, log))
+            if (await ValidateSetLeagueEmailAddressCommand(commandId, log))
             {
                 valid = true;
-
-#if FUNCTION_CHAINING
-                // Call the next command in the command chain to process the valid command
-                FunctionChaining funcChain = new FunctionChaining(log);
-                var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
-                queryParams.Add(new Tuple<string, string>("commandId", commandId.ToString()));
-                funcChain.TriggerCommandByHTTPS(@"Leagues", "SetLeagueEmailAddressCommandHandler", queryParams, null);
-#endif
-
             }
 
             if (null == commandId )
@@ -84,16 +75,16 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         [AggregateRoot("League")]
         [CommandName("Set League Email Address")]
         [FunctionName("SetLeagueEmailAddressCommandValidationActivity")]
-        public static bool SetLeagueEmailAddressCommandValidationActivity(
+        public static async Task<bool> SetLeagueEmailAddressCommandValidationActivity(
             [ActivityTrigger] DurableActivityContext setLeagueEmailAddressCommandContect,
-            TraceWriter log)
+            ILogger log)
         {
 
             // Return the validation result
             string commandId = setLeagueEmailAddressCommandContect.GetInput<string>();
             if (! string.IsNullOrWhiteSpace(commandId ) )
             {
-                return ValidateSetLeagueEmailAddressCommand(commandId, log);
+                return await ValidateSetLeagueEmailAddressCommand(commandId, log);
             }
 
             return false;
@@ -110,8 +101,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         /// <remarks>
         /// This is common functionality, whether called by function chaining or by duarble functions
         /// </remarks>
-        private static bool  ValidateSetLeagueEmailAddressCommand(string commandId, 
-            TraceWriter log)
+        private static async Task<bool>  ValidateSetLeagueEmailAddressCommand(string commandId, 
+            ILogger log)
         {
 
             const string COMMAND_NAME = @"set-league-email-address";
@@ -123,8 +114,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 #region Logging
                 if (null != log)
                 {
-                    log.Verbose($"Validating command {commandId} ",
-                        source: "ValidateSetLeagueEmailAddressCommand");
+                    log.LogDebug($"Validating command {commandId} in ValidateSetLeagueEmailAddressCommand");
                 }
 #endregion
 
@@ -140,15 +130,14 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 #region Logging
                     if (null != log)
                     {
-                        log.Verbose($"Projection processor created",
-                            source: "ValidateSetLeagueEmailAddressCommand");
+                        log.LogDebug($"Projection processor created in ValidateSetLeagueEmailAddressCommand");
                     }
 #endregion
 
                     Command_Summary_Projection cmdProjection =
                         new Command_Summary_Projection(log);
 
-                    getCommandState.Process(cmdProjection);
+                    await getCommandState.Process(cmdProjection);
 
                     if ((cmdProjection.CurrentSequenceNumber > 0) || (cmdProjection.ProjectionValuesChanged()))
                     {
@@ -156,8 +145,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 #region Logging
                         if (null != log)
                         {
-                            log.Verbose($"Command { cmdProjection.CommandName} projection run for {commandGuid} ",
-                                source: "ValidateSetLeagueEmailAddressCommand");
+                            log.LogDebug($"Command { cmdProjection.CommandName} projection run for {commandGuid} in ValidateSetLeagueEmailAddressCommand");
                         }
 #endregion
 
@@ -168,8 +156,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 #region Logging
                             if (null != log)
                             {
-                                log.Warning($"Command {commandId} is complete so no need to validate ",
-                                    source: "ValidateSetLeagueEmailAddressCommand");
+                                log.LogWarning($"Command {commandId} is complete so no need to validate in ValidateSetLeagueEmailAddressCommand");
                             }
 #endregion
                             return true ;
@@ -182,8 +169,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 #region Logging
                             if (null != log)
                             {
-                                log.Warning($"Command {commandId} is validated so no need to validate again ",
-                                    source: "ValidateSetLeagueEmailAddressCommand");
+                                log.LogWarning($"Command {commandId} is validated so no need to validate again in ValidateSetLeagueEmailAddressCommand");
                             }
 #endregion
                             return true;
@@ -205,12 +191,11 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 string leagueName = cmdProjection.GetParameter<string>(nameof(Create_New_League_Definition.LeagueName));
                                 if (string.IsNullOrWhiteSpace(leagueName))
                                 {
-                                    CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name may not be blank");
+                                    await CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name may not be blank");
 #region Logging
                                     if (null != log)
                                     {
-                                        log.Warning($"Command {COMMAND_NAME } :: {commandId} has a blank league name",
-                                            source: "ValidateSetLeagueEmailAddressCommand");
+                                        log.LogWarning($"Command {COMMAND_NAME } :: {commandId} has a blank league name in ValidateSetLeagueEmailAddressCommand");
                                     }
 #endregion
                                 }
@@ -226,12 +211,11 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 string emailAddress = cmdProjection.GetParameter<string >(nameof(Create_New_League_Definition.Email_Address ));
                                 if (string.IsNullOrEmpty(emailAddress) )
                                 {
-                                    CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Email address is blank");
+                                   await  CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Email address is blank");
 #region Logging
                                     if (null != log)
                                     {
-                                        log.Warning($"Command {COMMAND_NAME } :: {commandId} has a future dated incorporation date",
-                                            source: "ValidateSetLeagueEmailAddressCommand");
+                                        log.LogWarning($"Command {COMMAND_NAME } :: {commandId} has a future dated incorporation date in ValidateSetLeagueEmailAddressCommand");
                                     }
 #endregion
                                 }
@@ -243,7 +227,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 
                             if (emailAddressValid && leagueNameValid)
                             {
-                                CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
+                                await CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
                                 return true;
                             }
                         }
@@ -254,8 +238,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 #region Logging
                         if (null != log)
                         {
-                            log.Warning($"No command events read for {commandId} ",
-                                source: "ValidateSetLeagueEmailAddressCommand");
+                            log.LogWarning($"No command events read for {commandId} in ValidateSetLeagueEmailAddressCommand");
                         }
 #endregion
                     }

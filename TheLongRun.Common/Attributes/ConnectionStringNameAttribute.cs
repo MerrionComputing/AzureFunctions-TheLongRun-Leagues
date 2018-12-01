@@ -40,7 +40,13 @@ namespace TheLongRun.Common.Attributes
 
         public static string DefaultConnectionStringName(string domainName, string aggregateTypeName )
         {
-            return $"{domainName}{aggregateTypeName}StorageConnectionString";
+            return $"{domainName}.{aggregateTypeName}.StorageConnectionString";
+        }
+
+        public static CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings DefaultBlobStreamSettings(string domainName, string aggregateTypeName)
+        {
+            // Knock up settings for a blob backed event stream...
+            return new Settings.BlobStreamSettings() { DomainName = domainName, ConnectionStringName = DefaultConnectionStringName(domainName , aggregateTypeName) } ; 
         }
     }
 }

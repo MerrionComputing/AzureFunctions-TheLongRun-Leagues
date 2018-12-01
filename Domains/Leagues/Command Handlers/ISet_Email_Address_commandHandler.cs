@@ -8,9 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-/// <remarks>
-/// Each league will have an unique name
-/// </remarks>
 namespace Leagues.League.commandHandler
 {
     using CQRSAzure.EventSourcing;
