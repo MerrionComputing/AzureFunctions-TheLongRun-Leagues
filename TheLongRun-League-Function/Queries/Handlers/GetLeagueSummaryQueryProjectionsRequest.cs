@@ -76,7 +76,7 @@ namespace TheLongRunLeaguesFunction.Queries
                 log.LogInformation($"GetLeagueSummaryQueryProjectionRequestActivity called for query : {queryRequest.QueryUniqueIdentifier}");
             }
 
-            await RequestProjectionsGetLeagueSummaryQuery(queryRequest.QueryUniqueIdentifier.ToString());
+            await RequestProjectionsGetLeagueSummaryQuery(queryRequest.QueryUniqueIdentifier.ToString(), log);
         }
 
         /// <summary>

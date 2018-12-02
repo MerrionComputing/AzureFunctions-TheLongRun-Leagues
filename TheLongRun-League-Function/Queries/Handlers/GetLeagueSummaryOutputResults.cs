@@ -56,6 +56,27 @@ namespace TheLongRunLeaguesFunction.Queries
         }
 
         /// <summary>
+        /// Run the projections that are needed to be run to answer this query
+        /// </summary>
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [QueryName("Get League Summary")]
+        [FunctionName("GetLeagueSummaryOutputResultsActivity")]
+        public static async Task GetLeagueSummaryOutputResultsActivity([ActivityTrigger] QueryRequest<Get_League_Summary_Definition> queryRequest,
+            ILogger log)
+        {
+
+            if (null != log)
+            {
+                log.LogInformation($"GetLeagueSummaryOutputResultsActivity called for query : {queryRequest.QueryUniqueIdentifier}");
+            }
+
+            await OutputResultsGetLeagueSummaryQuery(queryRequest.QueryUniqueIdentifier.ToString(), log);
+        }
+
+
+        /// <summary>
         /// Send out the results for a completed "Get-League-Summary" query
         /// </summary>
         /// <param name="queryId">
@@ -108,7 +129,7 @@ namespace TheLongRunLeaguesFunction.Queries
                         // Ignore queries in an invalid state or not yet validated...
                         if (qryProjection.CurrentState == Query_Summary_Projection.QueryState.Invalid)
                         {
-                            // No need to validate a completed query
+                            // No need to run projections on an invalid query
                             #region Logging
                             if (null != log)
                             {

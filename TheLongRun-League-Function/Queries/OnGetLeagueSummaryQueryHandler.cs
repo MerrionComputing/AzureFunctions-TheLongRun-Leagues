@@ -248,12 +248,15 @@ namespace TheLongRunLeaguesFunction.Queries
                     else
                     {
                         // Request all the projections needed to answer this query
+                        await context.CallActivityAsync("GetLeagueSummaryQueryProjectionsRequestActivity", queryRequest);
 
                         // Run all the outstanding projections for this query
+                        await context.CallActivityAsync("GetLeagueSummaryQueryProjectionProcessActivity", queryRequest);
 
                         // Output the results
+                        await context.CallActivityAsync("GetLeagueSummaryOutputResultsActivity", queryRequest); 
 
-                        // Get the results for ourselves to return...
+                        // Get the results for ourselves to return...to do this the query must be complete...
 
                         return null;
                     }

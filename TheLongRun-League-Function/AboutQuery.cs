@@ -20,10 +20,17 @@ namespace TheLongRunLeaguesFunction
         /// </remarks>
         [FunctionName("AboutQuery")]
         public static async Task<HttpResponseMessage> AboutQueryRun(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req, 
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req,
+            ExecutionContext context,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
+
+            if (null != context )
+            {
+                log.LogInformation($"App directory: {context.FunctionAppDirectory}");
+                log.LogInformation($"Function directory: {context.FunctionDirectory }");
+            }
 
             // parse query parameter
             string name = req.GetQueryNameValuePairsExt()[@"name"];

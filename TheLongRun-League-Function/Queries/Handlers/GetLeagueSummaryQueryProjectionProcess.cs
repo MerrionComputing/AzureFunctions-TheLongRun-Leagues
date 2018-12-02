@@ -55,6 +55,26 @@ namespace TheLongRunLeaguesFunction.Queries
         }
 
         /// <summary>
+        /// Run the projections that are needed to be run to answer this query
+        /// </summary>
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [QueryName("Get League Summary")]
+        [FunctionName("GetLeagueSummaryQueryProjectionProcessActivity")]
+        public static async Task GetLeagueSummaryQueryProjectionProcessActivity([ActivityTrigger] QueryRequest<Get_League_Summary_Definition> queryRequest,
+            ILogger log)
+        {
+
+            if (null != log)
+            {
+                log.LogInformation($"GetLeagueSummaryQueryProjectionProcessActivity called for query : {queryRequest.QueryUniqueIdentifier}");
+            }
+
+            await ProcessProjectionsGetLeagueSummaryQuery(queryRequest.QueryUniqueIdentifier.ToString(), log);
+        }
+
+        /// <summary>
         /// Take an un-processed projection request from the Get League Summary query and process it
         /// </summary>
         /// <param name="queryId">
