@@ -42,6 +42,13 @@ namespace TheLongRun.Common.Events.Query
             Message = messageIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public QueryParameterValidationErrorOccured()
+        {
+        }
+
         public QueryParameterValidationErrorOccured(SerializationInfo info, StreamingContext context)
         {
             Name = info.GetString(nameof(Name));

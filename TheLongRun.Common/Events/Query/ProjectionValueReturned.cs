@@ -76,6 +76,11 @@ namespace TheLongRun.Common.Events.Query
             AsOfSequenceNumber = asOfSequenceIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ProjectionValueReturned() { }
+
         public ProjectionValueReturned(SerializationInfo info, StreamingContext context)
         {
             DomainName = info.GetString(nameof(DomainName));

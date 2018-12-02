@@ -40,6 +40,11 @@ namespace TheLongRun.Common.Events.Command
             Fatal = fatalIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ValidationErrorOccured() { }
+
         public ValidationErrorOccured(SerializationInfo info, StreamingContext context)
         {
             Date_Logged = info.GetDateTime(nameof(Date_Logged));

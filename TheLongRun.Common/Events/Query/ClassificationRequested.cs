@@ -62,6 +62,12 @@ namespace TheLongRun.Common.Events.Query
             AsOfDate = asOfDateIn;
         }
 
+
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ClassificationRequested() { }
+
         public ClassificationRequested(SerializationInfo info, StreamingContext context)
         {
             DomainName = info.GetString(nameof(DomainName));

@@ -35,6 +35,10 @@ namespace TheLongRun.Common.Events.Query
             TargetType = targetTypeIn ;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public OutputLocationSet() { }
 
         public OutputLocationSet(SerializationInfo info, StreamingContext context)
         {

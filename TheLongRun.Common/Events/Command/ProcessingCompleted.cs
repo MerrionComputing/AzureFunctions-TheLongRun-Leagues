@@ -39,6 +39,11 @@ namespace TheLongRun.Common.Events.Command
             Commentary  = commentaryIn ;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ProcessingCompleted() { }
+
         public ProcessingCompleted(SerializationInfo info, StreamingContext context)
         {
             Date_Completed = info.GetDateTime(nameof(Date_Completed));

@@ -39,6 +39,13 @@ namespace TheLongRun.Common.Events.Query
             AuthorisationToken = aurhorisationTokenIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public QueryCreated()
+        {
+        }
+
         public QueryCreated(SerializationInfo info, StreamingContext context)
         {
             Date_Logged = info.GetDateTime(nameof(Date_Logged));

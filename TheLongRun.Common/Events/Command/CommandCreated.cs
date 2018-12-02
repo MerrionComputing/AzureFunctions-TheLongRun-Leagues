@@ -54,6 +54,11 @@ namespace TheLongRun.Common.Events.Command
             AuthorisationToken = aurhorisationTokenIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public CommandCreated() { }
+
         public CommandCreated(SerializationInfo info, StreamingContext context)
         {
             Date_Logged = info.GetDateTime(nameof(Date_Logged) );

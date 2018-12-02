@@ -72,6 +72,11 @@ namespace TheLongRun.Common.Events.Query
             ClassifierRunnerIdentifier = classifierRunnerIdentifier;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ClassificationRunStarted() { }
+
         public ClassificationRunStarted(SerializationInfo info, StreamingContext context)
         {
             DomainName = info.GetString(nameof(DomainName));

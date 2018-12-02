@@ -31,6 +31,12 @@ namespace TheLongRun.Common.Events.Query
             Value = valueIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public QueryParameterValueSet()
+        {
+        }
 
         public QueryParameterValueSet(SerializationInfo info, StreamingContext context)
         {

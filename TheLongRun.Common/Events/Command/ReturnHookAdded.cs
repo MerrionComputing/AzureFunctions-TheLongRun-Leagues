@@ -53,6 +53,11 @@ namespace TheLongRun.Common.Events.Command
 
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ReturnHookAdded() { }
+
         public ReturnHookAdded(SerializationInfo info, StreamingContext context)
         {
             HookType  = info.GetString(nameof(HookType ));

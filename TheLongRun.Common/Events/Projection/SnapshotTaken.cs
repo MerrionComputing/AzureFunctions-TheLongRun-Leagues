@@ -59,6 +59,13 @@ namespace TheLongRun.Common.Events.Projection
 
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public SnapshotTaken()
+        {
+        }
+
         public SnapshotTaken(SerializationInfo info, StreamingContext context)
         {
             AggregateInstanceKey = info.GetString(nameof(AggregateInstanceKey));

@@ -69,6 +69,11 @@ namespace TheLongRun.Common.Events.Command
 
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ProjectionRequested() { }
+
         public ProjectionRequested(SerializationInfo info, StreamingContext context)
         {
             DomainName = info.GetString(nameof(DomainName));

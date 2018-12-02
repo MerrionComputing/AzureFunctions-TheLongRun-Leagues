@@ -83,6 +83,11 @@ namespace TheLongRun.Common.Events.Command
             IsInGroup = isInGroupIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ClassificationResultReturned() { }
+
         public ClassificationResultReturned(SerializationInfo info, StreamingContext context)
         {
             DomainName = info.GetString(nameof(DomainName));

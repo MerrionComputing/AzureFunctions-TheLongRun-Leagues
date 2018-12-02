@@ -50,6 +50,9 @@ namespace TheLongRun.Common.Events.Query
             ResultsURI = resultsURIIn;
         }
 
+        public QueryCompleted()
+        { }
+
         public QueryCompleted(SerializationInfo info, StreamingContext context)
         {
             Date_Completed  = info.GetDateTime(nameof(Date_Completed ));

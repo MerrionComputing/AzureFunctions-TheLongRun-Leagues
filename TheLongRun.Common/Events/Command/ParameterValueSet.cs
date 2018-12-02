@@ -30,6 +30,10 @@ namespace TheLongRun.Common.Events.Command
             Value  = valueIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ParameterValueSet() { }
 
         public ParameterValueSet(SerializationInfo info, StreamingContext context)
         {

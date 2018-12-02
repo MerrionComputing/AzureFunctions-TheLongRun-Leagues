@@ -70,6 +70,11 @@ namespace TheLongRun.Common.Events.Query
             ProjectionRunnerIdentifier = projectionRunnerIdentifier;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ProjectionRunStarted() { }
+
         public ProjectionRunStarted(SerializationInfo info, StreamingContext context)
         {
             DomainName = info.GetString(nameof(DomainName));

@@ -26,6 +26,10 @@ namespace TheLongRun.Common.Events.Command
             Date_Validated = dateValidatedIn;
         }
 
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public ValidationSucceeded() { }
 
         public ValidationSucceeded(SerializationInfo info, StreamingContext context)
         {
