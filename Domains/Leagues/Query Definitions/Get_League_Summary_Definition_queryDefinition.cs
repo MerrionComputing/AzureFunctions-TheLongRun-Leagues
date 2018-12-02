@@ -39,11 +39,11 @@ namespace Leagues.League.queryDefinition
         /// The league for which we want to get the summary information
         /// </summary>
         [CQRSAzure.EventSourcing.AggregateKey()]
-        public int League_Name
+        public string League_Name
         {
             get
             {
-                return base.GetParameterValue<int>("League Name", 0);
+                return base.GetParameterValue<string>("League Name", 0);
             }
             set
             {

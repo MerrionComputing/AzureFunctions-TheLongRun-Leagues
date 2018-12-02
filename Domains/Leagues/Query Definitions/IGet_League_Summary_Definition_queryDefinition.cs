@@ -51,7 +51,7 @@ namespace Leagues.League.queryDefinition
         /// <summary>
         /// The league for which we want to get the summary information
         /// </summary>
-        int League_Name
+        string League_Name
         {
             get;
         }

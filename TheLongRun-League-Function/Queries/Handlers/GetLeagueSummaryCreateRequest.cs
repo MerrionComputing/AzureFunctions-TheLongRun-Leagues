@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Leagues.League.queryDefinition;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
