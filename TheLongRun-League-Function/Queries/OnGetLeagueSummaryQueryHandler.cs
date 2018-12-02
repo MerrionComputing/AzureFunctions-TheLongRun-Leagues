@@ -83,96 +83,12 @@ namespace TheLongRunLeaguesFunction.Queries
 
                 QueryRequest<Get_League_Summary_Definition> queryRequest = eventGridEvent.Data as QueryRequest<Get_League_Summary_Definition>;
 
-#if FUNCTION_CHAINING
-                // Get the query parameters : [League Name]
 
-                if (null != queryRequest)
-                {
-
-                    // Create a new Query record to hold the event stream for this query...
-
-                    QueryLogRecord<Get_League_Summary_Definition> qryRecord = QueryLogRecord<Get_League_Summary_Definition>.Create(
-                        QUERY_NAME,
-                        queryRequest.Parameters,
-                        queryRequest.ReturnTarget,
-                        queryRequest.ReturnPath);
-
-                    if (null != qryRecord)
-                    {
-                #region Logging
-                        if (null != log)
-                        {
-                            log.LogDebug ($"Query {QUERY_NAME} called for {queryRequest.Parameters.League_Name} - to return to {queryRequest.Parameters }",
-                                source: "OnGetLeagueSummaryQuery");
-                        }
-                #endregion
-
-                        EventStream queryEvents = new EventStream(@"Query",
-                            QUERY_NAME ,
-                            qryRecord.QueryUniqueIdentifier.ToString());
-
-                        if (null != queryEvents )
-                        {
-                            // Log the query creation
-                            await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryCreated(QUERY_NAME ,
-                                        qryRecord.QueryUniqueIdentifier ));
-
-                            // set the parameters
-                            await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValueSet
-                                (nameof(queryRequest.Parameters.League_Name ), queryRequest.Parameters.League_Name ));
-
-                            // set the return target
-                            await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.OutputLocationSet 
-                                ( qryRecord.ReturnPath , qryRecord.ReturnTarget ));
-
-
-                            // Call the next query in the command chain
-                            FunctionChaining funcChain = new FunctionChaining(log);
-                            var queryParams = new System.Collections.Generic.List<Tuple<string, string>>();
-                            queryParams.Add (new Tuple<string, string>("queryId" , qryRecord.QueryUniqueIdentifier.ToString()) );
-                            funcChain.TriggerCommandByHTTPS(@"Leagues", "GetLeagueSummaryQueryValidation", queryParams, null );  
-
-
-            }
-
-                    }
-                    else
-                    {
-                #region Logging
-                        if (null != log)
-                        {
-                            log.Error($"Query called with data that could not be converted to query log record",
-                                source: "OnGetLeagueSummaryQuery");
-                        }
-                #endregion
-                    }
-
-                }
-                else
-                {
-                #region Logging
-                    if (null != log)
-                    {
-                        log.Error($"Query called with data that could not be converted to parameters",
-                            source: "OnGetLeagueSummaryQuery");
-                    }
-                #endregion
-                }
-
-            // Log that this step has completed
-            if (null != log)
-            {
-                log.LogInformation("Query passed on to handler from OnGetLeagueSummaryQuery");
-            }
-
-#else
                 // Using Azure Deurable functions to do the command chaining
                 string instanceId = await getLeagueSummaryQueryHandlerOrchestrationClient.StartNewAsync("OnGetLeagueSummaryQueryHandlerOrchestrator", queryRequest);
 
                 log.LogInformation($"Started OnGetLeagueSummaryQueryHandlerOrchestrator orchestration with ID = '{instanceId}'.");
 
-
-#endif
             }
             catch (Exception ex)
             {
@@ -209,10 +125,10 @@ namespace TheLongRunLeaguesFunction.Queries
 
             // Get the query definition form the context...
             QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput <QueryRequest<Get_League_Summary_Definition>>();
-            queryRequest.QueryName = "get-league-summary";
 
             if (null != queryRequest )
             {
+                queryRequest.QueryName = "get-league-summary";
 
                 // Log the query request in its own own query event stream
                 Guid queryId = await context.CallActivityAsync<Guid>("GetLeagueSummaryCreateQueryRequestActivity", queryRequest); 

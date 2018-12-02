@@ -16,9 +16,12 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
 
 
         [FunctionName("GetLeagueSummaryLogParametersActivity")]
-        public static async Task GetLeagueSummaryLogParametersActivity([ActivityTrigger] QueryRequest<Get_League_Summary_Definition> queryRequest, 
-            ILogger log)
+        public static async Task GetLeagueSummaryLogParametersActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            ILogger log = null)
         {
+
+            QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
 
 
             if (null != log)

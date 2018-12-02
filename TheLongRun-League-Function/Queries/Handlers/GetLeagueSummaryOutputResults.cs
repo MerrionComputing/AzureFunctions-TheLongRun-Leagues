@@ -63,9 +63,12 @@ namespace TheLongRunLeaguesFunction.Queries
         [AggregateRoot("League")]
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryOutputResultsActivity")]
-        public static async Task GetLeagueSummaryOutputResultsActivity([ActivityTrigger] QueryRequest<Get_League_Summary_Definition> queryRequest,
-            ILogger log)
+        public static async Task GetLeagueSummaryOutputResultsActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            ILogger log = null)
         {
+
+            QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
 
             if (null != log)
             {
