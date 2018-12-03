@@ -14,6 +14,7 @@ using TheLongRun.Common.Bindings;
 using Newtonsoft.Json.Linq;
 using Microsoft.Azure.EventGrid.Models;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
@@ -48,12 +49,11 @@ namespace TheLongRunLeaguesFunction.Queries
             )
         {
 
-            const string QUERY_NAME = @"get-league-summary";
-
             #region Logging
             if (null != log)
             {
                 log.LogDebug("Function triggered in OnGetLeagueSummaryQuery");
+                
             }
 
             if (null == eventGridEvent)
@@ -64,6 +64,17 @@ namespace TheLongRunLeaguesFunction.Queries
                     log.LogError("Missing event grid trigger data in OnGetLeagueSummaryQuery");
                 }
                 return;
+            }
+            else
+            {
+                if (null != log)
+                {
+                    log.LogDebug($"Event grid topic: {eventGridEvent.Topic}");
+                    log.LogDebug($"Event grid subject: {eventGridEvent.Subject }");
+                    log.LogDebug($"Event grid metadata version: {eventGridEvent.MetadataVersion }");
+                    log.LogDebug($"Event grid event type: {eventGridEvent.EventType }");
+                    log.LogDebug($"Event Grid Data : {eventGridEvent.Data }");
+                }
             }
             #endregion
 
@@ -81,14 +92,31 @@ namespace TheLongRunLeaguesFunction.Queries
                 }
                 #endregion
 
-                QueryRequest<Get_League_Summary_Definition> queryRequest = eventGridEvent.Data as QueryRequest<Get_League_Summary_Definition>;
+                // Get the query request details out of the event grid data request
+                var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
+                QueryRequest<Get_League_Summary_Definition> queryRequest = null;
+                if (!string.IsNullOrWhiteSpace(jsondata))
+                {
+                    queryRequest = JsonConvert.DeserializeObject<QueryRequest<Get_League_Summary_Definition>>(jsondata);
+                }
 
+                if (null != queryRequest)
+                {
+                    log.LogInformation($"Running query handler with durable functions orchestration");
+                    log.LogInformation($"{queryRequest.QueryName} with league {queryRequest.GetParameters().League_Name}");
 
-                // Using Azure Deurable functions to do the command chaining
-                string instanceId = await getLeagueSummaryQueryHandlerOrchestrationClient.StartNewAsync("OnGetLeagueSummaryQueryHandlerOrchestrator", queryRequest);
+                    // Using Azure Deurable functions to do the command chaining
+                    string instanceId = await getLeagueSummaryQueryHandlerOrchestrationClient.StartNewAsync("OnGetLeagueSummaryQueryHandlerOrchestrator", queryRequest);
 
-                log.LogInformation($"Started OnGetLeagueSummaryQueryHandlerOrchestrator orchestration with ID = '{instanceId}'.");
-
+                    log.LogInformation($"Started OnGetLeagueSummaryQueryHandlerOrchestrator orchestration with ID = '{instanceId}'.");
+                }
+                else
+                {
+                    if (null != log)
+                    {
+                        log.LogError($"Unable to read query request from eventgrid data: {eventGridEvent.Data} Type: {eventGridEvent.Data.GetType()} ");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -120,11 +148,11 @@ namespace TheLongRunLeaguesFunction.Queries
         [FunctionName("OnGetLeagueSummaryQueryHandlerOrchestrator")]
         public static async Task<Get_League_Summary_Definition_Return> OnGetLeagueSummaryQueryHandlerOrchestrator
             ([OrchestrationTrigger] DurableOrchestrationContext context,
-            Microsoft.Extensions.Logging.ILogger log)
+            Microsoft.Extensions.Logging.ILogger log = null)
         {
 
             // Get the query definition form the context...
-            QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput <QueryRequest<Get_League_Summary_Definition>>();
+            QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
 
             if (null != queryRequest )
             {
@@ -164,7 +192,7 @@ namespace TheLongRunLeaguesFunction.Queries
                     else
                     {
                         // Request all the projections needed to answer this query
-                        await context.CallActivityAsync("GetLeagueSummaryQueryProjectionsRequestActivity", queryRequest);
+                        await context.CallActivityAsync("GetLeagueSummaryQueryProjectionRequestActivity", queryRequest);
 
                         // Run all the outstanding projections for this query
                         await context.CallActivityAsync("GetLeagueSummaryQueryProjectionProcessActivity", queryRequest);
@@ -173,6 +201,7 @@ namespace TheLongRunLeaguesFunction.Queries
                         await context.CallActivityAsync("GetLeagueSummaryOutputResultsActivity", queryRequest); 
 
                         // Get the results for ourselves to return...to do this the query must be complete...
+
 
                         return null;
                     }
@@ -186,6 +215,17 @@ namespace TheLongRunLeaguesFunction.Queries
                 {
                     // Unable to get the request details from the orchestration
                     log.LogError("OnGetLeagueSummaryQueryHandlerOrchestrator : Unable to get the query request from the context");
+
+                    string contextAsString = context.GetInput<string>();
+                    if (! string.IsNullOrWhiteSpace(contextAsString ) )
+                    {
+                        log.LogError($"Context was {contextAsString} ");
+                    }
+                    else
+                    {
+                        log.LogError($"Context was blank ");
+                    }
+
                 }
 
                 return null;

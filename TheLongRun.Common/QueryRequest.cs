@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace TheLongRun.Common
 {
 
-    public class QueryRequest<TQueryParameters>
+    public class QueryRequest<TQueryParameters> 
     {
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace TheLongRun.Common
         /// <summary>
         /// The underlying parameters for the query
         /// </summary>
-        public TQueryParameters Parameters { get;  set; }
+        public JObject  Parameters { get;  set; }
 
         /// <summary>
         /// The name by which this type of query is known
@@ -47,5 +48,29 @@ namespace TheLongRun.Common
         /// The system wide unique identifier by which this instance of a query request is known
         /// </summary>
         public Guid QueryUniqueIdentifier { get; set; }
+
+        public TQueryParameters GetParameters()
+        {
+            if (null != Parameters )
+            {
+                return Parameters.ToObject<TQueryParameters>()  ; 
+            }
+            else
+            {
+                return default(TQueryParameters);
+            }
+        }
+
+        public void SetParameters(TQueryParameters parameters)
+        {
+            if (null != parameters )
+            {
+                Parameters = JObject.FromObject(parameters);
+            }
+            else
+            {
+                Parameters = null;
+            }
+        }
     }
 }

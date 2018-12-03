@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 using CQRSAzure.QueryDefinition;
 using CQRSAzure.EventSourcing;
+using Newtonsoft.Json;
 
 /// <remarks>
 /// Each league will have an unique name
@@ -23,10 +24,12 @@ namespace Leagues.League.queryDefinition
         IGet_League_Summary_Definition
     {
         
+        
         /// <summary>
         /// The unique name of this query
         /// Get League Summary
         /// </summary>
+        [JsonIgnore]
         public override string QueryName
         {
             get
@@ -49,6 +52,13 @@ namespace Leagues.League.queryDefinition
             {
                 base.SetParameterValue("League Name", 0, ref value);
             }
+        }
+
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public Get_League_Summary_Definition()
+        {
         }
     }
 }

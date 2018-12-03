@@ -38,12 +38,12 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
             {
                 // set the parameter(s)
                 await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValueSet
-                    (nameof(queryRequest.Parameters.League_Name), queryRequest.Parameters.League_Name));
+                    (nameof(Get_League_Summary_Definition.League_Name), queryRequest.GetParameters().League_Name));
 
                 if (null != log)
                 {
                     // Unable to get the request details from the orchestration
-                    log.LogInformation($"GetLeagueSummaryLogParametersActivity : Logged parameters - League name : {queryRequest.Parameters.League_Name } ");
+                    log.LogInformation($"GetLeagueSummaryLogParametersActivity : Logged parameters - League name : {queryRequest.GetParameters().League_Name } ");
                 }
 
             }

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="nunit" Version="3.10.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domains\Leagues\Command Definitions\Leagues.CommandDefinition.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Command Handlers\Leagues.CommandHandler.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Event Sourcing\Leagues.EventSourcing.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Identifier Groups\Leagues.IdentityGroup.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Query Definitions\Leagues.QueryDefinition.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Query Handlers\Leagues.QueryHandler.csproj" />
+    <ProjectReference Include="..\TheLongRun-League-Function\TheLongRun-League-Function.csproj" />
+    <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />
+  </ItemGroup>
+
+</Project>

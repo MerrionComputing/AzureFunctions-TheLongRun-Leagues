@@ -30,7 +30,7 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
             // Create a new Query record to hold the event stream for this query...
             QueryLogRecord<Get_League_Summary_Definition> qryRecord = QueryLogRecord<Get_League_Summary_Definition>.Create(
                 queryRequest.QueryName,
-                queryRequest.Parameters,
+                queryRequest.GetParameters(),
                 queryRequest.ReturnTarget,
                 queryRequest.ReturnPath,
                 queryRequest.QueryUniqueIdentifier);

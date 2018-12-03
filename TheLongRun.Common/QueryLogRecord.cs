@@ -20,19 +20,23 @@ namespace TheLongRun.Common
         public enum QueryReturnTarget
         {
             /// <summary>
+            /// No output type specified - just skip over this return target
+            /// </summary>
+            NotSet = 0,
+            /// <summary>
             /// Store the results of the query in the named azure storage blob, which will either trigger
             /// the next step or can be polled for (not ideal)
             /// </summary>
-            AzureBlobStorage = 0,
+            AzureBlobStorage = 1,
             /// <summary>
             /// Use the defined webhook to pass the results back for the query
             /// </summary>
-            WebHook = 1,
+            WebHook = 2,
             /// <summary>
             /// Fire off an event grid event with the specified custom topic name to notify that the
             /// query results are available
             /// </summary>
-            CustomEventGridTopic = 2
+            CustomEventGridTopic = 3
         }
 
         /// <summary>

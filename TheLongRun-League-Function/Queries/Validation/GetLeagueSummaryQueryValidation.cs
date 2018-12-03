@@ -189,8 +189,9 @@ namespace TheLongRunLeaguesFunction.Queries
         [AggregateRoot("League")]
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryValidateActivity")]
-        public static async Task<bool> GetLeagueSummaryValidateActivity([ActivityTrigger] QueryRequest<Get_League_Summary_Definition> queryRequest,
-            ILogger log)
+        public static async Task<bool> GetLeagueSummaryValidateActivity(
+            [ActivityTrigger] QueryRequest<Get_League_Summary_Definition> queryRequest,
+            ILogger log = null)
         {
 
             if (null != log )
