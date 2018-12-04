@@ -15,10 +15,11 @@ using Newtonsoft.Json.Linq;
 using Microsoft.Azure.EventGrid.Models;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
-    public static partial class Query
+    public static partial class GetLeagueSummaryQuery
     {
 
         /// <summary>
@@ -128,8 +129,6 @@ namespace TheLongRunLeaguesFunction.Queries
             }
 
 
-
-
         }
 
 
@@ -163,11 +162,13 @@ namespace TheLongRunLeaguesFunction.Queries
 
                 if (queryId.Equals(Guid.Empty )  )
                 {
+                    #region Logging
                     if (null != log)
                     {
                         // Unable to get the request details from the orchestration
                         log.LogError("OnGetLeagueSummaryQueryHandlerOrchestrator : Unable to create the query event stream");
                     }
+                    #endregion
 
                     return null;
                 }
@@ -175,7 +176,23 @@ namespace TheLongRunLeaguesFunction.Queries
                 {
                     queryRequest.QueryUniqueIdentifier = queryId;
                     // Save the parameters to the event stream
-                    await context.CallActivityAsync("GetLeagueSummaryLogParametersActivity", queryRequest);
+                    ActivityResponse resp = await context.CallActivityAsync<ActivityResponse>("GetLeagueSummaryLogParametersActivity", queryRequest);
+
+                    #region Logging
+                    if (null != log)
+                    {
+                        if (null != resp)
+                        {
+                            log.LogInformation($"{resp.FunctionName} complete: {resp.Message } "); 
+                        }
+                    }
+                    #endregion
+
+
+                    if (null != resp )
+                    {
+                        context.SetCustomStatus(resp);
+                    }
 
                     // next validate the query
                     bool valid = await context.CallActivityAsync<bool>("GetLeagueSummaryValidateActivity", queryRequest);
@@ -185,25 +202,62 @@ namespace TheLongRunLeaguesFunction.Queries
                         if (null != log)
                         {
                             // Could not run the query as the parameters don't make sense
-                            log.LogError("OnGetLeagueSummaryQueryHandlerOrchestrator : Query parameters are invalid");
+                            log.LogError($"OnGetLeagueSummaryQueryHandlerOrchestrator : Query parameters are invalid {queryId}");
                         }
                         return null;
                     }
                     else
                     {
                         // Request all the projections needed to answer this query
-                        await context.CallActivityAsync("GetLeagueSummaryQueryProjectionRequestActivity", queryRequest);
+                        resp = await context.CallActivityAsync<ActivityResponse>("GetLeagueSummaryQueryProjectionRequestActivity", queryRequest);
+                        #region Logging
+                        if (null != log)
+                        {
+                            if (null != resp)
+                            {
+                                log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                            }
+                        }
+                        #endregion
+                        if (null != resp)
+                        {
+                            context.SetCustomStatus(resp);
+                        }
 
                         // Run all the outstanding projections for this query
-                        await context.CallActivityAsync("GetLeagueSummaryQueryProjectionProcessActivity", queryRequest);
+                        resp = await context.CallActivityAsync< ActivityResponse>("GetLeagueSummaryQueryProjectionProcessActivity", queryRequest);
+                        #region Logging
+                        if (null != log)
+                        {
+                            if (null != resp)
+                            {
+                                log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                            }
+                        }
+                        #endregion
+                        if (null != resp)
+                        {
+                            context.SetCustomStatus(resp);
+                        }
 
                         // Output the results
-                        await context.CallActivityAsync("GetLeagueSummaryOutputResultsActivity", queryRequest); 
+                        resp =  await context.CallActivityAsync<ActivityResponse>("GetLeagueSummaryOutputResultsActivity", queryRequest);
+                        #region Logging
+                        if (null != log)
+                        {
+                            if (null != resp)
+                            {
+                                log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                            }
+                        }
+                        #endregion
+                        if (null != resp)
+                        {
+                            context.SetCustomStatus(resp);
+                        }
 
                         // Get the results for ourselves to return...to do this the query must be complete...
-
-
-                        return null;
+                        return await context.CallActivityAsync<Get_League_Summary_Definition_Return>("GetLeagueSummaryGetResultsActivity", queryRequest); 
                     }
 
                 }

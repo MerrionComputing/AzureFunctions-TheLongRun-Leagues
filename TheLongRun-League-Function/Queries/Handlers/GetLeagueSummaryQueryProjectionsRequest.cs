@@ -14,6 +14,7 @@ using TheLongRun.Common.Events.Query;
 using TheLongRun.Common.Events.Query.Projections;
 using System;
 using Microsoft.Extensions.Logging;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
@@ -29,7 +30,7 @@ namespace TheLongRunLeaguesFunction.Queries
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryQueryProjectionsRequest")]
         public static async Task<HttpResponseMessage> GetLeagueSummaryQueryProjectionRequestRun(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, 
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, 
             ILogger log)
         {
 
@@ -50,7 +51,9 @@ namespace TheLongRunLeaguesFunction.Queries
                 queryId = data?.QueryId;
             }
 
-            await RequestProjectionsGetLeagueSummaryQuery(queryId, log);
+            await RequestProjectionsGetLeagueSummaryQuery("get-league-summary",
+                queryId, 
+                log);
 
             return queryId == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a queryId on the query string or in the request body")
@@ -67,19 +70,34 @@ namespace TheLongRunLeaguesFunction.Queries
         [AggregateRoot("League")]
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryQueryProjectionRequestActivity")]
-        public static async Task GetLeagueSummaryQueryProjectionRequestActivity(
+        public static async Task<ActivityResponse> GetLeagueSummaryQueryProjectionRequestActivity(
             [ActivityTrigger] DurableActivityContext context,
-            ILogger log = null)
+            ILogger log)
         {
 
-            QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "GetLeagueSummaryQueryProjectionRequestActivity" };
 
-            if (null != log)
+            try
             {
-                log.LogInformation($"GetLeagueSummaryQueryProjectionRequestActivity called for query : {queryRequest.QueryUniqueIdentifier}");
-            }
+                QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
 
-            await RequestProjectionsGetLeagueSummaryQuery(queryRequest.QueryUniqueIdentifier.ToString(), log);
+                if (null != log)
+                {
+                    log.LogInformation($"GetLeagueSummaryQueryProjectionRequestActivity called for query : {queryRequest.QueryUniqueIdentifier}");
+                }
+
+                await RequestProjectionsGetLeagueSummaryQuery(queryRequest.QueryName,
+                    queryRequest.QueryUniqueIdentifier.ToString(), 
+                    log);
+
+                ret.Message = $"Requested projections : { queryRequest.QueryUniqueIdentifier.ToString() } ";
+            }
+            catch (Exception ex)
+            {
+                ret.Message = ex.Message;
+                ret.FatalError = true;
+            }
+            return ret;
         }
 
         /// <summary>
@@ -92,18 +110,19 @@ namespace TheLongRunLeaguesFunction.Queries
         /// <param name="log">
         /// Optional tracing output
         /// </param>
-        private static async Task RequestProjectionsGetLeagueSummaryQuery(string queryId,
-            ILogger log = null)
+        private static async Task RequestProjectionsGetLeagueSummaryQuery(
+            string queryName,
+            string queryId,
+            ILogger log)
         {
 
-            const string QUERY_NAME = @"get-league-summary";
             Guid queryGuid;
 
             if (Guid.TryParse(queryId, out queryGuid))
             {
                 // Get the current state of the query...
                 Projection getQueryState = new Projection(@"Query",
-                    QUERY_NAME,
+                    queryName ,
                     queryGuid.ToString(),
                     nameof(Query_Summary_Projection));
 
@@ -156,7 +175,7 @@ namespace TheLongRunLeaguesFunction.Queries
                                 #region Logging
                                 if (null != log)
                                 {
-                                    log.LogError($"Query {QUERY_NAME} :: {queryGuid} has a blank league name in RequestProjectionsGetLeagueSummaryQuery");
+                                    log.LogError($"Query {queryName } :: {queryGuid} has a blank league name in RequestProjectionsGetLeagueSummaryQuery");
                                 }
                                 #endregion
                             }
@@ -188,7 +207,7 @@ namespace TheLongRunLeaguesFunction.Queries
                                             #region Logging
                                             if (null != log)
                                             {
-                                                log.LogWarning($"Query {QUERY_NAME} projection in progress for {queryGuid } in RequestProjectionsGetLeagueSummaryQuery");
+                                                log.LogWarning($"Query {queryName} projection in progress for {queryGuid } in RequestProjectionsGetLeagueSummaryQuery");
                                             }
                                             #endregion
                                         }
@@ -197,7 +216,7 @@ namespace TheLongRunLeaguesFunction.Queries
                                             #region Logging
                                             if (null != log)
                                             {
-                                                log.LogWarning($"Query {QUERY_NAME} projection already processed for {queryGuid } in RequestProjectionsGetLeagueSummaryQuery");
+                                                log.LogWarning($"Query {queryName} projection already processed for {queryGuid } in RequestProjectionsGetLeagueSummaryQuery");
                                             }
                                             #endregion
                                         }
@@ -205,7 +224,6 @@ namespace TheLongRunLeaguesFunction.Queries
                                 }
                             }
                         }
-                        
                     }
                 }
             }

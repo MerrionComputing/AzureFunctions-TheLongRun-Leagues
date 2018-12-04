@@ -9,7 +9,7 @@ using TheLongRun.Common.Bindings;
 
 namespace TheLongRunLeaguesFunction.Queries.Handlers
 {
-    public static class GetLeagueSummaryCreateRequest
+    public static partial class GetLeagueSummaryQuery
     {
 
 

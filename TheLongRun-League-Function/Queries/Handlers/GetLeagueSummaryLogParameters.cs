@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,47 +9,77 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using TheLongRun.Common;
 using TheLongRun.Common.Bindings;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Queries.Handlers
 {
-    public static class GetLeagueSummaryLogParameters
+    public static partial class GetLeagueSummaryQuery
     {
 
 
         [FunctionName("GetLeagueSummaryLogParametersActivity")]
-        public static async Task GetLeagueSummaryLogParametersActivity(
+        public static async Task<ActivityResponse> GetLeagueSummaryLogParametersActivity(
             [ActivityTrigger] DurableActivityContext context,
             ILogger log = null)
         {
 
-            QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
+           
 
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "GetLeagueSummaryLogParametersActivity" };
 
-            if (null != log)
+            try
             {
-                // Unable to get the request details from the orchestration
-                log.LogInformation($"GetLeagueSummaryLogParametersActivity : Logging parameters for query {queryRequest.QueryUniqueIdentifier} ");
+                QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
+
+                if (null != queryRequest)
+                {
+                    if (null != log)
+                    {
+                        // Unable to get the request details from the orchestration
+                        log.LogInformation($"GetLeagueSummaryLogParametersActivity : Logging parameters for query {queryRequest.QueryUniqueIdentifier} ");
+                    }
+
+                    EventStream queryEvents = new EventStream(@"Query",
+                        queryRequest.QueryName,
+                        queryRequest.QueryUniqueIdentifier.ToString());
+
+                    if (null != queryEvents)
+                    {
+                        // set the parameter(s)
+                        await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValueSet
+                            (nameof(Get_League_Summary_Definition.League_Name), queryRequest.GetParameters().League_Name));
+
+                        if (null != log)
+                        {
+                            // Unable to get the request details from the orchestration
+                            log.LogInformation($"GetLeagueSummaryLogParametersActivity : Logged parameters - League name : {queryRequest.GetParameters().League_Name } ");
+                        }
+
+                        ret.Message = $"Logged parameters - League name : {queryRequest.GetParameters().League_Name } ";
+                    }
+                    else
+                    {
+                        ret.Message = $"Unable to get the event stream for {queryRequest.QueryName} : {queryRequest.QueryUniqueIdentifier }";
+                        ret.FatalError = true;
+                    }
+                }
+                else
+                {
+                    ret.Message = $"Unable to get the request details from {context.ToString()} ";
+                    ret.FatalError = true;
+                }
             }
-
-            EventStream queryEvents = new EventStream(@"Query",
-                queryRequest.QueryName ,
-                queryRequest.QueryUniqueIdentifier.ToString());
-
-            if (null != queryEvents )
+            catch (Exception ex)
             {
-                // set the parameter(s)
-                await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValueSet
-                    (nameof(Get_League_Summary_Definition.League_Name), queryRequest.GetParameters().League_Name));
-
                 if (null != log)
                 {
                     // Unable to get the request details from the orchestration
-                    log.LogInformation($"GetLeagueSummaryLogParametersActivity : Logged parameters - League name : {queryRequest.GetParameters().League_Name } ");
+                    log.LogError ($"GetLeagueSummaryLogParametersActivity : error {ex.Message} ");
                 }
-
+                ret.Message = ex.Message;
+                ret.FatalError = true;
             }
-
-            return;
+            return ret;
         }
 
 

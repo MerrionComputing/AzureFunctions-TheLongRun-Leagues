@@ -1,118 +1,98 @@
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+using System;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
-
-using Leagues.League.queryDefinition;
-using TheLongRun.Common;
-using TheLongRun.Common.Attributes;
-using TheLongRun.Common.Bindings;
-using TheLongRun.Common.Events.Query;
-using TheLongRun.Common.Events.Query.Projections;
-using System;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using TheLongRun.Common.Orchestration;
+using Newtonsoft.Json;
+using TheLongRun.Common.Attributes;
+using System.Net;
+using System.Net.Http;
+using TheLongRun.Common;
+using Leagues.League.queryDefinition;
+using TheLongRun.Common.Events.Query.Projections;
+using TheLongRun.Common.Bindings;
 
-namespace TheLongRunLeaguesFunction.Queries
+namespace TheLongRunLeaguesFunction.Queries.Handlers
 {
-
     public static partial class GetLeagueSummaryQuery
     {
         [ApplicationName("The Long Run")]
         [DomainName("Leagues")]
         [AggregateRoot("League")]
         [QueryName("Get League Summary")]
-        [FunctionName("GetLeagueSummaryOutputResults")]
-        public static async Task<HttpResponseMessage> GetLeagueSummaryOutputResultsRun(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, 
+        [FunctionName("GetLeagueSummaryGetResults")]
+        public static async Task<HttpResponseMessage> GetLeagueSummaryGetResultsRun(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
             ILogger log)
         {
 
             #region Logging
             if (null != log)
             {
-                log.LogDebug("Function triggered HTTP in GetLeagueSummaryOutputResults");
+                log.LogDebug("Function triggered HTTP in GetLeagueSummaryQueryProjectionsRequest");
             }
             #endregion
 
             // Get the query identifier
             string queryId = req.GetQueryNameValuePairsExt()[@"QueryId"];
 
+            Get_League_Summary_Definition_Return value = null;
+            string results = $"No results for {queryId}";
+
             if (queryId == null)
             {
                 // Get request body
                 dynamic data = await req.Content.ReadAsAsync<object>();
                 queryId = data?.QueryId;
+
+                 value = await GetLeagueSummaryGetResults("get-league-summary",
+                    queryId,
+                    log); 
+
+                if (null != value )
+                {
+                    results = $"Results from {queryId} - {value.LeagueName} incorporated {value.Date_Incorporated} at {value.Location} ({value.Twitter_Handle})";
+                }
             }
 
-            await OutputResultsGetLeagueSummaryQuery("get-league-summary",
-                queryId, 
-                log);
-
             return queryId == null
-                ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a queryId on the query string or in the request body")
-                : req.CreateResponse(HttpStatusCode.OK, $"Sent output for query {queryId}");
-
+                    ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a queryId on the query string or in the request body")
+                    : req.CreateResponse(HttpStatusCode.OK, results );
         }
 
-        /// <summary>
-        /// Run the projections that are needed to be run to answer this query
-        /// </summary>
+
         [ApplicationName("The Long Run")]
         [DomainName("Leagues")]
         [AggregateRoot("League")]
         [QueryName("Get League Summary")]
-        [FunctionName("GetLeagueSummaryOutputResultsActivity")]
-        public static async Task<ActivityResponse> GetLeagueSummaryOutputResultsActivity(
+        [FunctionName("GetLeagueSummaryGetResultsActivity")]
+        public static async Task<Get_League_Summary_Definition_Return> GetLeagueSummaryGetResultsActivity(
             [ActivityTrigger] DurableActivityContext context,
-            ILogger log)
+            ILogger log
+            )
         {
 
-            ActivityResponse ret = new ActivityResponse() { FunctionName = "GetLeagueSummaryOutputResultsActivity" };
+            QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
 
-            try
+            if (null != log)
             {
-                QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
-                if (null != log)
-                {
-                    log.LogInformation($"GetLeagueSummaryOutputResultsActivity called for query : {queryRequest.QueryUniqueIdentifier}");
-                }
-
-                await OutputResultsGetLeagueSummaryQuery(queryRequest.QueryName ,
-                    queryRequest.QueryUniqueIdentifier.ToString(), 
-                    log);
-
-                ret.Message = $"Output Results : {queryRequest.QueryUniqueIdentifier  } to {queryRequest.ReturnPath} ";
-            }
-            catch (Exception ex)
-            {
-                if (null != log)
-                {
-                    // Unable to get the request details from the orchestration
-                    log.LogError($"GetLeagueSummaryOutputResultsActivity : error {ex.Message} ");
-                }
-                ret.Message = ex.Message;
-                ret.FatalError = true;
+                log.LogInformation($"GetLeagueSummaryQueryProjectionRequestActivity called for query : {queryRequest.QueryUniqueIdentifier}");
             }
 
-            return ret;
+            return await GetLeagueSummaryGetResults(queryRequest.QueryName,
+                queryRequest.QueryUniqueIdentifier.ToString(),
+                log);
+
         }
 
-
         /// <summary>
-        /// Send out the results for a completed "Get-League-Summary" query
+        /// Get the league summary results as they currently are in this query
         /// </summary>
-        /// <param name="queryId">
-        /// Unique identifier of the query for which we want to send out the results
-        /// </param>
-        /// <param name="log">
-        /// Trace target for logging the outcomes of this operation
-        /// </param>
-        private static async Task OutputResultsGetLeagueSummaryQuery(
-            string queryName,
+        /// <returns></returns>
+        private static async Task<Get_League_Summary_Definition_Return >  GetLeagueSummaryGetResults(string queryName,
             string queryId,
             ILogger log)
         {
@@ -133,7 +113,7 @@ namespace TheLongRunLeaguesFunction.Queries
                     #region Logging
                     if (null != log)
                     {
-                        log.LogDebug ($"Projection processor created in OutputResultsGetLeagueSummaryQuery");
+                        log.LogDebug($"Projection processor created in OutputResultsGetLeagueSummaryQuery");
                     }
                     #endregion
 
@@ -149,7 +129,7 @@ namespace TheLongRunLeaguesFunction.Queries
                         #region Logging
                         if (null != log)
                         {
-                            log.LogDebug ($"Query { qryProjection.QueryName } projection run for {queryGuid } in OutputResultsGetLeagueSummaryQuery");
+                            log.LogDebug($"Query { qryProjection.QueryName } projection run for {queryGuid } in OutputResultsGetLeagueSummaryQuery");
                         }
                         #endregion
 
@@ -160,14 +140,14 @@ namespace TheLongRunLeaguesFunction.Queries
                             #region Logging
                             if (null != log)
                             {
-                                log.LogWarning ($"Query {queryGuid} state is {qryProjection.CurrentState} so no output processed in OutputResultsGetLeagueSummaryQuery");
+                                log.LogWarning($"Query {queryGuid} state is {qryProjection.CurrentState} so no output processed in OutputResultsGetLeagueSummaryQuery");
                             }
                             #endregion
-                            return;
+                            return null;
                         }
 
                         // Check all the projections have been run..
-                        Query_Projections_Projection qryProjectionState = new Query_Projections_Projection( log );
+                        Query_Projections_Projection qryProjectionState = new Query_Projections_Projection(log);
                         await getQueryState.Process(qryProjectionState);
 
                         if ((qryProjectionState.CurrentSequenceNumber > 0) || (qryProjectionState.ProjectionValuesChanged()))
@@ -189,40 +169,16 @@ namespace TheLongRunLeaguesFunction.Queries
                                             ret.Location = projectionResult.Location;
                                             ret.Date_Incorporated = projectionResult.Date_Incorporated;
                                             ret.Twitter_Handle = projectionResult.Twitter_Handle;
+                                            return ret;
                                         }
                                         else
                                         {
                                             #region Logging
                                             if (null != log)
                                             {
-                                                log.LogError ($"Unable to convert {qryProjectionState.ProcessedRequests[0].ReturnedValue} to {nameof(Leagues.League.projection.League_Summary_Information)} in OutputResultsGetLeagueSummaryQuery");
+                                                log.LogError($"Unable to convert {qryProjectionState.ProcessedRequests[0].ReturnedValue} to {nameof(Leagues.League.projection.League_Summary_Information)} in OutputResultsGetLeagueSummaryQuery");
                                             }
                                             #endregion
-                                        }
-                                    }
-
-                                    // Get all the output targets
-                                    Query_Outputs_Projection qryOutputs = new Query_Outputs_Projection(log);
-                                    await getQueryState.Process(qryOutputs);
-
-                                    if ((qryOutputs.CurrentSequenceNumber > 0) || (qryOutputs.ProjectionValuesChanged()))
-                                    {
-                                        #region Logging
-                                        if (null != log)
-                                        {
-                                            log.LogDebug($"Sending results to output targets {ret} in OutputResultsGetLeagueSummaryQuery");
-                                        }
-                                        #endregion
-                                        foreach (string location in qryOutputs.Targets.Keys )
-                                        {
-                                            #region Logging
-                                            if (null != log)
-                                            {
-                                                log.LogDebug($"Target : { location} - type {qryOutputs.Targets[location]} in OutputResultsGetLeagueSummaryQuery");
-                                            }
-                                            #endregion
-                                            // Send the output to the location...
-                                            QueryLogRecord.SendOutput(location, qryOutputs.Targets[location], ret);
                                         }
                                     }
                                 }
@@ -250,6 +206,8 @@ namespace TheLongRunLeaguesFunction.Queries
                     }
                 }
             }
+
+            return null;
         }
     }
 }

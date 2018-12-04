@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
-    public static partial class Query
+    public static partial class GetLeagueSummaryQuery
     {
         [ApplicationName("The Long Run")]
         [DomainName("Leagues")]
@@ -25,8 +25,9 @@ namespace TheLongRunLeaguesFunction.Queries
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryQueryValidation")]
         public static async Task<HttpResponseMessage> GetLeagueSummaryQueryValidationRun(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            HttpRequestMessage req, ILogger log)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]
+            HttpRequestMessage req, 
+            ILogger log)
         {
 
             #region Logging
@@ -64,7 +65,7 @@ namespace TheLongRunLeaguesFunction.Queries
         /// If set, output progress to this trace writer
         /// </param>
         private static async Task<bool> ValidateGetLeagueSummaryQuery(string queryId, 
-            ILogger log = null)
+            ILogger log)
         {
             const string QUERY_NAME = @"get-league-summary";
             Guid queryGuid;
@@ -191,7 +192,7 @@ namespace TheLongRunLeaguesFunction.Queries
         [FunctionName("GetLeagueSummaryValidateActivity")]
         public static async Task<bool> GetLeagueSummaryValidateActivity(
             [ActivityTrigger] QueryRequest<Get_League_Summary_Definition> queryRequest,
-            ILogger log = null)
+            ILogger log)
         {
 
             if (null != log )
@@ -199,7 +200,7 @@ namespace TheLongRunLeaguesFunction.Queries
                 log.LogInformation($"GetLeagueSummaryValidateActivity called for query : {queryRequest.QueryUniqueIdentifier}"); 
             }
 
-            return await ValidateGetLeagueSummaryQuery(queryRequest.QueryUniqueIdentifier.ToString() );
+            return await ValidateGetLeagueSummaryQuery(queryRequest.QueryUniqueIdentifier.ToString(), log );
         }
     }
 }

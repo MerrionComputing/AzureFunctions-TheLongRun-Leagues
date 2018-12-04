@@ -110,6 +110,7 @@
     <Compile Include="Events\Query\QueryParameterValidationErrorOccured.cs" />
     <Compile Include="Events\Query\QueryParameterValueSet.cs" />
     <Compile Include="HttpExtensions.cs" />
+    <Compile Include="Orchestration\ActivityResponse.cs" />
     <Compile Include="Orchestration\Attributes\EventStreamBackedClassifierOrchestrationTriggerAttribute.cs" />
     <Compile Include="Orchestration\Attributes\EventStreamBackedCommandOrchestrationTriggerAttribute.cs" />
     <Compile Include="Orchestration\Attributes\EventStreamBackedIdentifierGroupOrchestrationTriggerAttribute.cs" />
