@@ -41,14 +41,17 @@ namespace TheLongRunLeaguesFunction.Queries
             // Get the query identifier
             string queryId = req.GetQueryNameValuePairsExt()[@"QueryId"];
 
-            if (queryId == null)
+            if (null == queryId)
             {
                 // Get request body
                 dynamic data = await req.Content.ReadAsAsync<object>();
                 queryId = data?.QueryId;
             }
 
-            await ProcessProjectionsGetLeagueSummaryQuery("get-league-summary", queryId, log);
+            if (null != queryId)
+            {
+                await ProcessProjectionsGetLeagueSummaryQuery("get-league-summary", queryId, log);
+            }
 
             return queryId == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a queryId on the query string or in the request body")
@@ -263,6 +266,15 @@ namespace TheLongRunLeaguesFunction.Queries
                         }
                     }
                 }
+            }
+            else
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.LogError($"Projection processor not passed a correct query identifier : {queryId} for query {queryName} ");
+                }
+                #endregion
             }
         }
     }
