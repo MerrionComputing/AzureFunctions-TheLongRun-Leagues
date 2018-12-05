@@ -28,7 +28,7 @@ namespace TheLongRunLeaguesFunction.Queries
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryQueryProjectionProcess")]
         public static async Task<HttpResponseMessage> GetLeagueSummaryQueryProjectionProcessRun(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req,
             ILogger log)
         {
             #region Logging
@@ -117,7 +117,7 @@ namespace TheLongRunLeaguesFunction.Queries
                 // Get the current state of the query...
                 Projection getQueryState = new Projection(@"Query",
                     queryName ,
-                    queryGuid.ToString(),
+                    queryId,
                     nameof(Query_Summary_Projection));
 
                 if (null != getQueryState)
