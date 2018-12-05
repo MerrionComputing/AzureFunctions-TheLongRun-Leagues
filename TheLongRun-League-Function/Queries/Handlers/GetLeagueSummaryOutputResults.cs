@@ -167,7 +167,7 @@ namespace TheLongRunLeaguesFunction.Queries
                         }
 
                         // Check all the projections have been run..
-                        Query_Projections_Projection qryProjectionState = new Query_Projections_Projection( log );
+                        Query_Projections_Projection qryProjectionState = new Query_Projections_Projection(log);
                         await getQueryState.Process(qryProjectionState);
 
                         if ((qryProjectionState.CurrentSequenceNumber > 0) || (qryProjectionState.ProjectionValuesChanged()))

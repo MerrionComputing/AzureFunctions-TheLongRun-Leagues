@@ -147,7 +147,7 @@ namespace TheLongRunLeaguesFunction.Queries
         [FunctionName("OnGetLeagueSummaryQueryHandlerOrchestrator")]
         public static async Task<Get_League_Summary_Definition_Return> OnGetLeagueSummaryQueryHandlerOrchestrator
             ([OrchestrationTrigger] DurableOrchestrationContext context,
-            Microsoft.Extensions.Logging.ILogger log = null)
+            Microsoft.Extensions.Logging.ILogger log)
         {
 
             // Get the query definition form the context...
