@@ -12,13 +12,22 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
     public static partial class GetLeagueSummaryQuery
     {
 
-
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryCreateQueryRequestActivity")]
         public static async Task<Guid> GetLeagueSummaryCreateQueryRequestActivity(
             [ActivityTrigger] DurableActivityContext context,
-            ILogger log = null)
+            ILogger log)
         {
+
+            #region Logging
+            if (null != log)
+            {
+                log.LogInformation($"GetLeagueSummaryCreateQueryRequestActivity started - instance {context.InstanceId} ");
+            }
+            #endregion
 
             QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
 

@@ -10,6 +10,7 @@ using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -65,7 +66,13 @@ namespace TheLongRunLeaguesFunction
             try
             {
                 // Get the parameters etc out of the trigger and put them in the log record
-                Create_New_League_Definition parameters = eventGridEvent.Data as Create_New_League_Definition;
+                Create_New_League_Definition parameters = null;
+                // Get the query request details out of the event grid data request
+                var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
+                if (!string.IsNullOrWhiteSpace(jsondata))
+                {
+                    parameters = JsonConvert.DeserializeObject<Create_New_League_Definition>(jsondata);
+                }
 
                 // Log the parameters
                 #region Logging
@@ -95,7 +102,7 @@ namespace TheLongRunLeaguesFunction
                     #region Logging
                     if (null != log)
                     {
-                        log.LogDebug($"Setting {nameof(parameters.LeagueName)} to { parameters.LeagueName} in OnCreateLeagueCommand");
+                        log.LogDebug($"Setting League Name to { parameters.LeagueName} in OnCreateLeagueCommand");
                     }
                     #endregion
 

@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using TheLongRun.Common;
+using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Orchestration;
 
@@ -16,7 +17,10 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
     public static partial class GetLeagueSummaryQuery
     {
 
-
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryLogParametersActivity")]
         public static async Task<ActivityResponse> GetLeagueSummaryLogParametersActivity(
             [ActivityTrigger] DurableActivityContext context,

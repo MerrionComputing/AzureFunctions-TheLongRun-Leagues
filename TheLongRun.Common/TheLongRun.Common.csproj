@@ -69,6 +69,7 @@
     <Compile Include="Bindings\ProjectionValueBinder.cs" />
     <Compile Include="CommandErrorLogRecord.cs" />
     <Compile Include="CommandLogRecord.cs" />
+    <Compile Include="CommandRequest.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="CQRSAzureBindings.cs" />
     <Compile Include="Events\Classifier\SnapshotTaken.cs" />

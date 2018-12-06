@@ -1,25 +1,25 @@
-using System.Linq;
+using Leagues.League.queryDefinition;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
-
-using Leagues.League.queryDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
-using TheLongRun.Common.Events.Query;
 using TheLongRun.Common.Events.Query.Projections;
-using System;
-using Microsoft.Extensions.Logging;
 using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
 
-    public static partial class Query
+    public static partial class GetLeagueSummaryQuery
     {
         /// <summary>
         /// Request the projections that are needed to be run to answer this query
@@ -29,8 +29,8 @@ namespace TheLongRunLeaguesFunction.Queries
         [AggregateRoot("League")]
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryQueryProjectionsRequest")]
-        public static async Task<HttpResponseMessage> GetLeagueSummaryQueryProjectionRequestRun(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, 
+        public static async Task<IActionResult> GetLeagueSummaryQueryProjectionRequestRun(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequest req, 
             ILogger log)
         {
 
@@ -42,13 +42,13 @@ namespace TheLongRunLeaguesFunction.Queries
             #endregion
 
             // Get the query identifier
-            string queryId = req.GetQueryNameValuePairsExt()[@"QueryId"];
+            string queryId = req.Query["QueryId"];
 
-            if (queryId == null)
+            if (string.IsNullOrWhiteSpace( queryId))
             {
-                // Get request body
-                dynamic data = await req.Content.ReadAsAsync<object>();
-                queryId = data?.QueryId;
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                dynamic data = JsonConvert.DeserializeObject(requestBody);
+                queryId  = queryId  ?? data?.QueryId;
             }
 
             await RequestProjectionsGetLeagueSummaryQuery("get-league-summary",
@@ -56,8 +56,8 @@ namespace TheLongRunLeaguesFunction.Queries
                 log);
 
             return queryId == null
-                ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a queryId on the query string or in the request body")
-                : req.CreateResponse(HttpStatusCode.OK, $"Validated query {queryId}");
+                ? new BadRequestObjectResult("Please pass a queryId on the query string or in the request body")
+                : (ActionResult)new OkObjectResult($"Run projections for query {queryId}");
 
         }
 
