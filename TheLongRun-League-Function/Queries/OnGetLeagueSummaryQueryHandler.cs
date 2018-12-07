@@ -106,7 +106,7 @@ namespace TheLongRunLeaguesFunction.Queries
                     log.LogInformation($"Running query handler with durable functions orchestration");
                     log.LogInformation($"{queryRequest.QueryName} with league {queryRequest.GetParameters().League_Name}");
 
-                    // Using Azure Deurable functions to do the command chaining
+                    // Using Azure Durable functions to do the query chaining
                     string instanceId = await getLeagueSummaryQueryHandlerOrchestrationClient.StartNewAsync("OnGetLeagueSummaryQueryHandlerOrchestrator", queryRequest);
 
                     log.LogInformation($"Started OnGetLeagueSummaryQueryHandlerOrchestrator orchestration with ID = '{instanceId}'.");

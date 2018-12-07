@@ -11,6 +11,8 @@ using TheLongRun.Common.Bindings;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -35,7 +37,7 @@ namespace TheLongRunLeaguesFunction
         [DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Create League")]
-        [EventTopicSourceName("Create-New-League-Command") ]
+        [EventTopicSourceName("Create-New-League-Command")]
         [FunctionName("OnCreateLeagueCommand")]
         public static async void OnCreateLeagueCommand(
             [EventGridTrigger] EventGridEvent eventGridEvent,
@@ -43,21 +45,18 @@ namespace TheLongRunLeaguesFunction
             ILogger log
             )
         {
-
-            const string COMMAND_NAME = @"create-league";
-
             #region Logging
             if (null != log)
             {
                 log.LogDebug("Function triggered in OnCreateLeagueCommand");
             }
 
-            if (null == eventGridEvent )
+            if (null == eventGridEvent)
             {
                 // This function should not proceed if there is no event data
                 if (null != log)
                 {
-                    log.LogError ("Missing event grid trigger data in OnCreateLeagueCommand"); 
+                    log.LogError("Missing event grid trigger data in OnCreateLeagueCommand");
                 }
                 return;
             }
@@ -65,74 +64,137 @@ namespace TheLongRunLeaguesFunction
 
             try
             {
-                // Get the parameters etc out of the trigger and put them in the log record
-                Create_New_League_Definition parameters = null;
-                // Get the query request details out of the event grid data request
-                var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
-                if (!string.IsNullOrWhiteSpace(jsondata))
-                {
-                    parameters = JsonConvert.DeserializeObject<Create_New_League_Definition>(jsondata);
-                }
 
-                // Log the parameters
                 #region Logging
                 if (null != log)
                 {
-                    if (null == parameters )
+                    log.LogDebug($"Get the query parameters in OnGetLeagueSummaryQuery");
+                    if (null == eventGridEvent.Data)
                     {
-                        log.LogDebug($"Unable to read parameters from {eventGridEvent.Data} in OnCreateLeagueCommand");
+                        log.LogError($"The query parameter has no values in OnGetLeagueSummaryQuery");
+                        return;
                     }
-                    
                 }
                 #endregion
 
-                CommandLogRecord<Create_New_League_Definition> cmdRecord = CommandLogRecord<Create_New_League_Definition>.Create(COMMAND_NAME,
-                    parameters);
-
-
-                EventStream commandEvents = new EventStream(@"Command",
-                    COMMAND_NAME,
-                    cmdRecord.CommandUniqueIdentifier.ToString());
-                if (null != commandEvents )
+                // Get the query request details out of the event grid data request
+                var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
+                CommandRequest<Create_New_League_Definition> cmdRequest = null;
+                if (!string.IsNullOrWhiteSpace(jsondata))
                 {
-                    await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.CommandCreated(COMMAND_NAME,
-                        cmdRecord.CommandUniqueIdentifier));
+                    cmdRequest = JsonConvert.DeserializeObject<CommandRequest<Create_New_League_Definition>>(jsondata);
+                }
 
-                    // Log the parameters
-                    #region Logging
+                if (null != cmdRequest)
+                {
+                    // Create a new command
+                    // Make sure the command has a new identifier
+                    if (cmdRequest.CommandUniqueIdentifier == Guid.Empty)
+                    {
+                        cmdRequest.CommandUniqueIdentifier = Guid.NewGuid();
+                    }
+
+                    // Using Azure Durable functions to do the query chaining
+                    string instanceId = await createLeagueCommandHandlerOrchestrationClient.StartNewAsync("OnCreateLeagueCommandHandlerOrchestrator", cmdRequest);
+
+                    log.LogInformation($"Run OnCreateLeagueCommandHandlerOrchestrator orchestration with ID = '{instanceId}'.");
+
+                }
+                else
+                {
                     if (null != log)
                     {
-                        log.LogDebug($"Setting League Name to { parameters.LeagueName} in OnCreateLeagueCommand");
+                        log.LogError($"Unable to read command request details from {eventGridEvent.Data}");
                     }
-                    #endregion
-
-                   await  commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.LeagueName),
-                        parameters.LeagueName));
-
-                   await  commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Email_Address ),
-                        parameters.Email_Address ));
-
-                   await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Date_Incorporated ),
-                        parameters.Date_Incorporated));
-
-                    await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Twitter_Handle), 
-                        parameters.Twitter_Handle ));
-
-
                 }
 
 
             }
             catch (Exception ex)
             {
-                log.LogError(ex.ToString()); 
-            }
-
-            // Log that this step has completed
-            if (null != log)
-            {
-                log.LogDebug ("Command passed on to handler in OnCreateLeagueCommand");
+                if (null != log)
+                {
+                    log.LogError($"Unable to execute  OnCreateLeagueCommand : {ex.Message }");
+                }
             }
         }
-    }   
+
+        //OnCreateLeagueCommandHandlerOrchestrator
+        /// <summary>
+        /// The orchestration function for running a "create new league" command as an azure durable function
+        /// with that orchestration
+        /// </summary>
+        /// <param name="context">
+        /// The orchestration context the query is being executed under
+        /// </param>
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [CommandName("Create League")]
+        [EventTopicSourceName("Create-New-League-Command")]
+        [FunctionName("OnCreateLeagueCommandHandlerOrchestrator")]
+        public static async Task OnCreateLeagueCommandHandlerOrchestrator
+            ([OrchestrationTrigger] DurableOrchestrationContext context,
+            Microsoft.Extensions.Logging.ILogger log)
+        {
+
+            CommandRequest<Create_New_League_Definition> cmdRequest = context.GetInput<CommandRequest<Create_New_League_Definition>>();
+
+            if (null != cmdRequest)
+            {
+                // Save the parameters to the event stream
+                ActivityResponse resp = await context.CallActivityAsync<ActivityResponse>("CreateLeagueCommandLogParametersActivity", cmdRequest);
+
+                #region Logging
+                if (null != log)
+                {
+                    if (null != resp)
+                    {
+                        log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                    }
+                }
+                #endregion
+
+                if (! resp.FatalError )
+                {
+                    // validate the command
+                    bool valid = await context.CallActivityAsync<bool>("CreateLeagueCommandValidationAction", cmdRequest); 
+                    if (! valid)
+                    {
+                        resp.Message = $"Validation failed for command {cmdRequest.CommandName} id: {cmdRequest.CommandUniqueIdentifier }";
+                        resp.FatalError = true;
+                    }
+                }
+
+
+                if (!resp.FatalError)
+                {
+                    // execute the command
+                    resp = await context.CallActivityAsync<ActivityResponse>("CreateLeagueCommandHandlerAction", cmdRequest );  
+                }
+            }
+            else
+            {
+                #region Logging
+                if (null != log)
+                {
+                    // Unable to get the request details from the orchestration
+                    log.LogError("OnCreateLeagueCommandHandlerOrchestrator : Unable to get the command request from the context");
+
+                    string contextAsString = context.GetInput<string>();
+                    if (!string.IsNullOrWhiteSpace(contextAsString))
+                    {
+                        log.LogError($"Context was {contextAsString} ");
+                    }
+                    else
+                    {
+                        log.LogError($"Context was blank ");
+                    }
+
+                }
+                #endregion
+                return;
+            }
+        }
+    }
 }

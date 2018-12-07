@@ -24,7 +24,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         [FunctionName("CreateLeagueCommandLogParametersActivity")]
         public static async Task<ActivityResponse> CreateLeagueCommandLogParametersActivity(
                 [ActivityTrigger] DurableActivityContext context,
-                ILogger log = null)
+                ILogger log)
         {
 
 

@@ -24,7 +24,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
     /// League name may not be duplicate
     /// Date_Incorporated may not be future dated
     /// </remarks>
-    public static partial class Command
+    public static partial class CreateLeagueCommandHandler
     {
         [ApplicationName("The Long Run")]
         [DomainName("Leagues")]
@@ -53,11 +53,30 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                     commandId = data?.CommandId;
                 }
 
-                await ValidateCreateLeagueCommand(commandId, log);
+               bool valid  = await ValidateCreateLeagueCommand(commandId, log);
 
                 return commandId == null
                     ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
-                    : req.CreateResponse(HttpStatusCode.OK, $"Validated command {commandId}");
+                    : req.CreateResponse(HttpStatusCode.OK, $"Validated command {commandId} : {valid}");
+        }
+
+
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [CommandName("Create League")]
+        [FunctionName("CreateLeagueCommandValidationAction")]
+        public static async Task<bool> CreateLeagueCommandValidationAction
+            ([ActivityTrigger] CommandRequest<Create_New_League_Definition > cmdRequest,
+            ILogger log)
+        {
+
+            if (null != log)
+            {
+                log.LogInformation($"CreateLeagueCommandValidationAction called for command : {cmdRequest.CommandUniqueIdentifier}");
+            }
+
+            return await ValidateCreateLeagueCommand(cmdRequest.CommandUniqueIdentifier.ToString(), log);
         }
 
         /// <summary>
@@ -66,7 +85,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         /// <param name="commandId">
         /// The unique identifier of the command to validate
         /// </param>
-        private static async Task  ValidateCreateLeagueCommand(string commandId,
+        private static async Task<bool> ValidateCreateLeagueCommand(string commandId,
             ILogger log = null)
         {
 
@@ -127,7 +146,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                     log.LogWarning($"Command {commandId} is complete so no need to validate in ValidateCreateLeagueCommand");
                                 }
                                 #endregion
-                                return;
+                                return true ;
                             }
 
                             if (cmdProjection.CurrentState ==
@@ -140,7 +159,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                     log.LogWarning($"Command {commandId} is validated so no need to validate again in ValidateCreateLeagueCommand");
                                 }
                                 #endregion
-                                return;
+                                return true ;
                             }
 
                             if ((cmdProjection.CurrentState ==
@@ -196,8 +215,9 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 if (incoporatedDateValid && leagueNameValid)
                                 {
                                     await CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
-
                                 }
+
+                                return (incoporatedDateValid && leagueNameValid);
                             }
                         }
                         else
@@ -212,6 +232,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                         }
                     }
                 }
+
+                return false;
             }
         }
     }

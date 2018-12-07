@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Commands.Handlers
 {
@@ -54,6 +55,52 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
                 : req.CreateResponse(HttpStatusCode.OK, $"Handled command {commandId}");
         }
+
+
+
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [CommandName("Create League")]
+        [FunctionName("CreateLeagueCommandHandlerAction")]
+        public static async Task<ActivityResponse> CreateLeagueCommandHandlerAction(
+                [ActivityTrigger] DurableActivityContext context,
+                ILogger log)
+        {
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "CreateLeagueCommandHandlerAction" };
+
+            try
+            {
+                CommandRequest<Create_New_League_Definition> cmdRequest = context.GetInput<CommandRequest<Create_New_League_Definition>>();
+
+                if (null != cmdRequest)
+                {
+                    if (null != log)
+                    {
+                        // Unable to get the request details from the orchestration
+                        log.LogInformation($"CreateLeagueCommandLogParametersActivity : Logging parameters for command {cmdRequest.CommandUniqueIdentifier} ");
+                    }
+
+                    await HandleCreateLeagueCommand(cmdRequest.CommandUniqueIdentifier.ToString(), log);
+
+                    ret.Message = $"Created league for command {cmdRequest.CommandUniqueIdentifier}";
+
+                }
+                else
+                {
+                    ret.Message = $"Unable to get the command request details from {context.ToString()} ";
+                    ret.FatalError = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ret.Message = ex.Message;
+                ret.FatalError = true;
+            }
+
+            return ret;
+        }
+
 
         /// <summary>
         /// Perform the underlying processing on the specified command
