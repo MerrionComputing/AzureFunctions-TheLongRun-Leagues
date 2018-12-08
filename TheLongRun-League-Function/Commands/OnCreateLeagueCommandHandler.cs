@@ -77,7 +77,7 @@ namespace TheLongRunLeaguesFunction
                 }
                 #endregion
 
-                // Get the query request details out of the event grid data request
+                // Get the command request details out of the event grid data request
                 var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
                 CommandRequest<Create_New_League_Definition> cmdRequest = null;
                 if (!string.IsNullOrWhiteSpace(jsondata))
@@ -94,7 +94,7 @@ namespace TheLongRunLeaguesFunction
                         cmdRequest.CommandUniqueIdentifier = Guid.NewGuid();
                     }
 
-                    // Using Azure Durable functions to do the query chaining
+                    // Using Azure Durable functions to do the command chaining
                     string instanceId = await createLeagueCommandHandlerOrchestrationClient.StartNewAsync("OnCreateLeagueCommandHandlerOrchestrator", cmdRequest);
 
                     log.LogInformation($"Run OnCreateLeagueCommandHandlerOrchestrator orchestration with ID = '{instanceId}'.");
@@ -142,7 +142,6 @@ namespace TheLongRunLeaguesFunction
 
             if (null != cmdRequest)
             {
-                // Save the parameters to the event stream
                 ActivityResponse resp = await context.CallActivityAsync<ActivityResponse>("CreateLeagueCommandLogParametersActivity", cmdRequest);
 
                 #region Logging
@@ -154,6 +153,10 @@ namespace TheLongRunLeaguesFunction
                     }
                 }
                 #endregion
+                if (null != resp)
+                {
+                    context.SetCustomStatus(resp);
+                }
 
                 if (! resp.FatalError )
                 {
@@ -170,7 +173,20 @@ namespace TheLongRunLeaguesFunction
                 if (!resp.FatalError)
                 {
                     // execute the command
-                    resp = await context.CallActivityAsync<ActivityResponse>("CreateLeagueCommandHandlerAction", cmdRequest );  
+                    resp = await context.CallActivityAsync<ActivityResponse>("CreateLeagueCommandHandlerAction", cmdRequest );
+                    #region Logging
+                    if (null != log)
+                    {
+                        if (null != resp)
+                        {
+                            log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                        }
+                    }
+                    #endregion
+                    if (null != resp)
+                    {
+                        context.SetCustomStatus(resp);
+                    }
                 }
             }
             else

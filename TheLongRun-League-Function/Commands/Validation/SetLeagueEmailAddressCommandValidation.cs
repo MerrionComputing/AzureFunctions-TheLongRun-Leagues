@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace TheLongRunLeaguesFunction.Commands.Validation
 {
-    public static partial class Command
+    public static partial class SetLeagueEmailAddressCommandHandler
     {
 
         [ApplicationName("The Long Run")]

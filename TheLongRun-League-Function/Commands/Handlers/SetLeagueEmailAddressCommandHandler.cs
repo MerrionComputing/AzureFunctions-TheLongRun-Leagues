@@ -11,10 +11,11 @@ using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Events.Command.Projections;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Commands.Handlers
 {
-    public static partial class CommandHandler
+    public static partial class SetLeagueEmailAddressCommandHandler
     {
 
         [ApplicationName("The Long Run")]
@@ -57,18 +58,35 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         [AggregateRoot("League")]
         [CommandName("Set League Email Address")]
         [FunctionName("SetLeagueEmailAddressCommandHandlerActivity")]
-        public static  async Task SetLeagueEmailAddressCommandHandlerActivity(
-            [ActivityTrigger] DurableActivityContext setLeagueEmailAddressCommandContect,
+        public static  async Task<ActivityResponse> SetLeagueEmailAddressCommandHandlerActivity(
+            [ActivityTrigger] DurableActivityContext context,
             ILogger log)
         {
 
-            string commandId = setLeagueEmailAddressCommandContect.GetInput<string>();
-            if (!string.IsNullOrWhiteSpace(commandId))
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "SetLeagueEmailAddressCommandHandlerActivity" };
+
+            try
             {
-                 await HandleSetLeagueEmailAddressCommand(commandId, log);
+                CommandRequest<Set_Email_Address_Definition > cmdRequest = context.GetInput<CommandRequest<Set_Email_Address_Definition>>();
+
+                if (null != cmdRequest)
+                {
+                    await HandleSetLeagueEmailAddressCommand(cmdRequest.CommandUniqueIdentifier.ToString() , log);
+                    ret.Message = $"Command processed {cmdRequest.CommandName} : {cmdRequest.CommandUniqueIdentifier}";
+                }
+                else
+                {
+                    ret.FatalError = true;
+                    ret.Message = $"Unable to read command request from {context.InstanceId }";
+                }
+            }
+            catch (Exception ex)
+            {
+                ret.FatalError = true;
+                ret.Message = ex.Message;
             }
 
-            return;
+            return ret;
         }
 
         /// <summary>

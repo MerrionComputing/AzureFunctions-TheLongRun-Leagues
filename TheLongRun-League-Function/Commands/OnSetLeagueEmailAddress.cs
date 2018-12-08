@@ -12,10 +12,13 @@ using TheLongRun.Common.Bindings;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction
 {
-    public static partial class Command
+    public static partial class SetLeagueEmailAddressCommandHandler
     {
 
         [ApplicationName("The Long Run")]
@@ -26,7 +29,7 @@ namespace TheLongRunLeaguesFunction
         [FunctionName("OnSetLeagueEmailAddressCommandHandler")]
         public static async void OnSetLeagueEmailAddressCommandHandler(
                             [EventGridTrigger] EventGridEvent eventGridEvent,
-                            [OrchestrationClient] DurableOrchestrationClient setLeagueEmailAddressOrchestrationClient,
+                            [OrchestrationClient] DurableOrchestrationClient SetLeagueEmailAddressOrchestrationClient,
                             ILogger log
                             )
         {
@@ -52,20 +55,50 @@ namespace TheLongRunLeaguesFunction
 
             try
             {
-                // Get the parameters etc out of the trigger and put them in the log record
-                Set_Email_Address_Definition parameters = eventGridEvent.Data as Set_Email_Address_Definition;
+
+                // Get the command request details out of the event grid data request
+                var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
+                CommandRequest<Set_Email_Address_Definition> cmdRequest = null;
+                if (!string.IsNullOrWhiteSpace(jsondata))
+                {
+                    cmdRequest = JsonConvert.DeserializeObject<CommandRequest<Set_Email_Address_Definition>>(jsondata);
+                }
 
                 // Log the parameters
                 #region Logging
                 if (null != log)
                 {
-                    if (null == parameters)
+                    if (null == cmdRequest)
                     {
                         log.LogDebug($"Unable to read parameters from {eventGridEvent.Data} in OnSetLeagueEmailAddressCommand");
                     }
 
                 }
                 #endregion
+
+
+                if (null != cmdRequest)
+                {
+                    // Create a new command
+                    // Make sure the command has a new identifier
+                    if (cmdRequest.CommandUniqueIdentifier == Guid.Empty)
+                    {
+                        cmdRequest.CommandUniqueIdentifier = Guid.NewGuid();
+                    }
+                    if (string.IsNullOrWhiteSpace(cmdRequest.CommandName))
+                    {
+                        cmdRequest.CommandName = "Set League Email Address";
+                    }
+
+                    // Using Azure Durable functions to do the command chaining
+                    string instanceId = await SetLeagueEmailAddressOrchestrationClient.StartNewAsync("SetLeagueEmailAddressCommandHandlerOrchestrator", cmdRequest);
+
+                    log.LogInformation($"Run SetLeagueEmailAddressCommandHandlerOrchestrator orchestration with ID = '{instanceId}'.");
+
+
+                }
+
+#if FUNCTION_CHAINING
 
                 CommandLogRecord<Set_Email_Address_Definition> cmdRecord = CommandLogRecord<Set_Email_Address_Definition>.Create(COMMAND_NAME,
                     parameters);
@@ -80,12 +113,12 @@ namespace TheLongRunLeaguesFunction
                                                 cmdRecord.CommandUniqueIdentifier));
 
                     // Log the parameters
-                    #region Logging
+                #region Logging
                     if (null != log)
                     {
                         log.LogDebug($"Setting {nameof(parameters.LeagueName)} to { parameters.LeagueName} in OnSetLeagueEmailAddressCommand");
                     }
-                    #endregion
+                #endregion
                     await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.LeagueName), parameters.LeagueName));
                     await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.New_Email_Address ), parameters.New_Email_Address ));
                     await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Notes), parameters.Notes ));
@@ -94,45 +127,85 @@ namespace TheLongRunLeaguesFunction
                 }
 
             }
+
+#endif
+
+            }
             catch (Exception ex)
             {
                 log.LogError(ex.ToString());
             }
 
-            // Log that this step has completed
-            if (null != log)
-            {
-                log.LogDebug("Command passed on to handlerin OnSetLeagueEmailAddressCommand");
-            }
         }
 
+
+            
         [ApplicationName("The Long Run")]
         [DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Set League Email Address")]
-        [FunctionName("SetLeagueEmailAddressCommandHandlerSequence") ]
-        public static async void SetLeagueEmailAddressCommandHandlerSequence(
-            DurableOrchestrationContext commandOrchastrationContext,
+        [FunctionName("SetLeagueEmailAddressCommandHandlerOrchestrator") ]
+        public static async Task SetLeagueEmailAddressCommandHandlerOrchestrator(
+            DurableOrchestrationContext context,
             ILogger log)
         {
-            Set_Email_Address_Definition parameters = commandOrchastrationContext.GetInput<Set_Email_Address_Definition>();
-            string commandId = parameters.InstanceIdentifier.ToString();
 
-            if (!string.IsNullOrWhiteSpace(commandId))
+            CommandRequest<Set_Email_Address_Definition> cmdRequest = context.GetInput<CommandRequest<Set_Email_Address_Definition>>();
+
+ 
+            if (null != cmdRequest)
             {
-                // Log that this step has completed
+                ActivityResponse resp = await context.CallActivityAsync<ActivityResponse>("SetLeagueEmailAddressCommandLogParametersActivity", cmdRequest);
+                #region Logging
                 if (null != log)
                 {
-                    log.LogDebug("Command passed on to handler sequence in SetLeagueEmailAddressCommandHandlerSequence");
+                    if (null != resp)
+                    {
+                        log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                    }
+                }
+                #endregion
+                if (null != resp)
+                {
+                    context.SetCustomStatus(resp);
                 }
 
-                // 1) Validate the command
-                bool valid = await commandOrchastrationContext.CallActivityAsync<bool>("SetLeagueEmailAddressCommandValidationActivity", commandId);
-                if (valid )
+                if (!resp.FatalError)
                 {
-                    // 2) Perform the action of the command
-                    await commandOrchastrationContext.CallActivityAsync("SetLeagueEmailAddressCommandHandlerActivity", commandId); 
+                    // 1) Validate the command
+                    bool valid = await context.CallActivityAsync<bool>("SetLeagueEmailAddressCommandValidationActivity", cmdRequest);
+                    if (valid)
+                    {
+                        // 2) Perform the operation of the command
+                        resp = await context.CallActivityAsync<ActivityResponse>("SetLeagueEmailAddressCommandHandlerActivity", cmdRequest);
+                        #region Logging
+                        if (null != log)
+                        {
+                            if (null != resp)
+                            {
+                                log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                            }
+                        }
+                        #endregion
+                        if (null != resp)
+                        {
+                            context.SetCustomStatus(resp);
+                        }
+                    }
+                    else
+                    {
+                        #region Logging
+                        if (null != log)
+                        {
+                            log.LogWarning($"Command parameters not valid {cmdRequest.CommandName} : {cmdRequest.CommandUniqueIdentifier } ");
+                        }
+                        #endregion
+                    }
                 }
+            }
+            else
+            {
+
             }
         }
     }
