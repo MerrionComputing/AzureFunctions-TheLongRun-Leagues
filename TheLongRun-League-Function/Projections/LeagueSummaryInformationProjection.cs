@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
 
@@ -40,12 +41,12 @@ namespace TheLongRunLeaguesFunction.Projections
             }
             #endregion
 
-            Get_League_Summary_Definition projectionRequest = context.GetInput<Get_League_Summary_Definition>();
+            ProjectionRequest projectionRequest = context.GetInput<ProjectionRequest>();
 
             if (null != projectionRequest)
             {
                 return await ProcessLeagueSummaryInformationProjection(projectionRequest.ProjectionName,
-                    projectionRequest.League_Name,
+                    projectionRequest.EntityUniqueIdentifier,
                     log);
             }
             else

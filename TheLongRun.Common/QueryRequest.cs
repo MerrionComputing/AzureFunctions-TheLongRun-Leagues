@@ -6,6 +6,12 @@ using System;
 namespace TheLongRun.Common
 {
 
+    /// <summary>
+    /// The definition of a query request from an external system
+    /// </summary>
+    /// <typeparam name="TQueryParameters">
+    /// The type providing the parameters to pass in to the query
+    /// </typeparam>
     public class QueryRequest<TQueryParameters> 
     {
 

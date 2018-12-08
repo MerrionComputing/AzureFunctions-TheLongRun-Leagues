@@ -67,6 +67,7 @@
     <Compile Include="Bindings\ProjectionAttributeBinding.cs" />
     <Compile Include="Bindings\ProjectionAttributeBindingProvider.cs" />
     <Compile Include="Bindings\ProjectionValueBinder.cs" />
+    <Compile Include="ClassificationRequest.cs" />
     <Compile Include="CommandErrorLogRecord.cs" />
     <Compile Include="CommandLogRecord.cs" />
     <Compile Include="CommandRequest.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Orchestration\StartIdentifierGroupOrchestrationArgs.cs" />
     <Compile Include="Orchestration\StartProjectionOrchestrationArgs.cs" />
     <Compile Include="Orchestration\StartQueryOrchestrationArgs.cs" />
+    <Compile Include="ProjectionRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryLogRecord.cs" />
     <Compile Include="QueryRequest.cs" />
