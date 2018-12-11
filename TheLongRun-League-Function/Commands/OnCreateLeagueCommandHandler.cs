@@ -131,7 +131,6 @@ namespace TheLongRunLeaguesFunction
         [DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Create League")]
-        [EventTopicSourceName("Create-New-League-Command")]
         [FunctionName("OnCreateLeagueCommandHandlerOrchestrator")]
         public static async Task OnCreateLeagueCommandHandlerOrchestrator
             ([OrchestrationTrigger] DurableOrchestrationContext context,

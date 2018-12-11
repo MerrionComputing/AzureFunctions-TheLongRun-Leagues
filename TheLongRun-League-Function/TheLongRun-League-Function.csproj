@@ -60,5 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classsifiers\" />
+    <Folder Include="Identifier Groups\" />
   </ItemGroup>
 </Project>
