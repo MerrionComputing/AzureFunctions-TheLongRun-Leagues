@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace TheLongRun.Common.Orchestration
 {
-    public sealed class ProjectionResponse
+    public class ProjectionResponse
         : IProjectionResponse
     {
 

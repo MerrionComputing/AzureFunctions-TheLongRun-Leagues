@@ -13,7 +13,6 @@ namespace TheLongRun.Common.Events.Command.Projections
     /// <summary>
     /// A projection to get the current state of a command based on the events that have occured to it
     /// </summary>
-    [CQRSAzure.EventSourcing.DomainNameAttribute("Command")]
     [CQRSAzure.EventSourcing.Category("Command")]
     public class Command_Summary_Projection :
         CQRSAzure.EventSourcing.ProjectionBaseUntyped,
@@ -527,5 +526,62 @@ namespace TheLongRun.Common.Events.Command.Projections
             base.CreateProperty<string>(nameof(CommandName));
             
         }
+    }
+
+
+    /// <summary>
+    /// Command status returned from the command summary projection
+    /// as at a given point in time
+    /// </summary>
+    [CQRSAzure.EventSourcing.Category("Command")]
+    public class Command_Summary_Projection_Return
+    {
+
+        /// <summary>
+        /// The GUID of the unique instance of the command
+        /// </summary>
+       public string UniqueIdentifier { get; set; }
+
+        /// <summary>
+        /// The name of the command being executed
+        /// </summary>
+       public string CommandName { get; set; }
+
+        /// <summary>
+        /// The status of the command as at the current moment
+        /// </summary>
+        /// <remarks>
+        /// This is passed back as a string
+        /// </remarks>
+       public string Status { get; set; }
+
+        /// <summary>
+        /// An external correlation identifier used to identify the command
+        /// </summary>
+        public string CorrelationIdentifier { get; set; }
+
+        /// <summary>
+        /// The as-of date of the last event processed by the projection
+        /// </summary>
+        public DateTime? AsOfDate { get; set; }
+
+        /// <summary>
+        /// The number of the last step completed when this projection was run
+        /// </summary>
+        public int AsOfStepNumber { get; set; }
+    }
+
+    [CQRSAzure.EventSourcing.Category("Command")]
+    public class Command_Summary_Projection_Request
+    {
+        /// <summary>
+        /// The GUID of the unique instance of the command
+        /// </summary>
+        public string UniqueIdentifier { get; set; }
+
+        /// <summary>
+        /// The name of the command being executed
+        /// </summary>
+        public string CommandName { get; set; }
     }
 }

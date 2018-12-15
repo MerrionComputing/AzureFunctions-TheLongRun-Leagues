@@ -47,17 +47,17 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
                 // Get request body
                 dynamic data = await req.Content.ReadAsAsync<object>();
                 queryId = data?.QueryId;
-
-                 value = await GetLeagueSummaryGetResults("get-league-summary",
-                    queryId,
-                    log); 
-
-                if (null != value )
-                {
-                    results = $"Results from {queryId} - {value.LeagueName} incorporated {value.Date_Incorporated} at {value.Location} ({value.Twitter_Handle})";
-                }
             }
 
+            value = await GetLeagueSummaryGetResults("get-league-summary",
+               queryId,
+               log);
+
+            if (null != value)
+            {
+                results = $"Results from {queryId} - {value.LeagueName} incorporated {value.Date_Incorporated} at {value.Location} ({value.Twitter_Handle})";
+            }
+     
             return queryId == null
                     ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a queryId on the query string or in the request body")
                     : req.CreateResponse(HttpStatusCode.OK, results );

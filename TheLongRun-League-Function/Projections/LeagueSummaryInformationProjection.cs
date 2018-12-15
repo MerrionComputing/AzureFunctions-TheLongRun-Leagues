@@ -118,7 +118,7 @@ namespace TheLongRunLeaguesFunction.Projections
             }
             else
             {
-                return (ActionResult)new OkObjectResult(message);
+                return (ActionResult)new OkObjectResult(new {leagueName, message, ret });
             }
         }
 
