@@ -51,6 +51,7 @@
     <Compile Include="Attributes\ProjectionAttribute.cs" />
     <Compile Include="Attributes\ProjectionNameAttribute.cs" />
     <Compile Include="Attributes\QueryNameAttribute.cs" />
+    <Compile Include="Attributes\Settings\AggregateTypeMapping.cs" />
     <Compile Include="Attributes\Settings\BlobStreamSettings.cs" />
     <Compile Include="Attributes\Settings\FileStreamSettings.cs" />
     <Compile Include="Attributes\Settings\TableStreamSettings.cs" />

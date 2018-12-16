@@ -55,7 +55,7 @@ namespace TheLongRunLeaguesFunction.Projections
             commandId = req.GetQueryNameValuePairsExt()[@"CommandId"];
             commandName = req.GetQueryNameValuePairsExt()[@"CommandName"];
 
-            if (commandId == null)
+            if (string.IsNullOrWhiteSpace (commandId ))
             {
                 // Get request body
                 dynamic data = await req.Content.ReadAsAsync<object>();
@@ -69,9 +69,15 @@ namespace TheLongRunLeaguesFunction.Projections
                 log);
 
 
-            return string.IsNullOrWhiteSpace(commandId)
-        ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a command Id and command name on the query string or in the request body")
-        : req.CreateResponse(HttpStatusCode.OK, ret);
+            if ( ( string.IsNullOrWhiteSpace(commandId)) || (string.IsNullOrEmpty(commandName )))
+            {
+                return req.CreateResponse(HttpStatusCode.BadRequest, 
+                    "Please pass a command Id and command name on the query string or in the request body");
+            }
+            else
+            {
+                return req.CreateResponse(HttpStatusCode.OK, ret);
+            }
         }
 
 

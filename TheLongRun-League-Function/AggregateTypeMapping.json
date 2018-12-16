@@ -1,0 +1,35 @@
+﻿[
+  {
+    "Precedence": 1,
+    "MappedDomainName": "Command",
+    "MappedAggregateTypeName": "*",
+    "StorageType": "BlobStream",
+    "BlobStreamSettings": {
+      "DomainName": "Command",
+      "ConnectionStringName": "CommandStorageConnectionString",
+      "ReadSideConnectionStringName": "CommandStorageConnectionString"
+    }
+  },
+  {
+    "Precedence": 2,
+    "MappedDomainName": "Query",
+    "MappedAggregateTypeName": "*",
+    "StorageType": "BlobStream",
+    "BlobStreamSettings": {
+      "DomainName": "Query",
+      "ConnectionStringName": "QueryStorageConnectionString",
+      "ReadSideConnectionStringName": "QueryStorageConnectionString"
+    }
+  },
+  {
+    "Precedence": 3,
+    "MappedDomainName": "*",
+    "MappedAggregateTypeName": "*",
+    "StorageType": "BlobStream",
+    "BlobStreamSettings": {
+      "DomainName": "Leagues",
+      "ConnectionStringName": "LeaguesStorageConnectionString",
+      "ReadSideConnectionStringName": "LeaguesStorageConnectionString"
+    }
+  }
+]

@@ -40,7 +40,17 @@ namespace TheLongRun.Common.Attributes
 
         public static string DefaultConnectionStringName(string domainName, string aggregateTypeName )
         {
-            return $"{domainName}.{aggregateTypeName}.StorageConnectionString";
+            // First see if there is a mapping we can use...
+
+            // If not, make the connection string name directly from the domain and aggregate name
+            if (!string.IsNullOrWhiteSpace(aggregateTypeName))
+            {
+                return $"{domainName}.{aggregateTypeName}.StorageConnectionString";
+            }
+            else
+            {
+                return $"{domainName}.StorageConnectionString";
+            }
         }
 
         public static CQRSAzure.EventSourcing.Azure.Blob.IBlobStreamSettings DefaultBlobStreamSettings(string domainName, string aggregateTypeName)
