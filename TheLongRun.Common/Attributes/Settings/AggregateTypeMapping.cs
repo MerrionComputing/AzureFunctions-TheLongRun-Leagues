@@ -7,8 +7,16 @@ namespace TheLongRun.Common.Attributes.Settings
     /// <summary>
     /// A mapping between an entity type and the mechanism used to store it in the backing event stream store
     /// </summary>
+    /// <remarks>
+    /// These can be stored in azure function apps with the name:
+    /// TYPEMAP_{precedence}_{domain}_{aggregatetype}
+    /// And the value containing the details needed to create the type mapping (; separated):
+    /// BlobStream;CommandStorageConnectionString
+    /// </remarks>
     public class AggregateTypeMapping
     {
+
+
 
         public enum BackingStorageType
         {
@@ -26,6 +34,7 @@ namespace TheLongRun.Common.Attributes.Settings
             TableStream = 2
         }
 
+        public const string MAPPING_PREFIX = "TYPEMAP_";
         public const string MATCH_ALL = "*";
 
         /// <summary>
@@ -101,6 +110,55 @@ namespace TheLongRun.Common.Attributes.Settings
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Turn an azure function app setting to an aggregate type mapping
+        /// </summary>
+        /// <param name="ApplicationSettingName">
+        /// The function app setting name - this must start with TYPEMAP_ 
+        /// </param>
+        /// <param name="ApplicationSettingValue">
+        /// The application setting value to use - semi colon separated
+        /// </param>
+        /// <remarks>
+        /// These can be stored in azure function apps with the name:
+        /// TYPEMAP_{precedence}_{domain}_{aggregatetype}
+        /// And the value containing the details needed to create the type mapping (; separated):
+        /// BlobStream;CommandStorageConnectionString
+        /// </remarks>
+        public static AggregateTypeMapping MappingFromApplicationSetting(string ApplicationSettingName,
+            string ApplicationSettingValue)
+        {
+
+            if (string.IsNullOrWhiteSpace(ApplicationSettingName ) )
+            {
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(ApplicationSettingValue))
+            {
+                return null;
+            }
+
+            if (!ApplicationSettingName.StartsWith(AggregateTypeMapping.MAPPING_PREFIX ))
+            {
+                return null;
+            }
+
+            AggregateTypeMapping ret = new AggregateTypeMapping();
+
+            string[] nameSections = ApplicationSettingName.Split('_');
+            if (nameSections.Length > 1 )
+            {
+                int precedence = 0;
+                if (int.TryParse(nameSections[1], out precedence ))
+                {
+                    ret.Precedence = precedence;
+                }
+            }
+
+            return ret;
         }
     }
 }
