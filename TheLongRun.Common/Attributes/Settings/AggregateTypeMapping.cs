@@ -1,6 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace TheLongRun.Common.Attributes.Settings
 {
@@ -15,8 +17,6 @@ namespace TheLongRun.Common.Attributes.Settings
     /// </remarks>
     public class AggregateTypeMapping
     {
-
-
 
         public enum BackingStorageType
         {
@@ -78,7 +78,6 @@ namespace TheLongRun.Common.Attributes.Settings
         /// Extra settings to use when persisting this aggregate to a table
         /// </summary>
         public TableStreamSettings TableStreamSettings { get; set; }
-
 
         public bool Matches(string domainName, string aggregateTypeName)
         {
@@ -157,8 +156,104 @@ namespace TheLongRun.Common.Attributes.Settings
                     ret.Precedence = precedence;
                 }
             }
+            if (nameSections.Length > 2 )
+            {
+                ret.MappedDomainName = nameSections[2];
+            }
+            else
+            {
+                ret.MappedDomainName = AggregateTypeMapping.MATCH_ALL; 
+            }
+
+            if (nameSections.Length > 3)
+            {
+                ret.MappedAggregateTypeName = nameSections[3];
+            }
+            else
+            {
+                ret.MappedAggregateTypeName = AggregateTypeMapping.MATCH_ALL;
+            }
+
+            string[] valueSections = ApplicationSettingValue.Split(';');
+            foreach (string valueSection in valueSections )
+            {
+                if (valueSection.Equals("BlobStream") )
+                {
+                    ret.StorageType = BackingStorageType.BlobStream;
+                }
+                if (valueSection.Equals("FileStream"))
+                {
+                    ret.StorageType = BackingStorageType.FileStream ;
+                }
+                if (valueSection.Equals("TableStream"))
+                {
+                    ret.StorageType = BackingStorageType.TableStream ;
+                }
+            }
+
+            switch (ret.StorageType )
+            {
+                case BackingStorageType.BlobStream:
+                    {
+                        ret.BlobStreamSettings = new BlobStreamSettings();
+                        // Populate a blob stream settings from the application settings
+                        if (valueSections.Length > 1)
+                        {
+                            ret.BlobStreamSettings.ConnectionStringName = valueSections[1];
+                        }
+                        if (valueSections.Length > 2)
+                        {
+                            ret.BlobStreamSettings.ReadSideConnectionStringName = valueSections[2]; 
+                        }
+                        ret.BlobStreamSettings.DomainName = ret.MappedDomainName;
+                        break;
+                    }
+                case BackingStorageType.FileStream:
+                    {
+                        ret.FileStreamSettings = new FileStreamSettings();
+                        // Populate a file stream settings from the application settings
+                        break;
+                    }
+                case BackingStorageType.TableStream:
+                    {
+                        ret.TableStreamSettings = new TableStreamSettings();
+                        // Populate a table stream settings from the application settings
+                        break;
+                    }
+                default:
+                    break;
+            }
 
             return ret;
         }
+
+
+        private static List<AggregateTypeMapping> _configuredAggregateTypeMappings = null;
+
+        public static List<AggregateTypeMapping> ConfiguredAggregateTypeMappings
+        {
+            get {
+                if (null == _configuredAggregateTypeMappings )
+                {
+                    var config = new ConfigurationBuilder()
+                                    .AddEnvironmentVariables()
+                                    .Build();
+
+                    foreach (var item in config.AsEnumerable() )
+                    {
+                        if (item.Key.StartsWith(AggregateTypeMapping.MAPPING_PREFIX  ) )
+                        {
+                            _configuredAggregateTypeMappings.Add(AggregateTypeMapping.MappingFromApplicationSetting(item.Key, item.Value)); 
+                        }
+                    }
+
+                    _configuredAggregateTypeMappings = new List<AggregateTypeMapping>();
+                }
+                return _configuredAggregateTypeMappings;
+            }
+        }
+
+
+
     }
 }

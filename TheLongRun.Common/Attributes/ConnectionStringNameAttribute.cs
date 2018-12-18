@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TheLongRun.Common.Attributes.Settings;
 
 namespace TheLongRun.Common.Attributes
 {
@@ -41,6 +42,16 @@ namespace TheLongRun.Common.Attributes
         public static string DefaultConnectionStringName(string domainName, string aggregateTypeName )
         {
             // First see if there is a mapping we can use...
+            foreach (var mapping in AggregateTypeMapping.ConfiguredAggregateTypeMappings)
+            {
+                if (mapping.Matches(domainName,aggregateTypeName ))
+                {
+                    if (mapping.StorageType == AggregateTypeMapping.BackingStorageType.BlobStream )
+                    {
+                        return mapping.BlobStreamSettings.ConnectionStringName;
+                    }
+                }
+            }
 
             // If not, make the connection string name directly from the domain and aggregate name
             if (!string.IsNullOrWhiteSpace(aggregateTypeName))
