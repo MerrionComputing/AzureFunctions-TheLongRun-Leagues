@@ -42,7 +42,7 @@ namespace TheLongRun.Common.Attributes
         public static string DefaultConnectionStringName(string domainName, string aggregateTypeName )
         {
             // First see if there is a mapping we can use...
-            foreach (var mapping in AggregateTypeMapping.ConfiguredAggregateTypeMappings)
+            foreach (AggregateTypeMapping mapping in AggregateTypeMapping.ConfiguredAggregateTypeMappings)
             {
                 if (mapping.Matches(domainName,aggregateTypeName ))
                 {

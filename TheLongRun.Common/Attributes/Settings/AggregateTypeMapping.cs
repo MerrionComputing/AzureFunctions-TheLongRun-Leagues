@@ -235,8 +235,11 @@ namespace TheLongRun.Common.Attributes.Settings
             get {
                 if (null == _configuredAggregateTypeMappings )
                 {
+                    _configuredAggregateTypeMappings = new List<AggregateTypeMapping>();
+
                     var config = new ConfigurationBuilder()
                                     .AddEnvironmentVariables()
+                                    .AddJsonFile("host.json", true )
                                     .Build();
 
                     foreach (var item in config.AsEnumerable() )
@@ -247,7 +250,7 @@ namespace TheLongRun.Common.Attributes.Settings
                         }
                     }
 
-                    _configuredAggregateTypeMappings = new List<AggregateTypeMapping>();
+                    
                 }
                 return _configuredAggregateTypeMappings;
             }
