@@ -199,11 +199,17 @@ namespace TheLongRun.Common.Attributes.Settings
                         // Populate a blob stream settings from the application settings
                         if (valueSections.Length > 1)
                         {
-                            ret.BlobStreamSettings.ConnectionStringName = valueSections[1];
+                            if (!string.IsNullOrWhiteSpace(valueSections[1]))
+                            {
+                                ret.BlobStreamSettings.ConnectionStringName = valueSections[1];
+                            }
                         }
                         if (valueSections.Length > 2)
                         {
-                            ret.BlobStreamSettings.ReadSideConnectionStringName = valueSections[2]; 
+                            if (!string.IsNullOrWhiteSpace(valueSections[2]))
+                            {
+                                ret.BlobStreamSettings.ReadSideConnectionStringName = valueSections[2];
+                            }
                         }
                         ret.BlobStreamSettings.DomainName = ret.MappedDomainName;
                         break;
@@ -242,15 +248,13 @@ namespace TheLongRun.Common.Attributes.Settings
                                     .AddJsonFile("host.json", true )
                                     .Build();
 
-                    foreach (var item in config.AsEnumerable() )
+                    foreach (KeyValuePair<string, string> item in config.AsEnumerable() )
                     {
                         if (item.Key.StartsWith(AggregateTypeMapping.MAPPING_PREFIX  ) )
                         {
                             _configuredAggregateTypeMappings.Add(AggregateTypeMapping.MappingFromApplicationSetting(item.Key, item.Value)); 
                         }
                     }
-
-                    
                 }
                 return _configuredAggregateTypeMappings;
             }
