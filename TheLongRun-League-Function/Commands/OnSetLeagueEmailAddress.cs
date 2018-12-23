@@ -34,8 +34,6 @@ namespace TheLongRunLeaguesFunction
                             )
         {
 
-            const string COMMAND_NAME = @"set-league-email-address";
-
             #region Logging
             if (null != log)
             {
@@ -95,40 +93,8 @@ namespace TheLongRunLeaguesFunction
 
                     log.LogInformation($"Run SetLeagueEmailAddressCommandHandlerOrchestrator orchestration with ID = '{instanceId}'.");
 
-
                 }
 
-#if FUNCTION_CHAINING
-
-                CommandLogRecord<Set_Email_Address_Definition> cmdRecord = CommandLogRecord<Set_Email_Address_Definition>.Create(COMMAND_NAME,
-                    parameters);
-
-                EventStream commandEvents = new EventStream(@"Command",
-                                                            COMMAND_NAME,
-                                                            cmdRecord.CommandUniqueIdentifier.ToString());
-
-                if (null != commandEvents)
-                {
-                    await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.CommandCreated(COMMAND_NAME,
-                                                cmdRecord.CommandUniqueIdentifier));
-
-                    // Log the parameters
-                #region Logging
-                    if (null != log)
-                    {
-                        log.LogDebug($"Setting {nameof(parameters.LeagueName)} to { parameters.LeagueName} in OnSetLeagueEmailAddressCommand");
-                    }
-                #endregion
-                    await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.LeagueName), parameters.LeagueName));
-                    await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.New_Email_Address ), parameters.New_Email_Address ));
-                    await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ParameterValueSet(nameof(parameters.Notes), parameters.Notes ));
-
-
-                }
-
-            }
-
-#endif
 
             }
             catch (Exception ex)
@@ -146,7 +112,7 @@ namespace TheLongRunLeaguesFunction
         [CommandName("Set League Email Address")]
         [FunctionName("SetLeagueEmailAddressCommandHandlerOrchestrator") ]
         public static async Task SetLeagueEmailAddressCommandHandlerOrchestrator(
-            DurableOrchestrationContext context,
+            [OrchestrationTrigger] DurableOrchestrationContext context,
             ILogger log)
         {
 
