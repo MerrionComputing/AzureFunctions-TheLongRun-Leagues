@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TheLongRun.Common.Attributes.Settings
 {
@@ -81,6 +82,10 @@ namespace TheLongRun.Common.Attributes.Settings
 
         public bool Matches(string domainName, string aggregateTypeName)
         {
+
+            domainName = domainName.ToUpperInvariant();
+            aggregateTypeName = aggregateTypeName.ToUpperInvariant(); 
+
             if (domainName.Equals(MappedDomainName ) && aggregateTypeName.Equals(MappedAggregateTypeName )  )
             {
                 return true;
@@ -158,7 +163,7 @@ namespace TheLongRun.Common.Attributes.Settings
             }
             if (nameSections.Length > 2 )
             {
-                ret.MappedDomainName = nameSections[2];
+                ret.MappedDomainName = nameSections[2].ToUpperInvariant() ;
             }
             else
             {
@@ -167,7 +172,7 @@ namespace TheLongRun.Common.Attributes.Settings
 
             if (nameSections.Length > 3)
             {
-                ret.MappedAggregateTypeName = nameSections[3];
+                ret.MappedAggregateTypeName = nameSections[3].ToUpperInvariant() ;
             }
             else
             {
@@ -241,7 +246,7 @@ namespace TheLongRun.Common.Attributes.Settings
             get {
                 if (null == _configuredAggregateTypeMappings )
                 {
-                    _configuredAggregateTypeMappings = new List<AggregateTypeMapping>();
+                    var values = new List<AggregateTypeMapping>();
 
                     var config = new ConfigurationBuilder()
                                     .AddEnvironmentVariables()
@@ -252,10 +257,13 @@ namespace TheLongRun.Common.Attributes.Settings
                     {
                         if (item.Key.StartsWith(AggregateTypeMapping.MAPPING_PREFIX  ) )
                         {
-                            _configuredAggregateTypeMappings.Add(AggregateTypeMapping.MappingFromApplicationSetting(item.Key, item.Value)); 
+                            values.Add(AggregateTypeMapping.MappingFromApplicationSetting(item.Key, item.Value)); 
                         }
                     }
+
+                    _configuredAggregateTypeMappings= values.OrderBy(o=> o.Precedence).ToList();
                 }
+
                 return _configuredAggregateTypeMappings;
             }
         }
