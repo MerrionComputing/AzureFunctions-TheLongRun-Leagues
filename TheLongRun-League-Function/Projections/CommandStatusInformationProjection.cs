@@ -18,8 +18,7 @@ namespace TheLongRunLeaguesFunction.Projections
     /// Get the current status of a given command by running the status information projection over it
     /// </summary>
     [ApplicationName("The Long Run")]
-    [DomainName("Commands")]
-    [AggregateRoot("Command")]
+    [DomainName("Command")]
     [ProjectionName("Command Summary")]
     public static class CommandStatusInformationProjection
     {
@@ -33,8 +32,7 @@ namespace TheLongRunLeaguesFunction.Projections
         /// </param>
         /// <param name="log"></param>
         [ApplicationName("The Long Run")]
-        [DomainName("Commands")]
-        [AggregateRoot("Command")]
+        [DomainName("Command")]
         [ProjectionName("Command Summary")]
         [FunctionName("GetCommandStatusInformationProjection")]
         public static async Task<HttpResponseMessage> GetCommandStatusInformationProjectionRun(
@@ -82,8 +80,7 @@ namespace TheLongRunLeaguesFunction.Projections
 
 
         [ApplicationName("The Long Run")]
-        [DomainName("Commands")]
-        [AggregateRoot("Command")]
+        [DomainName("Command")]
         [ProjectionName("Command Summary")]
         [FunctionName("GetCommandStatusInformationProjectionActivity")]
         public static async Task<Command_Summary_Projection_Return> GetCommandStatusInformationProjectionActivity(
@@ -122,7 +119,7 @@ namespace TheLongRunLeaguesFunction.Projections
                     #region Logging
                     if (null != log)
                     {
-                        log.LogDebug($"Validating command {commandId} in HandleCreateLeagueCommand");
+                        log.LogDebug($"Getting command satus {commandName} - {commandId} in ProcessCommandStatusInformationProjection");
                     }
                     #endregion
 
@@ -138,7 +135,7 @@ namespace TheLongRunLeaguesFunction.Projections
                         #region Logging
                         if (null != log)
                         {
-                            log.LogDebug($"Projection processor created in HandleCreateLeagueCommand");
+                            log.LogDebug($"Projection processor created in ProcessCommandStatusInformationProjection");
                         }
                         #endregion
 

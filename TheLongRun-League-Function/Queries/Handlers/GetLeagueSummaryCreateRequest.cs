@@ -51,6 +51,7 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
                         queryRequest.QueryName,
                         qryRecord.QueryUniqueIdentifier.ToString());
 
+
                 if (null != queryEvents)
                 {
                     // Log the query creation

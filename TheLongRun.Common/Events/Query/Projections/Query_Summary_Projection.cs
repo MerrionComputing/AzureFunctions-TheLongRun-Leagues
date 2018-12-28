@@ -415,4 +415,62 @@ namespace TheLongRun.Common.Events.Query.Projections
             }
         }
     }
+
+
+    /// <summary>
+    /// Query status returned from the command summary projection
+    /// as at a given point in time
+    /// </summary>
+    [CQRSAzure.EventSourcing.Category("Query")]
+    public class Query_Summary_Projection_Return
+    {
+
+        /// <summary>
+        /// The GUID of the unique instance of the query
+        /// </summary>
+        public string UniqueIdentifier { get; set; }
+
+        /// <summary>
+        /// The name of the query being executed
+        /// </summary>
+        public string QueryName { get; set; }
+
+        /// <summary>
+        /// The status of the query as at the current moment
+        /// </summary>
+        /// <remarks>
+        /// This is passed back as a string
+        /// </remarks>
+        public string Status { get; set; }
+
+        /// <summary>
+        /// An external correlation identifier used to identify the query
+        /// </summary>
+        public string CorrelationIdentifier { get; set; }
+
+        /// <summary>
+        /// The as-of date of the last event processed by the projection
+        /// </summary>
+        public DateTime? AsOfDate { get; set; }
+
+        /// <summary>
+        /// The number of the last step completed when this projection was run
+        /// </summary>
+        public int AsOfStepNumber { get; set; }
+
+    }
+
+    [CQRSAzure.EventSourcing.Category("Query")]
+    public class Query_Summary_Projection_Request
+    {
+        /// <summary>
+        /// The GUID of the unique instance of the query
+        /// </summary>
+        public string UniqueIdentifier { get; set; }
+
+        /// <summary>
+        /// The name of the query being executed
+        /// </summary>
+        public string QueryName { get; set; }
+    }
 }

@@ -64,6 +64,7 @@
     <Compile Include="Bindings\EventStreamAttributeBinding.cs" />
     <Compile Include="Bindings\EventStreamAttributeBindingProvider.cs" />
     <Compile Include="Bindings\EventStreamValueBinder.cs" />
+    <Compile Include="Bindings\IdentifierGroup.cs" />
     <Compile Include="Bindings\Projection.cs" />
     <Compile Include="Bindings\ProjectionAttributeBinding.cs" />
     <Compile Include="Bindings\ProjectionAttributeBindingProvider.cs" />
