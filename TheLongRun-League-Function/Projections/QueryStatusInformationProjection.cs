@@ -18,14 +18,14 @@ namespace TheLongRunLeaguesFunction.Projections
     /// Get the current status of a given query by running the status information projection over it
     /// </summary>
     [ApplicationName("The Long Run")]
-    [DomainName("Query")]
+    [DomainName(Constants.Domain_Query)]
     [ProjectionName("Query Summary")]
     public static class QueryStatusInformationProjection
     {
 
 
         [ApplicationName("The Long Run")]
-        [DomainName("Command")]
+        [DomainName(Constants.Domain_Query)]
         [ProjectionName("Command Summary")]
         [FunctionName("GetQueryStatusInformationProjection")]
         public static async Task<HttpResponseMessage> GetQueryStatusInformationProjectionnRun(
@@ -72,7 +72,7 @@ namespace TheLongRunLeaguesFunction.Projections
         }
 
         [ApplicationName("The Long Run")]
-        [DomainName("Query")]
+        [DomainName(Constants.Domain_Query)]
         [ProjectionName("Query Summary")]
         [FunctionName("GetQueryStatusInformationProjectionActivity")]
         public static async Task<Query_Summary_Projection_Return> GetQueryStatusInformationProjectionActivity(
@@ -116,7 +116,7 @@ namespace TheLongRunLeaguesFunction.Projections
                     #endregion
 
                     // Get the current state of the command...
-                    Projection getQueryState = new Projection(@"Query",
+                    Projection getQueryState = new Projection(Constants.Domain_Query,
                         queryName,
                         queryGuid.ToString(),
                         nameof(Query_Summary_Projection));

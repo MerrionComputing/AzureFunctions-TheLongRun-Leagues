@@ -69,5 +69,18 @@ namespace TheLongRun.Common
         public const string Container_Query_Results = @"query-results";
 
         #endregion
+
+        #region Common Domains
+        /// <summary>
+        /// Where we put command backing event streams etc.
+        /// </summary>
+        public const string Domain_Command = "Command";
+
+        /// <summary>
+        /// Where we put query backing event streams etc.
+        /// </summary>
+        public const string Domain_Query = "Query";
+
+        #endregion
     }
 }

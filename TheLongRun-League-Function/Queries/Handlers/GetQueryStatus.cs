@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using TheLongRun.Common.Events.Query.Projections;
 using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Attributes;
+using TheLongRun.Common;
+using TheLongRunLeaguesFunction.Identifier_Groups;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
@@ -24,7 +26,16 @@ namespace TheLongRunLeaguesFunction.Queries
             [OrchestrationClient] DurableOrchestrationClient getAllQueryStatusByNameOrchestrationClient,
             ILogger log)
         {
-            log.LogInformation("Get all query status by name");
+
+            #region Logging
+            if (null != log)
+            {
+                log.LogInformation("Get all query status by name");
+            }
+            #endregion
+
+            int timeoutLength = 30;  // seconds
+            int retryWait = 1; // seconds
 
             string queryName = req.RequestUri.ParseQueryString()["QueryName"];
             string asOfDateString = req.RequestUri.ParseQueryString()["AsOfDate"];
@@ -36,6 +47,16 @@ namespace TheLongRunLeaguesFunction.Queries
                 {
                     asOfDate = dtOut;
                 }
+            }
+            string timeoutLengthString = req.RequestUri.ParseQueryString()["TimeOut"];
+            if (!string.IsNullOrWhiteSpace(timeoutLengthString))
+            {
+                int.TryParse(timeoutLengthString, out timeoutLength);
+            }
+            string retryWaitString = req.RequestUri.ParseQueryString()["RetryWait"];
+            if (!string.IsNullOrWhiteSpace(retryWaitString))
+            {
+                int.TryParse(retryWaitString, out retryWait );
             }
 
             dynamic eventData = await req.Content.ReadAsAsync<object>();
@@ -54,9 +75,16 @@ namespace TheLongRunLeaguesFunction.Queries
                 // Use durable functions to get the status of all the queries of the given name
                 string instanceId = await getAllQueryStatusByNameOrchestrationClient.StartNewAsync("GetAllQueryStatusByNameOrchestrator", payload);
 
+                #region Logging
+                if (null != log)
+                {
+                    log.LogInformation($"Started GetAllQueryStatusByNameOrchestrator - instance id: {instanceId }");
+                }
+                #endregion
+
                 // Wait for it to complete
-                TimeSpan timeout = TimeSpan.FromSeconds(30);
-                TimeSpan retryInterval =  TimeSpan.FromSeconds(1);
+                TimeSpan timeout = TimeSpan.FromSeconds(timeoutLength);
+                TimeSpan retryInterval =  TimeSpan.FromSeconds(retryWait );
 
                 return await getAllQueryStatusByNameOrchestrationClient.WaitForCompletionOrCreateCheckStatusResponseAsync(
                     req,
@@ -98,36 +126,71 @@ namespace TheLongRunLeaguesFunction.Queries
             List <Query_Summary_Projection_Return> ret = new List<Query_Summary_Projection_Return>() ;
             // get every query id of the given name...
 
-            IdentifierGroup allQueries = new IdentifierGroup("Query",
-                queryName,
-                "All");
-
-            // This should be done by fan-out/fan-in
-            List<Task<Query_Summary_Projection_Return>> allTasks = new List<Task<Query_Summary_Projection_Return>>(); 
-            foreach (string queryId in await allQueries.GetAll(asOfDate))
+            #region Logging
+            if (null != log)
             {
+                log.LogInformation($"Creating identifier group processor for {queryName }");
+            }
+            #endregion
+            context.SetCustomStatus($"Creating identifier group processor for {queryName }");
 
-                context.SetCustomStatus( $"Queueing {queryId}" );
+            AllQueriesIdentifierGroup_Request groupRequest = new AllQueriesIdentifierGroup_Request()
+            {
+               QueryName = queryName,
+               AsOfDate= asOfDate
+            };
 
-                // add each to the list...
-                Query_Summary_Projection_Request request = new Query_Summary_Projection_Request()
+            IEnumerable<string> allQueryIds = await context.CallActivityAsync<IEnumerable<string>>("GetAllQueriesIdentifierGroupActivity", groupRequest );
+
+            if (null != allQueryIds)
+            {
+                // This should be done by fan-out/fan-in
+                List<Task<Query_Summary_Projection_Return>> allTasks = new List<Task<Query_Summary_Projection_Return>>();
+
+                foreach (string queryId in allQueryIds )
                 {
-                    QueryName = queryName,
-                    UniqueIdentifier = queryId
-                };
 
-                allTasks.Add( context.CallActivityAsync<Query_Summary_Projection_Return>("GetQueryStatusInformationProjectionActivity",
-                    request));
+                    #region Logging
+                    if (null != log)
+                    {
+                        log.LogInformation($"Queueing {queryId}");
+                    }
+                    #endregion
+                    context.SetCustomStatus($"Queueing {queryId}");
+
+                    // add each to the list...
+                    Query_Summary_Projection_Request request = new Query_Summary_Projection_Request()
+                    {
+                        QueryName = queryName,
+                        UniqueIdentifier = queryId
+                    };
+
+                    allTasks.Add(context.CallActivityAsync<Query_Summary_Projection_Return>("GetQueryStatusInformationProjectionActivity",
+                        request));
+                }
+
+                #region Logging
+                if (null != log)
+                {
+                    log.LogInformation($"Running {allTasks.Count } projections in parallel");
+                }
+                #endregion
+                context.SetCustomStatus($"Running {allTasks.Count } projections in parallel");
+
+                await Task.WhenAll(allTasks);
+
+                foreach (var returnValue in allTasks)
+                {
+                    ret.Add(returnValue.Result);
+                }
             }
 
-            await Task.WhenAll( allTasks);
-
-            foreach (var returnValue in allTasks )
+            #region Logging
+            if (null != log)
             {
-                ret.Add(returnValue.Result);
+                log.LogInformation($"Completed {ret.Count } projections in parallel for {queryName}");
             }
-
-
+            #endregion
             return ret;
         }
 

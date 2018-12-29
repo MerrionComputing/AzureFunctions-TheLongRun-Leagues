@@ -18,7 +18,7 @@ namespace TheLongRunLeaguesFunction.Projections
     /// Get the current status of a given command by running the status information projection over it
     /// </summary>
     [ApplicationName("The Long Run")]
-    [DomainName("Command")]
+    [DomainName(Constants.Domain_Command)]
     [ProjectionName("Command Summary")]
     public static class CommandStatusInformationProjection
     {
@@ -32,7 +32,7 @@ namespace TheLongRunLeaguesFunction.Projections
         /// </param>
         /// <param name="log"></param>
         [ApplicationName("The Long Run")]
-        [DomainName("Command")]
+        [DomainName(Constants.Domain_Command)]
         [ProjectionName("Command Summary")]
         [FunctionName("GetCommandStatusInformationProjection")]
         public static async Task<HttpResponseMessage> GetCommandStatusInformationProjectionRun(
@@ -80,7 +80,7 @@ namespace TheLongRunLeaguesFunction.Projections
 
 
         [ApplicationName("The Long Run")]
-        [DomainName("Command")]
+        [DomainName(Constants.Domain_Command)]
         [ProjectionName("Command Summary")]
         [FunctionName("GetCommandStatusInformationProjectionActivity")]
         public static async Task<Command_Summary_Projection_Return> GetCommandStatusInformationProjectionActivity(
@@ -124,7 +124,7 @@ namespace TheLongRunLeaguesFunction.Projections
                     #endregion
 
                     // Get the current state of the command...
-                    Projection getCommandState = new Projection(@"Command",
+                    Projection getCommandState = new Projection(Constants.Domain_Command,
                         commandName,
                         commandGuid.ToString(),
                         nameof(Command_Summary_Projection));
