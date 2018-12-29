@@ -16,6 +16,8 @@ namespace TheLongRunLeaguesFunction.Queries
 {
     public static class Query
     {
+        [ApplicationName("The Long Run")]
+        [DomainName("Query")]
         [FunctionName("GetAllQueryStatusByName")]
         public static async Task<HttpResponseMessage> GetAllQueryStatusByNameRun(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
@@ -104,6 +106,9 @@ namespace TheLongRunLeaguesFunction.Queries
             List<Task<Query_Summary_Projection_Return>> allTasks = new List<Task<Query_Summary_Projection_Return>>(); 
             foreach (string queryId in await allQueries.GetAll(asOfDate))
             {
+
+                context.SetCustomStatus( $"Queueing {queryId}" );
+
                 // add each to the list...
                 Query_Summary_Projection_Request request = new Query_Summary_Projection_Request()
                 {
