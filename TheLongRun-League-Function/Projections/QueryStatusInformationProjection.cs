@@ -83,10 +83,12 @@ namespace TheLongRunLeaguesFunction.Projections
 
             Query_Summary_Projection_Request queryInfo = context.GetInput<Query_Summary_Projection_Request>();
 
+            #region Logging
             if (null != log)
             {
                 log.LogInformation($"GetQueryStatusInformationProjectionActivity called for query : {queryInfo.QueryName } - ID: {queryInfo.UniqueIdentifier }");
             }
+            #endregion
 
             return await ProcessQueryStatusInformationProjection(queryInfo.QueryName,
                 queryInfo.UniqueIdentifier,

@@ -16,23 +16,22 @@ using System.Linq;
 namespace TheLongRunLeaguesFunction.Identifier_Groups
 {
     /// <summary>
-    /// Get the unique identifiers of all the queries that fit the given parameters
+    /// Get the unique identifiers of all the commands that fit the given parameters
     /// </summary>
     [ApplicationName("The Long Run")]
-    [DomainName(Constants.Domain_Query)]
-    [IdentifierGroupName("All Queries")]
-    public static class AllQueriesIdentifierGroup
+    [DomainName(Constants.Domain_Command)]
+    [IdentifierGroupName("All Commands")]
+    public static class CommandsIdentifierGroup
     {
-
 
         /// <summary>
         /// Get the unique identifiers of the queries that match the given input parameters
         /// </summary>
         [ApplicationName("The Long Run")]
-        [DomainName(Constants.Domain_Query)]
-        [IdentifierGroupName("All Queries")]
-        [FunctionName("GetAllQueriesIdentifierGroup")]
-        public static async Task<HttpResponseMessage> GetAllQueriesIdentifierGroupRun(
+        [DomainName(Constants.Domain_Command)]
+        [IdentifierGroupName("All Commands")]
+        [FunctionName("GetAllCommandsIdentifierGroup")]
+        public static async Task<HttpResponseMessage> GetAllCommandsIdentifierGroupRun(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
         ILogger log)
         {
@@ -40,11 +39,11 @@ namespace TheLongRunLeaguesFunction.Identifier_Groups
             #region Logging
             if (null != log)
             {
-                log.LogDebug("Function triggered HTTP in GetAllQueriesIdentifierGroup");
+                log.LogDebug("Function triggered HTTP in GetAllCommandsIdentifierGroup");
             }
             #endregion
 
-            string queryName = req.RequestUri.ParseQueryString()["QueryName"];
+            string commandName = req.RequestUri.ParseQueryString()["CommandName"];
             string asOfDateString = req.RequestUri.ParseQueryString()["AsOfDate"];
             DateTime? asOfDate = null;
             if (!string.IsNullOrWhiteSpace(asOfDateString))
@@ -56,93 +55,96 @@ namespace TheLongRunLeaguesFunction.Identifier_Groups
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(queryName))
+            if (string.IsNullOrWhiteSpace(commandName))
             {
                 // Get request body
-                AllQueriesIdentifierGroup_Request data = await req.Content.ReadAsAsync<AllQueriesIdentifierGroup_Request>();
-                queryName = data.QueryName;
+                AllCommandsIdentifierGroup_Request data = await req.Content.ReadAsAsync<AllCommandsIdentifierGroup_Request>();
+                commandName = data.CommandName;
                 asOfDate = data.AsOfDate;
             }
 
-            AllQueriesIdentifierGroup_Request request = new AllQueriesIdentifierGroup_Request()
+            AllCommandsIdentifierGroup_Request request = new AllCommandsIdentifierGroup_Request()
             {
-                QueryName = queryName,
+                CommandName = commandName,
                 AsOfDate = asOfDate
             };
 
-            if (string.IsNullOrWhiteSpace(queryName ))
+            if (string.IsNullOrWhiteSpace(commandName))
             {
                 return req.CreateResponse(HttpStatusCode.BadRequest,
-                    "Please pass a query name on the query string or in the request body");
+                    "Please pass a command name on the query string or in the request body");
             }
             else
             {
-                IEnumerable<string> ret = await AllQueriesIdentifierGroupProcess(request, log);
+                IEnumerable<string> ret = await AllCommandsIdentifierGroupProcess(request, log);
                 return req.CreateResponse(HttpStatusCode.OK, ret);
             }
 
         }
 
+
         /// <summary>
         /// Get the unique identifiers of the queries that match the given input parameters
         /// </summary>
         [ApplicationName("The Long Run")]
-        [DomainName(Constants.Domain_Query)]
-        [IdentifierGroupName("All Queries")]
-        [FunctionName("GetAllQueriesIdentifierGroupActivity")]
-        public static async Task<IEnumerable<string>> GetAllQueriesIdentifierGroupActivity(
+        [DomainName(Constants.Domain_Command )]
+        [IdentifierGroupName("All Commands")]
+        [FunctionName("GetAllCommandsIdentifierGroupActivity")]
+        public static async Task<IEnumerable<string>> GetAllCommandsIdentifierGroupActivity(
                             [ActivityTrigger] DurableActivityContext context,
                             ILogger log)
         {
 
-            AllQueriesIdentifierGroup_Request request = context.GetInput<AllQueriesIdentifierGroup_Request>();
+            AllCommandsIdentifierGroup_Request request = context.GetInput<AllCommandsIdentifierGroup_Request>();
 
+            #region Logging
             if (null != log)
             {
-                log.LogInformation($"GetAllQueriesIdentifierGroupActivity called for query: {request.QueryName} as of {request.AsOfDate} status matching {request.MatchStatus} ");
+                log.LogInformation($"GetAllCommandsIdentifierGroupActivity called for command: {request.CommandName } as of {request.AsOfDate} status matching {request.MatchStatus} ");
             }
+            #endregion
 
-            return await AllQueriesIdentifierGroupProcess(request, log); 
+            return await AllCommandsIdentifierGroupProcess(request, log);
         }
 
         /// <summary>
-        /// Get all the unique identifiers of the queries that match the input request settings
+        /// Get all the unique identifiers of the commands that match the input request settings
         /// </summary>
-        /// <param name="request">
-        /// </param>
-        private static async Task<IEnumerable<string>> AllQueriesIdentifierGroupProcess(
-            AllQueriesIdentifierGroup_Request request,
+        private static async Task<IEnumerable<string>> AllCommandsIdentifierGroupProcess(
+            AllCommandsIdentifierGroup_Request request,
             ILogger log)
         {
 
             #region Logging
             if (null != log)
             {
-                log.LogInformation($"Creating identifier group processor for {request.QueryName }");
+                log.LogInformation($"Creating identifier group processor for {request.CommandName}");
             }
             #endregion
-            
+
+            #region Input validations
             // If no match status, default to ALL
-            if (string.IsNullOrWhiteSpace(request.MatchStatus  ))
+            if (string.IsNullOrWhiteSpace(request.MatchStatus))
             {
                 request.MatchStatus = @"All";
             }
             // If as of date is stupid, clear it
-            if (request.AsOfDate.HasValue )
+            if (request.AsOfDate.HasValue)
             {
                 if (request.AsOfDate.Value.Year < 2000)
                 {
                     request.AsOfDate = null;
                 }
             }
+            #endregion
 
-            IdentifierGroup allQueries = new IdentifierGroup(Constants.Domain_Query,
-                request.QueryName ,
-                request.MatchStatus );
+            IdentifierGroup allCommands = new IdentifierGroup(Constants.Domain_Command ,
+                request.CommandName ,
+                request.MatchStatus);
 
-            if (null != allQueries )
+            if (null != allCommands)
             {
-                return await allQueries.GetAll(request.AsOfDate );
+                return await allCommands.GetAll(request.AsOfDate);
             }
             else
             {
@@ -155,24 +157,24 @@ namespace TheLongRunLeaguesFunction.Identifier_Groups
     /// <summary>
     /// Parameters passed when requesting the queries that match the given 
     /// </summary>
-    public class AllQueriesIdentifierGroup_Request
+    public class AllCommandsIdentifierGroup_Request
     {
 
         /// <summary>
-        /// The name of the query type for which we want to get all instances
+        /// The name of the command type for which we want to get all instances
         /// </summary>
-       public  string QueryName { get; set; }
+        public string CommandName { get; set; }
 
         /// <summary>
-        /// The effective date for which we want to get the queries
+        /// The effective date for which we want to get the commands
         /// </summary>
         public DateTime? AsOfDate { get; set; }
 
         /// <summary>
-        /// What the status of the queries we want to get is (e.g. failed, completed etc.)
+        /// What the status of the command we want to get is (e.g. failed, completed etc.)
         /// </summary>
         /// <remarks>
-        /// If this is blank then all queries are returned
+        /// If this is blank then all commands are returned
         /// </remarks>
         public string MatchStatus { get; set; }
     }
