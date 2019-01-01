@@ -39,7 +39,7 @@ namespace TheLongRunLeaguesFunction
         [CommandName("Create League")]
         [EventTopicSourceName("Create-New-League-Command")]
         [FunctionName("OnCreateLeagueCommand")]
-        public static async void OnCreateLeagueCommand(
+        public static async Task OnCreateLeagueCommand(
             [EventGridTrigger] EventGridEvent eventGridEvent,
             [OrchestrationClient] DurableOrchestrationClient createLeagueCommandHandlerOrchestrationClient,
             ILogger log

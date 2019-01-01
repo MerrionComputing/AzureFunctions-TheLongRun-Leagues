@@ -27,7 +27,7 @@ namespace TheLongRunLeaguesFunction
         [CommandName("Set League Email Address")]
         [EventTopicSourceName("Set-League-Email-Address-Command")]
         [FunctionName("OnSetLeagueEmailAddressCommandHandler")]
-        public static async void OnSetLeagueEmailAddressCommandHandler(
+        public static async Task OnSetLeagueEmailAddressCommandHandler(
                             [EventGridTrigger] EventGridEvent eventGridEvent,
                             [OrchestrationClient] DurableOrchestrationClient SetLeagueEmailAddressOrchestrationClient,
                             ILogger log

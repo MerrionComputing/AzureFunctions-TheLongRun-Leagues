@@ -27,8 +27,8 @@ namespace TheLongRunLeaguesFunction.Queries
         [AggregateRoot("League")]
         [QueryName("Get League Summary")]
         [FunctionName("GetLeagueSummaryQueryProjectionProcess")]
-        public static async Task<IActionResult> GetLeagueSummaryQueryProjectionProcessRun(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequest req,
+        public static async Task<HttpResponseMessage> GetLeagueSummaryQueryProjectionProcessRun(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req,
             ILogger log)
         {
             #region Logging
@@ -39,13 +39,13 @@ namespace TheLongRunLeaguesFunction.Queries
             #endregion
 
             // Get the query identifier
-            string queryId = req.Query["QueryId"];
+            string queryId = req.GetQueryNameValuePairsExt()[@"QueryId"];
 
-            if (string.IsNullOrWhiteSpace(queryId))
+            if (queryId == null)
             {
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                dynamic data = JsonConvert.DeserializeObject(requestBody);
-                queryId = queryId ?? data?.QueryId;
+                // Get request body
+                dynamic data = await req.Content.ReadAsAsync<object>();
+                queryId = data?.QueryId;
             }
 
             string message = $"Process projections for query {queryId}";
@@ -57,16 +57,26 @@ namespace TheLongRunLeaguesFunction.Queries
                 if (null != resp)
                 {
                     message = resp.Message;
+                    #region Logging
+                    if (resp.FatalError )
+                    {
+                        log.LogError($"Error {resp.Message } running {resp.FunctionName }");
+                    }
+                    else
+                    {
+                        log.LogInformation($"{resp.FunctionName} succeeded {resp.Message} ");
+                    }
+                    #endregion
                 }
             }
 
             if (string.IsNullOrEmpty(queryId))
             {
-                return new BadRequestObjectResult("Please pass a QueryId on the query string or in the request body");
+                return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a QueryId on the query string or in the request body");
             }
             else
             {
-                return (ActionResult)new OkObjectResult($"Process projections for get-league-summary {queryId}, {message }");
+                return req.CreateResponse(HttpStatusCode.OK, $"Process projections for get-league-summary {queryId}, {message }");
             }
         }
 
@@ -134,7 +144,7 @@ namespace TheLongRunLeaguesFunction.Queries
                 if (Guid.TryParse(queryId, out queryGuid))
                 {
                     // Get the current state of the query...
-                    Projection getQueryState = new Projection(@"Query",
+                    Projection getQueryState = new Projection(Constants.Domain_Query ,
                         queryName,
                         queryId,
                         nameof(Query_Summary_Projection));
