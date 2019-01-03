@@ -11,7 +11,7 @@ namespace TheLongRun.Common
     /// <remarks>
     /// These can be used to allow one azure function to call one (or many) others
     /// </remarks>
-    [Obsolete("Use Azure durable functions instead")]
+    
     public class FunctionChaining
     {
 
@@ -43,6 +43,7 @@ namespace TheLongRun.Common
         #endregion
 
 
+        [Obsolete("Use Azure durable functions instead")]
         public async void TriggerCommandByHTTPS(string DomainName,
             string commandName,
             System.Collections.Generic.IEnumerable<Tuple<string ,string > > parameters,

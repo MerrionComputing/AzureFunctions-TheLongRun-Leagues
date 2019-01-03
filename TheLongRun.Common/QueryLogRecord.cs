@@ -40,7 +40,7 @@ namespace TheLongRun.Common
         }
 
         /// <summary>
-        /// The folder that new commands are logged to
+        /// The folder that new queries are logged to
         /// </summary>
         public const string DEFAULT_CONTAINER_NAME = @"query-log";
 
@@ -127,7 +127,7 @@ namespace TheLongRun.Common
             string errorMessage)
         {
 
-            EventStream qryEvents = new EventStream(@"Query",
+            EventStream qryEvents = new EventStream(Constants.Domain_Query,
             queryName ,
             queryGuid.ToString());
             if (null != qryEvents )
@@ -144,7 +144,7 @@ namespace TheLongRun.Common
             string aggregateInstanceKey,
             Nullable<DateTime > asOfDate )
         {
-            EventStream qryEvents = new EventStream(@"Query",
+            EventStream qryEvents = new EventStream(Constants.Domain_Query,
             queryName,
             queryGuid.ToString());
             if (null != qryEvents)
@@ -167,7 +167,7 @@ namespace TheLongRun.Common
             object projectionValue,
             uint sequenceNumber)
         {
-            EventStream qryEvents = new EventStream(@"Query",
+            EventStream qryEvents = new EventStream(Constants.Domain_Query,
             queryName,
             queryGuid.ToString());
             if (null != qryEvents)
@@ -248,9 +248,13 @@ namespace TheLongRun.Common
         /// The identifier of the event grid location to send the value to
         /// </param>
         /// <param name="valueAsJson">
-        /// The query result encoded as JSON
+        /// The query result encoded as JSON that gets put in the "data" element.
         /// </param>
-        private static void SendOutputToCustomTopic(string location, string valueAsJson)
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/azure/event-grid/post-to-custom-topic
+        /// </remarks>
+        private static void SendOutputToCustomTopic(string location, 
+            string valueAsJson)
         {
             throw new NotImplementedException();
         }

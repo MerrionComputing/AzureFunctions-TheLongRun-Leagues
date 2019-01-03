@@ -108,13 +108,13 @@ namespace TheLongRunLeaguesFunction.Queries
                     queryRequest.QueryUniqueIdentifier.ToString(), 
                     log);
 
-                ret.FunctionName = "GetLeagueSummaryQueryProjectionProcessActivity";
                 ret.Message = $"Projections processed for {queryRequest.QueryUniqueIdentifier}";
             }
             catch (Exception ex)
             {
                 ret.Message = ex.Message;
                 ret.FatalError = true;
+                throw;
             }
 
             return ret;

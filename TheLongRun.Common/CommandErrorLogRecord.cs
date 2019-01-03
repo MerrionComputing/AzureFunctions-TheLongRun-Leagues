@@ -51,7 +51,7 @@ namespace TheLongRun.Common
             string errorMessage)
         {
 
-            EventStream commandEvents = new EventStream(@"Command",
+            EventStream commandEvents = new EventStream(Constants.Domain_Command,
                         CommandName,
                         commandGuid.ToString());
             if (null != commandEvents)
@@ -73,7 +73,7 @@ namespace TheLongRun.Common
             string commandName)
         {
 
-            EventStream commandEvents = new EventStream(@"Command",
+            EventStream commandEvents = new EventStream(Constants.Domain_Command,
                     commandName,
                     commandGuid.ToString());
             if (null != commandEvents)
