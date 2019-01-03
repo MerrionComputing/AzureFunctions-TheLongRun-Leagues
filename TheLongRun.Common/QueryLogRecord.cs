@@ -256,7 +256,7 @@ namespace TheLongRun.Common
         private static void SendOutputToCustomTopic(string location, 
             string valueAsJson)
         {
-            throw new NotImplementedException();
+            // TODO: Write to the Event Grid topic specified
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace TheLongRun.Common
         private static void SendOutputToBlob(string location, 
             string valueAsJson)
         {
-            throw new NotImplementedException();
+            // TODO: Write to the BLOB specified
         }
     }
 
