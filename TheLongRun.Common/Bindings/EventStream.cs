@@ -68,6 +68,22 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
+        /// <summary>
+        /// Does the event stream identified by the domain/type/instance exist yet
+        /// </summary>
+        public async Task<bool> Exists()
+        {
+            if (null != _writer)
+            {
+                return await _writer.Exists();
+            }
+            else
+            {
+                // It cannot exist if the event stream writer was not created
+                return false;
+            }
+        }
+
         private readonly string _connectionStringName;
         public string ConnectionStringName
         {

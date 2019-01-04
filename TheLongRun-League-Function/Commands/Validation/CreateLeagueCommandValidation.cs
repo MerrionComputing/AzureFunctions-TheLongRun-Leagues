@@ -106,7 +106,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                     #endregion
 
                     // Get the current state of the command...
-                    Projection getCommandState = new Projection(@"Command",
+                    Projection getCommandState = new Projection(Constants.Domain_Command,
                         COMMAND_NAME,
                         commandGuid.ToString(),
                         nameof(Command_Summary_Projection));
@@ -189,6 +189,31 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                     else
                                     {
                                         leagueNameValid = true;
+
+                                        // was the name already used?
+                                        EventStream leagueEvents = new EventStream(@"Leagues",
+                                            "League",
+                                            leagueName);
+
+                                        if (null != leagueEvents)
+                                        {
+                                            bool alreadyUsed = await leagueEvents.Exists(); 
+                                            if (alreadyUsed )
+                                            {
+                                                await CommandErrorLogRecord.LogCommandValidationError(commandGuid, 
+                                                    COMMAND_NAME, true, 
+                                                    $"League name '{leagueName}' already created.");
+
+                                                #region Logging
+                                                if (null != log)
+                                                {
+                                                    log.LogWarning($"Command {COMMAND_NAME } :: {commandId} league name '{leagueName}' already created in ValidateCreateLeagueCommand");
+                                                }
+                                                #endregion
+
+                                                leagueNameValid = false;
+                                            }
+                                        }
                                     }
                                 }
 
