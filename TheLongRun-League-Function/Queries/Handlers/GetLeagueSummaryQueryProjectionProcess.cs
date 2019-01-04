@@ -99,22 +99,28 @@ namespace TheLongRunLeaguesFunction.Queries
             {
                 QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
 
+                #region Logging
                 if (null != log)
                 {
                     log.LogInformation($"GetLeagueSummaryQueryProjectionProcessActivity called for query : {queryRequest.QueryUniqueIdentifier}");
                 }
+                #endregion
 
                 ret = await ProcessProjectionsGetLeagueSummaryQuery(queryRequest.QueryName ,
                     queryRequest.QueryUniqueIdentifier.ToString(), 
                     log);
 
-                ret.Message = $"Projections processed for {queryRequest.QueryUniqueIdentifier}";
+                #region Logging
+                if (null != log)
+                {
+                    log.LogInformation($"Projections processed for query : {queryRequest.QueryUniqueIdentifier}");
+                }
+                #endregion
             }
             catch (Exception ex)
             {
                 ret.Message = ex.Message;
                 ret.FatalError = true;
-                throw;
             }
 
             return ret;
@@ -186,6 +192,7 @@ namespace TheLongRunLeaguesFunction.Queries
                                     log.LogWarning($"Query {queryGuid} state is {qryProjection.CurrentState} so no projections requested in RequestProjectionsGetLeagueSummaryQuery");
                                 }
                                 #endregion
+                                ret.Message = $"Query {queryGuid} state is {qryProjection.CurrentState} so no projections requested in RequestProjectionsGetLeagueSummaryQuery";
                                 return ret;
                             }
 
@@ -197,7 +204,7 @@ namespace TheLongRunLeaguesFunction.Queries
                             if ((qryProjectionsRequested.CurrentSequenceNumber > 0) || (qryProjectionsRequested.ProjectionValuesChanged()))
                             {
                                 // Process the query state as is now...
-                                if ((qryProjectionsRequested.UnprocessedRequests.Count == 1) && (qryProjectionsRequested.ProcessedRequests.Count == 0))
+                                if (qryProjectionsRequested.UnprocessedRequests.Count > 0) 
                                 {
                                     // Run the requested projection
                                     var nextProjectionRequest = qryProjectionsRequested.UnprocessedRequests[0];
@@ -303,6 +310,17 @@ namespace TheLongRunLeaguesFunction.Queries
                                     }
                                 }
                             }
+                            else
+                            {
+                                #region Logging
+                                if (null != log)
+                                {
+                                    log.LogWarning($"Unable to get projections in ProcessProjectionsGetLeagueSummaryQuery");
+                                }
+                                #endregion
+                                ret.Message = $"Unable to get projections in ProcessProjectionsGetLeagueSummaryQuery";
+                                return ret;
+                            }
                         }
                     }
                 }
@@ -314,12 +332,16 @@ namespace TheLongRunLeaguesFunction.Queries
                         log.LogError($"Projection processor not passed a correct query identifier : {queryId} for query {queryName} ");
                     }
                     #endregion
+                    ret.Message = $"Projection processor not passed a correct query identifier : {queryId} for query {queryName} ";
+                    ret.FatalError = true;
+                    return ret;
                 }
             }
             catch (Exception ex)
             {
                 ret.Message = ex.ToString();
                 ret.FatalError = true;
+                throw;
             }
 
             return ret;

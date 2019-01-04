@@ -111,11 +111,13 @@ namespace TheLongRunLeaguesFunction.Queries
         /// <param name="log">
         /// Trace target for logging the outcomes of this operation
         /// </param>
-        private static async Task OutputResultsGetLeagueSummaryQuery(
+        private static async Task<ActivityResponse> OutputResultsGetLeagueSummaryQuery(
             string queryName,
             string queryId,
             ILogger log)
         {
+
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "OutputResultsGetLeagueSummaryQuery" };
 
             Guid queryGuid;
 
@@ -163,7 +165,11 @@ namespace TheLongRunLeaguesFunction.Queries
                                 log.LogWarning ($"Query {queryGuid} state is {qryProjection.CurrentState} so no output processed in OutputResultsGetLeagueSummaryQuery");
                             }
                             #endregion
-                            return;
+
+                            ret.Message = $"Query {queryGuid} state is {qryProjection.CurrentState} so no output processed in OutputResultsGetLeagueSummaryQuery";
+                            ret.FatalError = true;
+
+                            return ret;
                         }
 
                         // Check all the projections have been run..
@@ -178,7 +184,7 @@ namespace TheLongRunLeaguesFunction.Queries
                                 if (qryProjectionState.ProcessedRequests.Count > 0)
                                 {
                                     // Turn the projections into a query return (This could include a collate step)
-                                    Get_League_Summary_Definition_Return ret = new Get_League_Summary_Definition_Return(queryGuid,
+                                    Get_League_Summary_Definition_Return projectionReturn = new Get_League_Summary_Definition_Return(queryGuid,
                                         qryProjectionState.ProcessedRequests[0].AggregateInstanceKey);
 
                                     if (qryProjectionState.ProcessedRequests[0].ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information).Name)
@@ -186,9 +192,9 @@ namespace TheLongRunLeaguesFunction.Queries
                                         Leagues.League.projection.League_Summary_Information projectionResult = ((Newtonsoft.Json.Linq.JObject)qryProjectionState.ProcessedRequests[0].ReturnedValue).ToObject<Leagues.League.projection.League_Summary_Information>();
                                         if (null != projectionResult)
                                         {
-                                            ret.Location = projectionResult.Location;
-                                            ret.Date_Incorporated = projectionResult.Date_Incorporated;
-                                            ret.Twitter_Handle = projectionResult.Twitter_Handle;
+                                            projectionReturn.Location = projectionResult.Location;
+                                            projectionReturn.Date_Incorporated = projectionResult.Date_Incorporated;
+                                            projectionReturn.Twitter_Handle = projectionResult.Twitter_Handle; 
                                         }
                                         else
                                         {
@@ -210,7 +216,7 @@ namespace TheLongRunLeaguesFunction.Queries
                                         #region Logging
                                         if (null != log)
                                         {
-                                            log.LogDebug($"Sending results to output targets {ret} in OutputResultsGetLeagueSummaryQuery");
+                                            log.LogDebug($"Sending results to output targets in OutputResultsGetLeagueSummaryQuery");
                                         }
                                         #endregion
                                         foreach (string location in qryOutputs.Targets.Keys )
@@ -224,6 +230,21 @@ namespace TheLongRunLeaguesFunction.Queries
                                             // Send the output to the location...
                                             QueryLogRecord.SendOutput(location, qryOutputs.Targets[location], ret);
                                         }
+
+                                        ret.Message = $"Sent results to output targets ({qryOutputs.Targets.Keys.Count}) in OutputResultsGetLeagueSummaryQuery";
+                                        return ret;
+                                    }
+                                    else
+                                    {
+                                        // No outputs set
+                                        #region Logging
+                                        if (null != log)
+                                        {
+                                            log.LogWarning($"No output targets found in OutputResultsGetLeagueSummaryQuery");
+                                        }
+                                        #endregion
+                                        ret.Message = $"No output targets found in OutputResultsGetLeagueSummaryQuery";
+                                        return ret;
                                     }
                                 }
                                 else
@@ -235,6 +256,8 @@ namespace TheLongRunLeaguesFunction.Queries
                                         log.LogWarning($"Query {queryGuid} state is has no processed projections so no output processed in OutputResultsGetLeagueSummaryQuery");
                                     }
                                     #endregion
+                                    ret.Message = $"Query {queryGuid} state is has no processed projections so no output processed in OutputResultsGetLeagueSummaryQuery";
+                                    return ret;
                                 }
                             }
                             else
@@ -245,11 +268,26 @@ namespace TheLongRunLeaguesFunction.Queries
                                     log.LogWarning($"Query {queryGuid} still has unprocessed projections so no output processed in OutputResultsGetLeagueSummaryQuery");
                                 }
                                 #endregion
+                                ret.Message = $"Query {queryGuid} still has unprocessed projections so no output processed in OutputResultsGetLeagueSummaryQuery";
+                                return ret;
                             }
+                        }
+                        else
+                        {
+                            ret.Message = $"Projection run but has no results";
+                            ret.FatalError = true;
+                            return ret;
                         }
                     }
                 }
             }
+
+
+            ret.Message = $"Query identifier blank or not set when running OutputResultsGetLeagueSummaryQuery";
+            ret.FatalError = true;
+            return ret;
+
+
         }
     }
 }

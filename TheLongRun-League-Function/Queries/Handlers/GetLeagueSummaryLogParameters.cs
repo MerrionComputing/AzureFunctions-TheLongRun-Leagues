@@ -43,12 +43,16 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
                         log.LogInformation($"GetLeagueSummaryLogParametersActivity : Logging parameters for query {queryRequest.QueryUniqueIdentifier} ");
                     }
 
-                    EventStream queryEvents = new EventStream(@"Query",
+                    EventStream queryEvents = new EventStream(Constants.Domain_Query ,
                         queryRequest.QueryName,
                         queryRequest.QueryUniqueIdentifier.ToString());
 
                     if (null != queryEvents)
                     {
+
+                        // Set the context for the events to be written using
+                        queryEvents.SetContext(new WriteContext(ret.FunctionName, context.InstanceId));
+
                         // set the parameter(s)
                         await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValueSet
                             (nameof(Get_League_Summary_Definition.League_Name), queryRequest.GetParameters().League_Name));
