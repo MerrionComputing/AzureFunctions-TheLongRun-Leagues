@@ -17,6 +17,7 @@ namespace TheLongRun.Common.Bindings
     {
 
         private readonly IEventStreamWriterUntyped _writer = null;
+        private  IWriteContext _context = null;
 
         /// <summary>
         /// The domain name the aggregate instance belongs to
@@ -77,17 +78,37 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
+        /// <summary>
+        /// Set the writer context which is used to "wrap" events writyten so we know who wrote them (and why)
+        /// </summary>
+        /// <param name="context">
+        /// The context to use when writing events
+        /// </param>
+        public void SetContext(IWriteContext context)
+        {
+            if (null != context )
+            {
+                _context = context;
+                if (null != _writer)
+                {
+                    _writer.SetContext(_context);
+                }
+            }
+        }
+
         public EventStream(string domainName,
             string aggregateTypeName,
             string aggregateInstanceKey,
-            string connectionStringName = "")
+            string connectionStringName = "",
+            IWriteContext context = null)
             : this(new EventStreamAttribute(domainName, aggregateTypeName , aggregateInstanceKey  ), 
-                  connectionStringName  )
+                  connectionStringName, context   )
         {
         }
 
         public EventStream(EventStreamAttribute attribute, 
-            string connectionStringName = "")
+            string connectionStringName = "",
+            IWriteContext context = null)
         {
             _domainName = attribute.DomainName;
             _aggregateTypeName = attribute.AggregateTypeName;
@@ -105,7 +126,16 @@ namespace TheLongRun.Common.Bindings
             // wire up the event stream writer 
             // TODO : Cater for different backing technologies... currently just AppendBlob
             _writer = new CQRSAzure.EventSourcing.Azure.Blob.Untyped.BlobEventStreamWriterUntyped(attribute, 
-                connectionStringName= _connectionStringName); 
+                connectionStringName= _connectionStringName);
+
+            if (null != context)
+            {
+                _context = context;
+                if (null != _writer)
+                {
+                    _writer.SetContext(_context);
+                }
+            }
 
         }
 

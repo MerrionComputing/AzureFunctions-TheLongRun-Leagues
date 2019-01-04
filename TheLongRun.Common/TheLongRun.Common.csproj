@@ -152,6 +152,7 @@
     <Compile Include="Orchestration\StartIdentifierGroupOrchestrationArgs.cs" />
     <Compile Include="Orchestration\StartProjectionOrchestrationArgs.cs" />
     <Compile Include="Orchestration\StartQueryOrchestrationArgs.cs" />
+    <Compile Include="Orchestration\WriteContext.cs" />
     <Compile Include="ProjectionRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryLogRecord.cs" />
