@@ -176,7 +176,7 @@ namespace TheLongRun.Common
             string aggregateTypeName, 
             string aggregateInstanceKey, 
             Nullable<DateTime> asOfDate,
-            IEnumerable<ProjectionSnapshotProperty> projectionValue,
+            object projectionValues,
             uint sequenceNumber,
             IWriteContext writeContext = null)
         {
@@ -195,7 +195,7 @@ namespace TheLongRun.Common
                     aggregateInstanceKey,
                     projectionTypeName,
                     asOfDate.GetValueOrDefault(DateTime.UtcNow) ,
-                    projectionValue ,
+                    projectionValues,
                     sequenceNumber ));
             }
         }

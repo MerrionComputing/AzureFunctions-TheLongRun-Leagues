@@ -45,7 +45,7 @@ namespace TheLongRun.Common.Events.Query
         /// <summary>
         /// The value returned by the projection running
         /// </summary>
-        public IEnumerable<ProjectionSnapshotProperty> ReturnedValue { get; set; }
+        public object  ReturnedValue { get; set; }
 
         /// <summary>
         /// The sequence number of the last event read by this projection
@@ -61,7 +61,7 @@ namespace TheLongRun.Common.Events.Query
             string aggregateKeyIn,
             string projectionTypeNameIn,
             DateTime asOfDateIn,
-            IEnumerable<ProjectionSnapshotProperty> returnedValueIn,
+            object returnedValueIn,
             uint asOfSequenceIn
          )
         {
@@ -91,7 +91,7 @@ namespace TheLongRun.Common.Events.Query
             ProjectionTypeName = info.GetString(nameof(ProjectionTypeName));
             AsOfDate = info.GetDateTime(nameof(AsOfDate));
             AsOfSequenceNumber = info.GetUInt32(nameof(AsOfSequenceNumber));
-            ReturnedValue = (IEnumerable < ProjectionSnapshotProperty >)info.GetValue(nameof(ReturnedValue), typeof(IEnumerable<ProjectionSnapshotProperty>));
+            ReturnedValue = (IEnumerable < object >)info.GetValue(nameof(ReturnedValue), typeof(IEnumerable<object>));
         }
 
         /// <summary>

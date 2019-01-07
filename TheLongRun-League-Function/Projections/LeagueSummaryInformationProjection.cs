@@ -29,7 +29,7 @@ namespace TheLongRunLeaguesFunction.Projections
         [AggregateRoot("League")]
         [ProjectionName("League Summary Information")]
         [FunctionName("RunLeagueSummaryInformationProjectionActivity")]
-        public static async Task<Get_League_Summary_Definition_Return> RunLeagueSummaryInformationProjectionActivity(
+        public static async Task<ProjectionResultsRecord<Get_League_Summary_Definition_Return>> RunLeagueSummaryInformationProjectionActivity(
                 [ActivityTrigger] DurableActivityContext context,
                 ILogger log)
         {
@@ -91,7 +91,7 @@ namespace TheLongRunLeaguesFunction.Projections
             }
 
 
-            Get_League_Summary_Definition_Return ret = null;
+            ProjectionResultsRecord<Get_League_Summary_Definition_Return> ret = null;
             string message = $"Running projection for {leagueName}";
 
             try
@@ -105,11 +105,14 @@ namespace TheLongRunLeaguesFunction.Projections
                 message = ex.ToString();
             }
 
-            
+
 
             if (null != ret)
             {
-                message = $"{leagueName} Location: {ret.Location } incorporated {ret.Date_Incorporated} (Twitter handle:{ret.Twitter_Handle }) ";
+                if (null != ret.Result)
+                {
+                    message = $"{leagueName} Location: {ret.Result.Location } incorporated {ret.Result.Date_Incorporated} (Twitter handle:{ret.Result.Twitter_Handle }) ";
+                }
             }
 
             if (string.IsNullOrWhiteSpace(leagueName))
@@ -123,7 +126,7 @@ namespace TheLongRunLeaguesFunction.Projections
         }
 
 
-        private static async Task<Get_League_Summary_Definition_Return> ProcessLeagueSummaryInformationProjection(
+        private static async Task<ProjectionResultsRecord<Get_League_Summary_Definition_Return>> ProcessLeagueSummaryInformationProjection(
             string projectionName,
             string leagueName,
             ILogger log)
@@ -145,12 +148,21 @@ namespace TheLongRunLeaguesFunction.Projections
                     {
                         if ((prjLeagueInfo.CurrentSequenceNumber > 0) || (prjLeagueInfo.ProjectionValuesChanged()))
                         {
-                            return new Get_League_Summary_Definition_Return(Guid.Empty, leagueName)
+                            Get_League_Summary_Definition_Return value = new Get_League_Summary_Definition_Return(Guid.Empty, leagueName)
                             {
                                 Date_Incorporated = prjLeagueInfo.Date_Incorporated,
                                 Location = prjLeagueInfo.Location,
                                 Twitter_Handle = prjLeagueInfo.Twitter_Handle
                             };
+
+                            return new ProjectionResultsRecord<Get_League_Summary_Definition_Return>() {
+                                CurrentAsOfDate= prjLeagueInfo.CurrentAsOfDate,
+                                CurrentSequenceNumber = prjLeagueInfo.CurrentSequenceNumber ,
+                                AggregateTypeName = leagueEvents.AggregateTypeName ,
+                                DomainName = leagueEvents.DomainName,
+                                EntityUniqueIdentifier = leagueEvents.AggregateInstanceKey ,
+                                Result =value };
+
                         }
                     }
                 }
