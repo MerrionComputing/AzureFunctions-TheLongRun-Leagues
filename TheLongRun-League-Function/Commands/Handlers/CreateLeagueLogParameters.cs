@@ -49,6 +49,8 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                     if (null != commandEvents)
                     {
+                        // Set the event context to indicate who wrote them
+                        commandEvents.SetContext(new WriteContext(ret.FunctionName, context.InstanceId));
 
                         Create_New_League_Definition parameters = cmdRequest.GetParameters();
 

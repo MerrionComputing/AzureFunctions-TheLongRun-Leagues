@@ -46,6 +46,8 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                     if (null != commandEvents)
                     {
+                        // Set the context for events written
+                        commandEvents.SetContext(new WriteContext(ret.FunctionName, context.InstanceId));
 
                         Set_Email_Address_Definition  parameters = cmdRequest.GetParameters();
 

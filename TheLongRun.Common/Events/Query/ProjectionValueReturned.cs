@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using CQRSAzure.EventSourcing;
 namespace TheLongRun.Common.Events.Query
@@ -44,7 +45,7 @@ namespace TheLongRun.Common.Events.Query
         /// <summary>
         /// The value returned by the projection running
         /// </summary>
-        public object ReturnedValue { get; set; }
+        public IEnumerable<ProjectionSnapshotProperty> ReturnedValue { get; set; }
 
         /// <summary>
         /// The sequence number of the last event read by this projection
@@ -60,7 +61,7 @@ namespace TheLongRun.Common.Events.Query
             string aggregateKeyIn,
             string projectionTypeNameIn,
             DateTime asOfDateIn,
-            object returnedValueIn,
+            IEnumerable<ProjectionSnapshotProperty> returnedValueIn,
             uint asOfSequenceIn
          )
         {
@@ -81,7 +82,8 @@ namespace TheLongRun.Common.Events.Query
         /// </summary>
         public ProjectionValueReturned() { }
 
-        public ProjectionValueReturned(SerializationInfo info, StreamingContext context)
+        public ProjectionValueReturned(SerializationInfo info, 
+            StreamingContext context)
         {
             DomainName = info.GetString(nameof(DomainName));
             AggregateType = info.GetString(nameof(AggregateType));
@@ -89,7 +91,7 @@ namespace TheLongRun.Common.Events.Query
             ProjectionTypeName = info.GetString(nameof(ProjectionTypeName));
             AsOfDate = info.GetDateTime(nameof(AsOfDate));
             AsOfSequenceNumber = info.GetUInt32(nameof(AsOfSequenceNumber));
-            ReturnedValue = info.GetValue(nameof(ReturnedValue), typeof(object));
+            ReturnedValue = (IEnumerable < ProjectionSnapshotProperty >)info.GetValue(nameof(ReturnedValue), typeof(IEnumerable<ProjectionSnapshotProperty>));
         }
 
         /// <summary>

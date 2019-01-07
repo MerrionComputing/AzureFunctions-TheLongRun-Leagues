@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using TheLongRun.Common.Orchestration;
+using CQRSAzure.EventSourcing;
 
 namespace TheLongRunLeaguesFunction.Commands.Handlers
 {
@@ -23,7 +24,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
 
         [ApplicationName("The Long Run")]
-        [DomainName("Leagues")]
+        [TheLongRun.Common.Attributes.DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Create League")]
         [FunctionName("CreateLeagueCommandHandler")]
@@ -59,7 +60,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
 
         [ApplicationName("The Long Run")]
-        [DomainName("Leagues")]
+        [TheLongRun.Common.Attributes.DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Create League")]
         [FunctionName("CreateLeagueCommandHandlerAction")]
@@ -81,7 +82,9 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                         log.LogInformation($"CreateLeagueCommandLogParametersActivity : Logging parameters for command {cmdRequest.CommandUniqueIdentifier} ");
                     }
 
-                    await HandleCreateLeagueCommand(cmdRequest.CommandUniqueIdentifier.ToString(), log);
+                    await HandleCreateLeagueCommand(cmdRequest.CommandUniqueIdentifier.ToString(), 
+                        log, 
+                        new WriteContext(ret.FunctionName, context.InstanceId ));
 
                     ret.Message = $"Created league for command {cmdRequest.CommandUniqueIdentifier}";
 
@@ -109,7 +112,8 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         /// The unique identifier of the command to process
         /// </param>
         private static async Task HandleCreateLeagueCommand(string commandId,
-            ILogger log = null)
+            ILogger log,
+            IWriteContext writeContext = null)
         {
 
             const string COMMAND_NAME = @"create-league";
@@ -224,6 +228,10 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                                 if ((null != leagueEvents) && (null != formedEvent))
                                 {
+                                    if (null != writeContext )
+                                    {
+                                        leagueEvents.SetContext(writeContext);
+                                    }
                                     await leagueEvents.AppendEvent(formedEvent);
                                 }
 
@@ -249,6 +257,10 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                                     if ((null != leagueEvents) && (null != contactDetailsEvent))
                                     {
+                                        if (null != writeContext )
+                                        {
+                                            leagueEvents.SetContext(writeContext);
+                                        }
                                         await leagueEvents.AppendEvent(contactDetailsEvent);
                                     }
 

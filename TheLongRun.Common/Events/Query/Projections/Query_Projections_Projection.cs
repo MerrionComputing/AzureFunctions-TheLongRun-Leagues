@@ -6,6 +6,7 @@ using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Events.Query;
 
 namespace TheLongRun.Common.Events.Query.Projections
@@ -13,6 +14,7 @@ namespace TheLongRun.Common.Events.Query.Projections
     /// <summary>
     /// A projection to list the requested and executed projections for this query
     /// </summary>
+    [TheLongRun.Common.Attributes.ProjectionName("Query Projections")]
     public class Query_Projections_Projection
         : CQRSAzure.EventSourcing.ProjectionBaseUntyped,
         CQRSAzure.EventSourcing.IHandleEvent<ProjectionRequested >,
@@ -246,5 +248,62 @@ namespace TheLongRun.Common.Events.Query.Projections
                 log = logIn;
             }
         }
+    }
+
+
+    /// <summary>
+    /// A single projection status returned from running the "Query Projections" projection
+    /// </summary>
+    [CQRSAzure.EventSourcing.Category(Constants.Domain_Query)]
+    public class Query_Projections_Projection_Return
+    {
+
+        /// <summary>
+        /// The state of the projection run on this query
+        /// </summary>
+        public enum QueryProjectionState
+        {
+            /// <summary>
+            /// The projection has been requested but not started
+            /// </summary>
+            Queued = 0,
+            /// <summary>
+            /// The projection is currently running
+            /// </summary>
+            InProgress = 1,
+            /// <summary>
+            /// The projection is complete and the results are on the query event stream
+            /// </summary>
+            Complete = 2
+        }
+
+
+        /// <summary>
+        /// The state of the projection as at the time the request was run
+        /// </summary>
+        public QueryProjectionState ProjectionState { get; set; }
+
+        /// <summary>
+        /// The detail of the projection request
+        /// </summary>
+        public ProjectionAttribute Projection { get; set; }
+    }
+
+
+    [CQRSAzure.EventSourcing.Category(Constants.Domain_Query)]
+    public class Query_Projections_Projection_Request
+    {
+        /// <summary>
+        /// The GUID of the unique instance of the query
+        /// </summary>
+        public string UniqueIdentifier { get; set; }
+
+        /// <summary>
+        /// Th ename of the query we want to list the projections for
+        /// </summary>
+        /// <remarks>
+        /// This is required as the different query types may have different backing store locations
+        /// </remarks>
+        public string QueryName { get; set; }
     }
 }

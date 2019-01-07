@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CQRSAzure.EventSourcing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,7 +49,8 @@ namespace TheLongRun.Common
         public static async Task LogCommandValidationError(Guid commandGuid,
             string CommandName,
             bool fatal,
-            string errorMessage)
+            string errorMessage,
+            IWriteContext writeContext = null)
         {
 
             EventStream commandEvents = new EventStream(Constants.Domain_Command,
@@ -56,6 +58,10 @@ namespace TheLongRun.Common
                         commandGuid.ToString());
             if (null != commandEvents)
             {
+                if (null != writeContext )
+                {
+                    commandEvents.SetContext(writeContext);
+                }
                 await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ValidationErrorOccured(errorMessage,fatal ));
             }
         }
@@ -70,7 +76,8 @@ namespace TheLongRun.Common
         /// The name of the command to mark as valid
         /// </param>
         public static async Task LogCommandValidationSuccess(Guid commandGuid ,
-            string commandName)
+            string commandName,
+            IWriteContext writeContext = null)
         {
 
             EventStream commandEvents = new EventStream(Constants.Domain_Command,
@@ -78,6 +85,10 @@ namespace TheLongRun.Common
                     commandGuid.ToString());
             if (null != commandEvents)
             {
+                if (null != writeContext )
+                {
+                    commandEvents.SetContext(writeContext);
+                }
                 await commandEvents.AppendEvent(new TheLongRun.Common.Events.Command.ValidationSucceeded(DateTime.UtcNow ));
             }
         }

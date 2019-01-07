@@ -108,7 +108,8 @@ namespace TheLongRunLeaguesFunction.Queries
 
                 ret = await ProcessProjectionsGetLeagueSummaryQuery(queryRequest.QueryName ,
                     queryRequest.QueryUniqueIdentifier.ToString(), 
-                    log);
+                    log,
+                    new WriteContext(ret.FunctionName, context.InstanceId ) );
 
                 #region Logging
                 if (null != log)
@@ -138,7 +139,8 @@ namespace TheLongRunLeaguesFunction.Queries
         private static async Task<ActivityResponse>  ProcessProjectionsGetLeagueSummaryQuery(
             string queryName,
             string queryId, 
-            ILogger log)
+            ILogger log,
+            CQRSAzure.EventSourcing.IWriteContext writeContext = null)
         {
 
             ActivityResponse ret = new ActivityResponse() { FunctionName = "ProcessProjectionsGetLeagueSummaryQuery" };
@@ -185,7 +187,7 @@ namespace TheLongRunLeaguesFunction.Queries
                             if ((qryProjection.CurrentState == Query_Summary_Projection.QueryState.Completed) ||
                                  (qryProjection.CurrentState == Query_Summary_Projection.QueryState.Invalid))
                             {
-                                // No need to validate a completed query
+                                // No need to run projections for a completed query
                                 #region Logging
                                 if (null != log)
                                 {
@@ -207,80 +209,83 @@ namespace TheLongRunLeaguesFunction.Queries
                                 if (qryProjectionsRequested.UnprocessedRequests.Count > 0) 
                                 {
                                     // Run the requested projection
-                                    var nextProjectionRequest = qryProjectionsRequested.UnprocessedRequests[0];
-                                    if (null != nextProjectionRequest)
+                                    foreach (var nextProjectionRequest in qryProjectionsRequested.UnprocessedRequests)
                                     {
-                                        #region Logging
-                                        if (null != log)
+                                        if (null != nextProjectionRequest)
                                         {
-                                            log.LogDebug($"Query {queryName} running projection {nextProjectionRequest.ProjectionTypeName } for {queryGuid } in ProcessProjectionsGetLeagueSummaryQuery");
-                                        }
-                                        #endregion
-                                        ret.Message = $"Query {queryName} running projection {nextProjectionRequest.ProjectionTypeName } for {queryGuid } in ProcessProjectionsGetLeagueSummaryQuery";
-                                        if (nextProjectionRequest.ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information).Name)
-                                        {
-                                            // run the League_Summary_Information projection..
-                                            Projection leagueEvents = new Projection(nextProjectionRequest.DomainName,
-                                                nextProjectionRequest.AggregateType,
-                                                nextProjectionRequest.AggregateInstanceKey,
-                                                typeof(Leagues.League.projection.League_Summary_Information).Name);
-
-                                            if (null != leagueEvents)
+                                            #region Logging
+                                            if (null != log)
                                             {
-                                                Leagues.League.projection.League_Summary_Information prjLeagueInfo = new Leagues.League.projection.League_Summary_Information();
-                                                await leagueEvents.Process(prjLeagueInfo);
-                                                if (null != prjLeagueInfo)
-                                                {
-                                                    if ((prjLeagueInfo.CurrentSequenceNumber > 0) || (prjLeagueInfo.ProjectionValuesChanged()))
-                                                    {
-                                                        // append the projection result to the query
-                                                        await QueryLogRecord.LogProjectionResult(queryGuid,
-                                                                qryProjection.QueryName,
-                                                                nameof(Leagues.League.projection.League_Summary_Information),
-                                                                leagueEvents.DomainName,
-                                                                leagueEvents.AggregateTypeName,
-                                                                leagueEvents.AggregateInstanceKey,
-                                                                prjLeagueInfo.CurrentAsOfDate ,
-                                                                prjLeagueInfo,
-                                                                prjLeagueInfo.CurrentSequenceNumber);
+                                                log.LogDebug($"Query {queryName} running projection {nextProjectionRequest.ProjectionTypeName } for {queryGuid } in ProcessProjectionsGetLeagueSummaryQuery");
+                                            }
+                                            #endregion
+                                            ret.Message = $"Query {queryName} running projection {nextProjectionRequest.ProjectionTypeName } for {queryGuid } in ProcessProjectionsGetLeagueSummaryQuery";
+                                            if (nextProjectionRequest.ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information).Name)
+                                            {
+                                                // run the League_Summary_Information projection..
+                                                Projection leagueEvents = new Projection(nextProjectionRequest.DomainName,
+                                                    nextProjectionRequest.AggregateType,
+                                                    nextProjectionRequest.AggregateInstanceKey,
+                                                    typeof(Leagues.League.projection.League_Summary_Information).Name);
 
-                                                        #region Logging
-                                                        if (null != log)
-                                                        {
-                                                            log.LogDebug($"Query {queryName } projection {nextProjectionRequest.ProjectionTypeName } key {nextProjectionRequest.AggregateInstanceKey } run to sequence number {prjLeagueInfo.CurrentSequenceNumber } in ProcessProjectionsGetLeagueSummaryQuery");
-                                                        }
-                                                        #endregion
-                                                        ret.Message = $"Query {queryName } projection {nextProjectionRequest.ProjectionTypeName } key {nextProjectionRequest.AggregateInstanceKey } run to sequence number {prjLeagueInfo.CurrentSequenceNumber } ";
-                                                        return ret;
-                                                    }
-                                                    else
+                                                if (null != leagueEvents)
+                                                {
+                                                    Leagues.League.projection.League_Summary_Information prjLeagueInfo = new Leagues.League.projection.League_Summary_Information();
+                                                    await leagueEvents.Process(prjLeagueInfo);
+                                                    if (null != prjLeagueInfo)
                                                     {
-                                                        #region Logging
-                                                        if (null != log)
+                                                        if ((prjLeagueInfo.CurrentSequenceNumber > 0) || (prjLeagueInfo.ProjectionValuesChanged()))
                                                         {
-                                                            log.LogWarning($"Query {queryName } running projection {nextProjectionRequest.ProjectionTypeName } for {queryGuid } returned no data in ProcessProjectionsGetLeagueSummaryQuery");
+                                                            // append the projection result to the query
+                                                            await QueryLogRecord.LogProjectionResult(queryGuid,
+                                                                    qryProjection.QueryName,
+                                                                    nameof(Leagues.League.projection.League_Summary_Information),
+                                                                    leagueEvents.DomainName,
+                                                                    leagueEvents.AggregateTypeName,
+                                                                    leagueEvents.AggregateInstanceKey,
+                                                                    prjLeagueInfo.CurrentAsOfDate,
+                                                                    prjLeagueInfo.CurrentValues ,
+                                                                    prjLeagueInfo.CurrentSequenceNumber,
+                                                                    writeContext );
+
+                                                            #region Logging
+                                                            if (null != log)
+                                                            {
+                                                                log.LogDebug($"Query {queryName } projection {nextProjectionRequest.ProjectionTypeName } key {nextProjectionRequest.AggregateInstanceKey } run to sequence number {prjLeagueInfo.CurrentSequenceNumber } in ProcessProjectionsGetLeagueSummaryQuery");
+                                                            }
+                                                            #endregion
+                                                            ret.Message = $"Query {queryName } projection {nextProjectionRequest.ProjectionTypeName } key {nextProjectionRequest.AggregateInstanceKey } run to sequence number {prjLeagueInfo.CurrentSequenceNumber } ";
+                                                            return ret;
                                                         }
-                                                        #endregion
-                                                        ret.Message = $"Query { queryName}  unable to create event stream for projection { nextProjectionRequest.ProjectionTypeName} returned no data in ProcessProjectionsGetLeagueSummaryQuery";
-                                                        return ret;
+                                                        else
+                                                        {
+                                                            #region Logging
+                                                            if (null != log)
+                                                            {
+                                                                log.LogWarning($"Query {queryName } running projection {nextProjectionRequest.ProjectionTypeName } for {queryGuid } returned no data in ProcessProjectionsGetLeagueSummaryQuery");
+                                                            }
+                                                            #endregion
+                                                            ret.Message = $"Query { queryName}  unable to create event stream for projection { nextProjectionRequest.ProjectionTypeName} returned no data in ProcessProjectionsGetLeagueSummaryQuery";
+                                                            return ret;
+                                                        }
                                                     }
+                                                }
+                                                else
+                                                {
+                                                    #region Logging
+                                                    if (null != log)
+                                                    {
+                                                        log.LogError($"Query {queryName} unable to create event stream for projection {nextProjectionRequest.ProjectionTypeName } key {nextProjectionRequest.AggregateInstanceKey } in ProcessProjectionsGetLeagueSummaryQuery");
+                                                    }
+                                                    #endregion
+                                                    ret.Message = $"Query { queryName}  unable to create event stream for projection { nextProjectionRequest.ProjectionTypeName} key { nextProjectionRequest.AggregateInstanceKey}";
+                                                    return ret;
                                                 }
                                             }
                                             else
                                             {
-                                                #region Logging
-                                                if (null != log)
-                                                {
-                                                    log.LogError($"Query {queryName} unable to create event stream for projection {nextProjectionRequest.ProjectionTypeName } key {nextProjectionRequest.AggregateInstanceKey } in ProcessProjectionsGetLeagueSummaryQuery");
-                                                }
-                                                #endregion
-                                                ret.Message = $"Query { queryName}  unable to create event stream for projection { nextProjectionRequest.ProjectionTypeName} key { nextProjectionRequest.AggregateInstanceKey}";
                                                 return ret;
                                             }
-                                        }
-                                        else
-                                        {
-                                            return ret;
                                         }
                                     }
                                 }
@@ -341,7 +346,6 @@ namespace TheLongRunLeaguesFunction.Queries
             {
                 ret.Message = ex.ToString();
                 ret.FatalError = true;
-                throw;
             }
 
             return ret;

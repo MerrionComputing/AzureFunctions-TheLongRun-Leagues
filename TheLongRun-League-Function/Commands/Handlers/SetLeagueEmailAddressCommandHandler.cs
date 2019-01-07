@@ -1,3 +1,4 @@
+using CQRSAzure.EventSourcing;
 using Leagues.League.commandDefinition;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -19,7 +20,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
     {
 
         [ApplicationName("The Long Run")]
-        [DomainName("Leagues")]
+        [TheLongRun.Common.Attributes.DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Set League Email Address")]
         [FunctionName("SetLeagueEmailAddressCommandHandler")]
@@ -54,7 +55,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
 
         [ApplicationName("The Long Run")]
-        [DomainName("Leagues")]
+        [TheLongRun.Common.Attributes.DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Set League Email Address")]
         [FunctionName("SetLeagueEmailAddressCommandHandlerActivity")]
@@ -71,7 +72,8 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                 if (null != cmdRequest)
                 {
-                    await HandleSetLeagueEmailAddressCommand(cmdRequest.CommandUniqueIdentifier.ToString() , log);
+                    await HandleSetLeagueEmailAddressCommand(cmdRequest.CommandUniqueIdentifier.ToString() , log,
+                        new WriteContext(ret.FunctionName , context.InstanceId ) );
                     ret.Message = $"Command processed {cmdRequest.CommandName} : {cmdRequest.CommandUniqueIdentifier}";
                 }
                 else
@@ -96,7 +98,8 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
         /// The unique identifier of the command to process
         /// </param>
         private static async Task  HandleSetLeagueEmailAddressCommand(string commandId,
-            ILogger log = null)
+            ILogger log,
+            IWriteContext writeContext = null)
         {
 
             const string COMMAND_NAME = @"set-league-email-address";
@@ -212,6 +215,10 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
 
                             if ((null != leagueEvents) && (null != changedEvent))
                             {
+                                if (null != writeContext )
+                                {
+                                    leagueEvents.SetContext(writeContext);
+                                }
                                 await leagueEvents.AppendEvent(changedEvent);
                             }
 

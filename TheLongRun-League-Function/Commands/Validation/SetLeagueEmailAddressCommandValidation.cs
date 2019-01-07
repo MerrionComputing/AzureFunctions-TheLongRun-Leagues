@@ -13,6 +13,7 @@ using Leagues.League.commandDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using Microsoft.Extensions.Logging;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Commands.Validation
 {
@@ -84,7 +85,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
             string commandId = setLeagueEmailAddressCommandContect.GetInput<string>();
             if (! string.IsNullOrWhiteSpace(commandId ) )
             {
-                return await ValidateSetLeagueEmailAddressCommand(commandId, log);
+                return await ValidateSetLeagueEmailAddressCommand(commandId, log,
+                     new WriteContext("SetLeagueEmailAddressCommandValidationActivity", setLeagueEmailAddressCommandContect.InstanceId ));
             }
 
             return false;
@@ -102,7 +104,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         /// This is common functionality, whether called by function chaining or by duarble functions
         /// </remarks>
         private static async Task<bool>  ValidateSetLeagueEmailAddressCommand(string commandId, 
-            ILogger log)
+            ILogger log,
+            CQRSAzure.EventSourcing.IWriteContext writeContext =null )
         {
 
             const string COMMAND_NAME = @"set-league-email-address";
@@ -191,7 +194,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 string leagueName = cmdProjection.GetParameter<string>(nameof(Create_New_League_Definition.LeagueName));
                                 if (string.IsNullOrWhiteSpace(leagueName))
                                 {
-                                    await CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name may not be blank");
+                                    await CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name may not be blank",
+                                        writeContext );
 #region Logging
                                     if (null != log)
                                     {
@@ -211,7 +215,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 string emailAddress = cmdProjection.GetParameter<string >(nameof(Create_New_League_Definition.Email_Address ));
                                 if (string.IsNullOrEmpty(emailAddress) )
                                 {
-                                   await  CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Email address is blank");
+                                   await  CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Email address is blank",
+                                       writeContext );
 #region Logging
                                     if (null != log)
                                     {
@@ -227,7 +232,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 
                             if (emailAddressValid && leagueNameValid)
                             {
-                                await CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME);
+                                await CommandErrorLogRecord.LogCommandValidationSuccess(commandGuid, COMMAND_NAME,
+                                    writeContext );
                                 return true;
                             }
                         }

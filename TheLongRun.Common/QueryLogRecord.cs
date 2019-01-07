@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
@@ -124,7 +126,8 @@ namespace TheLongRun.Common
         public static async Task LogQueryValidationError(Guid queryGuid, 
             string queryName, 
             bool fatalError, 
-            string errorMessage)
+            string errorMessage,
+            IWriteContext writeContext = null)
         {
 
             EventStream qryEvents = new EventStream(Constants.Domain_Query,
@@ -132,6 +135,10 @@ namespace TheLongRun.Common
             queryGuid.ToString());
             if (null != qryEvents )
             {
+                if (null != writeContext )
+                {
+                    qryEvents.SetContext(writeContext);
+                }
                 await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValidationErrorOccured (queryName , fatalError, errorMessage ));
             }
         }
@@ -142,13 +149,18 @@ namespace TheLongRun.Common
             string domainName,
             string aggregateTypeName,
             string aggregateInstanceKey,
-            Nullable<DateTime > asOfDate )
+            Nullable<DateTime > asOfDate,
+            IWriteContext writeContext = null)
         {
             EventStream qryEvents = new EventStream(Constants.Domain_Query,
             queryName,
             queryGuid.ToString());
             if (null != qryEvents)
             {
+                if (null != writeContext)
+                {
+                    qryEvents.SetContext(writeContext);
+                }
                 await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRequested(domainName,
                     aggregateTypeName ,
                     aggregateInstanceKey,
@@ -163,15 +175,21 @@ namespace TheLongRun.Common
             string domainName, 
             string aggregateTypeName, 
             string aggregateInstanceKey, 
-            Nullable<DateTime> asOfDate, 
-            object projectionValue,
-            uint sequenceNumber)
+            Nullable<DateTime> asOfDate,
+            IEnumerable<ProjectionSnapshotProperty> projectionValue,
+            uint sequenceNumber,
+            IWriteContext writeContext = null)
         {
             EventStream qryEvents = new EventStream(Constants.Domain_Query,
             queryName,
             queryGuid.ToString());
             if (null != qryEvents)
             {
+                if (null != writeContext)
+                {
+                    qryEvents.SetContext(writeContext);
+                }
+
                 await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionValueReturned (domainName,
                     aggregateTypeName,
                     aggregateInstanceKey,

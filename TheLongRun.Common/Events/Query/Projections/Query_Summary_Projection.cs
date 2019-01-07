@@ -421,7 +421,7 @@ namespace TheLongRun.Common.Events.Query.Projections
     /// Query status returned from the command summary projection
     /// as at a given point in time
     /// </summary>
-    [CQRSAzure.EventSourcing.Category("Query")]
+    [CQRSAzure.EventSourcing.Category(Constants.Domain_Query )]
     public class Query_Summary_Projection_Return
     {
 
@@ -460,7 +460,7 @@ namespace TheLongRun.Common.Events.Query.Projections
 
     }
 
-    [CQRSAzure.EventSourcing.Category("Query")]
+    [CQRSAzure.EventSourcing.Category(Constants.Domain_Query)]
     public class Query_Summary_Projection_Request
     {
         /// <summary>

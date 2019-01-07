@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Queries.Handlers
 {
@@ -54,6 +55,9 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
 
                 if (null != queryEvents)
                 {
+                    // Set the context for the events to be written using
+                    queryEvents.SetContext(new WriteContext("GetLeagueSummaryCreateQueryRequestActivity", context.InstanceId));
+
                     // Log the query creation
                     await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryCreated(queryRequest.QueryName,
                                 qryRecord.QueryUniqueIdentifier));

@@ -26,7 +26,7 @@ namespace TheLongRunLeaguesFunction.Projections
 
         [ApplicationName("The Long Run")]
         [DomainName(Constants.Domain_Query)]
-        [ProjectionName("Command Summary")]
+        [ProjectionName("Query Summary")]
         [FunctionName("GetQueryStatusInformationProjection")]
         public static async Task<HttpResponseMessage> GetQueryStatusInformationProjectionnRun(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequestMessage req,
@@ -55,8 +55,9 @@ namespace TheLongRunLeaguesFunction.Projections
             }
 
             // Run the projection....ProcessCommandStatusInformationProjection
-            Query_Summary_Projection_Return ret = await ProcessQueryStatusInformationProjection(queryId,
+            Query_Summary_Projection_Return ret = await ProcessQueryStatusInformationProjection(
                 queryName,
+                queryId,
                 log);
 
 
@@ -97,8 +98,8 @@ namespace TheLongRunLeaguesFunction.Projections
 
 
         private static async Task<Query_Summary_Projection_Return> ProcessQueryStatusInformationProjection(
-            string queryId,
             string queryName,
+            string queryId,
             ILogger log)
         {
 

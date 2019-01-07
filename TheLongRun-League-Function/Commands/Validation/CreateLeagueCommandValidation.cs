@@ -13,6 +13,8 @@ using Leagues.League.commandDefinition;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
 using Microsoft.Extensions.Logging;
+using CQRSAzure.EventSourcing;
+using TheLongRun.Common.Orchestration;
 
 namespace TheLongRunLeaguesFunction.Commands.Validation
 {
@@ -27,7 +29,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
     public static partial class CreateLeagueCommandHandler
     {
         [ApplicationName("The Long Run")]
-        [DomainName("Leagues")]
+        [TheLongRun.Common.Attributes.DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Create League")]
         [FunctionName("CreateLeagueCommandValidation")]
@@ -62,7 +64,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 
 
         [ApplicationName("The Long Run")]
-        [DomainName("Leagues")]
+        [TheLongRun.Common.Attributes.DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Create League")]
         [FunctionName("CreateLeagueCommandValidationAction")]
@@ -86,7 +88,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         /// The unique identifier of the command to validate
         /// </param>
         private static async Task<bool> ValidateCreateLeagueCommand(string commandId,
-            ILogger log = null)
+            ILogger log,
+            IWriteContext writeContext = null)
         {
 
             const string COMMAND_NAME = @"create-league";

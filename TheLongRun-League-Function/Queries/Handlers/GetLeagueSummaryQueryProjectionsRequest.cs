@@ -86,6 +86,7 @@ namespace TheLongRunLeaguesFunction.Queries
                     log.LogInformation($"GetLeagueSummaryQueryProjectionRequestActivity called for query : {queryRequest.QueryUniqueIdentifier}");
                 }
 
+
                 await RequestProjectionsGetLeagueSummaryQuery(queryRequest.QueryName,
                     queryRequest.QueryUniqueIdentifier.ToString(), 
                     log);
