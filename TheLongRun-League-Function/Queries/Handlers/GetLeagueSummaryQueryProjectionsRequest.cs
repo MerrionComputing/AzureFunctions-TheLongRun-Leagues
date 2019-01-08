@@ -62,6 +62,8 @@ namespace TheLongRunLeaguesFunction.Queries
         }
 
 
+
+
         /// <summary>
         /// Request the projections that are needed to be run to answer this query
         /// </summary>

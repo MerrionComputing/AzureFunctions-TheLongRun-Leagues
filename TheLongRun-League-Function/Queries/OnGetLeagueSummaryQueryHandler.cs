@@ -261,7 +261,13 @@ namespace TheLongRunLeaguesFunction.Queries
                                         // mark it as in-flight
 
                                         // and start running it...
-                                        allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>("RunLeagueSummaryInformationProjectionActivity", projectionRequest.Projection));
+                                        ProjectionRequest projRequest = new ProjectionRequest() {
+                                            EntityUniqueIdentifier = projectionRequest.Projection.InstanceKey,
+                                            AsOfDate = null,
+                                            ProjectionName = projectionRequest.Projection.ProjectionTypeName 
+                                        };
+
+                                        allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>("RunLeagueSummaryInformationProjectionActivity", projRequest));
                                     }
                                 }
 
@@ -269,6 +275,8 @@ namespace TheLongRunLeaguesFunction.Queries
                                 context.SetCustomStatus($"Running {allProjectionTasks.Count } projections in parallel");
 
                                 await Task.WhenAll(allProjectionTasks);
+
+                                context.SetCustomStatus($"Completed running {allProjectionTasks.Count } projections in parallel");
 
                                 foreach (var returnValue in allProjectionTasks)
                                 {
@@ -278,7 +286,22 @@ namespace TheLongRunLeaguesFunction.Queries
                                     projectionResponse.ParentRequestName = queryRequest.QueryName ;
                                     // log the result...
                                     resp = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionResultActivity", projectionResponse);
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.LogInformation ($"Logged projection response for {projectionResponse.ProjectionName} on {projectionResponse.EntityUniqueIdentifier} for query {projectionResponse.CorrelationIdentifier}");
+                                    }
+                                    #endregion
+                                    if (null != resp)
+                                    {
+                                        context.SetCustomStatus(resp);
+                                    }
                                 }
+                            }
+                            else
+                            {
+                                resp.Message = "GetQueryProjectionsStatusProjectionActivity returned no results";
+                                context.SetCustomStatus(resp);
                             }
 
 

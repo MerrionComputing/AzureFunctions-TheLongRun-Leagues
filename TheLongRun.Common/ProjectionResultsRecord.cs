@@ -23,12 +23,12 @@ namespace TheLongRun.Common
         public string ProjectionName { get; set; }
 
         /// <summary>
-        /// The domain in qhich the projection was run
+        /// The domain in which the projection was run
         /// </summary>
         public string DomainName { get; set; }
 
         /// <summary>
-        /// The 
+        /// The aggregate type over which the projection was run
         /// </summary>
         public string AggregateTypeName { get; set; }
 

@@ -169,6 +169,38 @@ namespace TheLongRun.Common
             }
         }
 
+        public static async Task LogProjectionStarted(
+            Guid queryGuid,
+            string queryName,
+            string projectionTypeName,
+            string domainName,
+            string aggregateTypeName,
+            string aggregateInstanceKey,
+            Nullable<DateTime> asOfDate,
+            string projectionRunneridentifier,
+            IWriteContext writeContext = null)
+        {
+            EventStream qryEvents = new EventStream(Constants.Domain_Query,
+            queryName,
+            queryGuid.ToString());
+
+            if (null != qryEvents)
+            {
+                if (null != writeContext)
+                {
+                    qryEvents.SetContext(writeContext);
+                }
+
+                await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRunStarted(domainName,
+                    aggregateTypeName,
+                    aggregateInstanceKey,
+                    projectionTypeName,
+                    asOfDate.GetValueOrDefault(DateTime.UtcNow),
+                    projectionRunneridentifier
+                    ));
+            }
+        }
+
         public static async Task LogProjectionResult(Guid queryGuid, 
             string queryName, 
             string projectionTypeName, 
