@@ -166,6 +166,11 @@ namespace TheLongRunLeaguesFunction
                             log.LogWarning($"Command parameters not valid {cmdRequest.CommandName} : {cmdRequest.CommandUniqueIdentifier } ");
                         }
                         #endregion
+                        if (null != resp)
+                        {
+                            resp.Message = $"Command parameters not valid {cmdRequest.CommandName} : {cmdRequest.CommandUniqueIdentifier } ";
+                            context.SetCustomStatus(resp);
+                        }
                     }
                 }
             }
