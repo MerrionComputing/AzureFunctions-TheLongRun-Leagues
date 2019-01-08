@@ -57,7 +57,7 @@ namespace TheLongRunLeaguesFunction.Queries
 
             QueryRequest<Get_League_Summary_Definition> queryRequest = new QueryRequest<Get_League_Summary_Definition>();
             queryRequest.QueryUniqueIdentifier = new Guid(queryId);
-            queryRequest.QueryName = "";
+            queryRequest.QueryName = "Get League Summary";
 
             // start an orchestrator to run all the projections...
             string instanceId = await orchestrationClient.StartNewAsync("GetLeagueSummaryQueryProjectionProcessOrchestrator", queryRequest);
@@ -87,7 +87,7 @@ namespace TheLongRunLeaguesFunction.Queries
 
             // Get all the outstanding projection requests
             Query_Projections_Projection_Request projectionQueryRequest = new Query_Projections_Projection_Request() { UniqueIdentifier = queryRequest.QueryUniqueIdentifier.ToString(), QueryName = queryRequest.QueryName };
-            IEnumerable<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<IEnumerable<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", queryRequest);
+            List<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", queryRequest);
 
             if (null != allProjections)
             {
@@ -96,19 +96,28 @@ namespace TheLongRunLeaguesFunction.Queries
                 List<Task<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>> allProjectionTasks = new List<Task<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>>();
 
                 // run all the outstanding projections in parallel
-                foreach (var projectionRequest in allProjections)
+                foreach (Query_Projections_Projection_Return projectionRequest in allProjections)
                 {
                     if (projectionRequest.ProjectionState == Query_Projections_Projection_Return.QueryProjectionState.Queued)
                     {
-                        // mark it as in-flight
-
-                        // and start running it...
                         ProjectionRequest projRequest = new ProjectionRequest()
                         {
+                            ParentRequestName = queryRequest.QueryName ,
+                            CorrelationIdentifier = queryRequest.QueryUniqueIdentifier ,
+                            DomainName = "Leagues",
+                            AggregateTypeName = "League",
                             EntityUniqueIdentifier = projectionRequest.Projection.InstanceKey,
                             AsOfDate = null,
                             ProjectionName = projectionRequest.Projection.ProjectionTypeName
                         };
+
+                        // mark it as in-flight
+                        resp = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionInFlightActivity", projRequest);
+
+                        if (null != resp)
+                        {
+                            context.SetCustomStatus(resp);
+                        }
 
                         // and start running it...
                         allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>("RunLeagueSummaryInformationProjectionActivity", projRequest));
@@ -223,14 +232,14 @@ namespace TheLongRunLeaguesFunction.Queries
             ProjectionRequest projectionRequest = context.GetInput<ProjectionRequest>();
             if (null != projectionRequest )
             {
-                await QueryLogRecord.LogProjectionStarted(new Guid(projectionRequest.EntityUniqueIdentifier),
-                    projectionRequest.EntityUniqueIdentifier ,
+                await QueryLogRecord.LogProjectionStarted(projectionRequest.CorrelationIdentifier ,
+                    projectionRequest.ParentRequestName  ,
                     projectionRequest.ProjectionName ,
-                    Constants.Domain_Query ,
-                    "",
+                    projectionRequest.DomainName ,
+                    projectionRequest.AggregateTypeName ,
                     projectionRequest.EntityUniqueIdentifier ,
                     projectionRequest.AsOfDate ,
-                    "",
+                    projectionRequest.CorrelationIdentifier.ToString()   ,
                     writeContext 
                     );
 

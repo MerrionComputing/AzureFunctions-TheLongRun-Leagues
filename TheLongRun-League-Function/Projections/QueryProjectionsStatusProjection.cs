@@ -78,7 +78,7 @@ namespace TheLongRunLeaguesFunction.Projections
         [DomainName(Constants.Domain_Query)]
         [ProjectionName("Query Summary")]
         [FunctionName("GetQueryProjectionsStatusProjectionActivity")]
-        public static async Task<IEnumerable<Query_Projections_Projection_Return>> GetQueryProjectionsStatusProjectionActivity(
+        public static async Task<List<Query_Projections_Projection_Return>> GetQueryProjectionsStatusProjectionActivity(
                         [ActivityTrigger] DurableActivityContext context,
                         ILogger log
                         )
@@ -99,7 +99,7 @@ namespace TheLongRunLeaguesFunction.Projections
                 log);
         }
 
-        private static async Task<IEnumerable<Query_Projections_Projection_Return>> ProcessQueryProjectionsStatusProjection(
+        private static async Task<List<Query_Projections_Projection_Return>> ProcessQueryProjectionsStatusProjection(
             string queryName,
             string queryId,
             ILogger log)

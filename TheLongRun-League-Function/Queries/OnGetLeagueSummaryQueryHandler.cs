@@ -145,7 +145,6 @@ namespace TheLongRunLeaguesFunction.Queries
         [DomainName("Leagues")]
         [AggregateRoot("League")]
         [QueryName("Get League Summary")]
-        [EventTopicSourceName("Get-League-Summary-Query")]
         [FunctionName("OnGetLeagueSummaryQueryHandlerOrchestrator")]
         public static async Task<Get_League_Summary_Definition_Return> OnGetLeagueSummaryQueryHandlerOrchestrator
             ([OrchestrationTrigger] DurableOrchestrationContext context,
@@ -245,7 +244,7 @@ namespace TheLongRunLeaguesFunction.Queries
 
                             // Get all the outstanding projection requests
                             Query_Projections_Projection_Request projectionQueryRequest = new Query_Projections_Projection_Request() { UniqueIdentifier = queryRequest.QueryUniqueIdentifier.ToString(), QueryName = queryRequest.QueryName  };
-                            IEnumerable<Query_Projections_Projection_Return> allProjections = await  context.CallActivityAsync<IEnumerable<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", queryRequest);
+                            List<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", queryRequest);
 
                             if (null != allProjections)
                             {
@@ -254,19 +253,30 @@ namespace TheLongRunLeaguesFunction.Queries
                                 List<Task<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>> allProjectionTasks = new List<Task<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>>();
 
                                 // run all the outstanding projections in parallel
-                                foreach (var projectionRequest in allProjections)
+                                foreach (Query_Projections_Projection_Return projectionRequest in allProjections)
                                 {
                                     if (projectionRequest.ProjectionState == Query_Projections_Projection_Return.QueryProjectionState.Queued)
                                     {
-                                        // mark it as in-flight
-
-                                        // and start running it...
-                                        ProjectionRequest projRequest = new ProjectionRequest() {
+                                        ProjectionRequest projRequest = new ProjectionRequest()
+                                        {
+                                            ParentRequestName= "Get League Summary",
+                                            CorrelationIdentifier = queryId,
+                                            DomainName = "Leagues",
+                                            AggregateTypeName = "League",
                                             EntityUniqueIdentifier = projectionRequest.Projection.InstanceKey,
                                             AsOfDate = null,
-                                            ProjectionName = projectionRequest.Projection.ProjectionTypeName 
+                                            ProjectionName = projectionRequest.Projection.ProjectionTypeName
                                         };
 
+                                        // mark it as in-flight
+                                        resp = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionInFlightActivity", projRequest);
+
+                                        if (null != resp)
+                                        {
+                                            context.SetCustomStatus(resp);
+                                        }
+
+                                        // and start running it...
                                         allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>("RunLeagueSummaryInformationProjectionActivity", projRequest));
                                     }
                                 }

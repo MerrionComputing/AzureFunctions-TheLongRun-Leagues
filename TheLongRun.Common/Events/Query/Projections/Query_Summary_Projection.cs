@@ -206,6 +206,10 @@ namespace TheLongRun.Common.Events.Query.Projections
                 HandleEvent(eventToHandle as QueryCompleted );
             }
 
+            if (eventToHandle.GetType() == typeof(ProjectionRequested ))
+            {
+                HandleEvent(eventToHandle as ProjectionRequested);
+            }
 
         }
 
@@ -243,6 +247,10 @@ namespace TheLongRun.Common.Events.Query.Projections
                 HandleEvent<QueryCompleted>(eventToHandle.ToObject<QueryCompleted>());
             }
 
+            if (eventFullName == typeof(ProjectionRequested).FullName )
+            {
+                HandleEvent<ProjectionRequested>(eventToHandle.ToObject<ProjectionRequested>()); 
+            }
 
         }
 
@@ -272,6 +280,11 @@ namespace TheLongRun.Common.Events.Query.Projections
             }
 
             if (eventTypeFullName == typeof(QueryCompleted ).FullName)
+            {
+                return true;
+            }
+
+            if (eventTypeFullName == typeof(ProjectionRequested).FullName )
             {
                 return true;
             }
@@ -405,11 +418,41 @@ namespace TheLongRun.Common.Events.Query.Projections
             }
         }
 
+        //ProjectionRequested
+        public void HandleEvent(ProjectionRequested eventHandled)
+        {
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"HandleEvent( ProjectionRequested ) in {nameof(Query_Summary_Projection)}");
+            }
+            #endregion
 
+            if (null != eventHandled)
+            {
+                // Set the status as "In error" if this was a fatal parameter error
+                base.AddOrUpdateValue<QueryState>(nameof(CurrentState), 0, QueryState.InProgress );
+                #region Logging
+                if (null != log)
+                {
+                    log.LogDebug($"Projection requested {eventHandled.ProjectionTypeName} for {eventHandled.AggregateType}-{eventHandled.AggregateInstanceKey } in {nameof(Query_Summary_Projection)}");
+                }
+                #endregion
+            }
+            else
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.LogWarning($"HandleEvent( QueryParameterValidationErrorOccured ) - parameter was null in {nameof(Query_Summary_Projection)}");
+                }
+                #endregion
+            }
+        }
 
         public Query_Summary_Projection(ILogger logToUse = null)
         {
-            if (null!= logToUse)
+            if (null != logToUse)
             {
                 log = logToUse;
             }

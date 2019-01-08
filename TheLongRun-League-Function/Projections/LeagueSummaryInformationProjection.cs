@@ -94,17 +94,9 @@ namespace TheLongRunLeaguesFunction.Projections
             ProjectionResultsRecord<Get_League_Summary_Definition_Return> ret = null;
             string message = $"Running projection for {leagueName}";
 
-            try
-            {
-                 ret = await ProcessLeagueSummaryInformationProjection("League_Summary_Information",
+            ret = await ProcessLeagueSummaryInformationProjection("League_Summary_Information",
                     leagueName,
                     log);
-            }
-            catch (Exception  ex)
-            {
-                message = ex.ToString();
-            }
-
 
 
             if (null != ret)
