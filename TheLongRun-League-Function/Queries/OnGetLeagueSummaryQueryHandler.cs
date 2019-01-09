@@ -95,6 +95,7 @@ namespace TheLongRunLeaguesFunction.Queries
                 }
                 #endregion
 
+
                 // Get the query request details out of the event grid data request
                 var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
                 QueryRequest<Get_League_Summary_Definition> queryRequest = null;
@@ -112,6 +113,11 @@ namespace TheLongRunLeaguesFunction.Queries
                     string instanceId = await getLeagueSummaryQueryHandlerOrchestrationClient.StartNewAsync("OnGetLeagueSummaryQueryHandlerOrchestrator", queryRequest);
 
                     log.LogInformation($"Started OnGetLeagueSummaryQueryHandlerOrchestrator orchestration with ID = '{instanceId}'.");
+
+                    var status = await getLeagueSummaryQueryHandlerOrchestrationClient.GetStatusAsync(instanceId);
+
+                    log.LogInformation($"Orchestration  '{instanceId}' has status {status.RuntimeStatus} : {status.Output}.");
+
                 }
                 else
                 {
@@ -244,8 +250,8 @@ namespace TheLongRunLeaguesFunction.Queries
 
                             // Get all the outstanding projection requests
                             Query_Projections_Projection_Request projectionQueryRequest = new Query_Projections_Projection_Request() { UniqueIdentifier = queryRequest.QueryUniqueIdentifier.ToString(), QueryName = queryRequest.QueryName  };
-                            List<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", queryRequest);
-
+                            List<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", projectionQueryRequest);
+                            
                             if (null != allProjections)
                             {
 
