@@ -47,17 +47,19 @@ namespace TheLongRunLeaguesFunction.Queries
 
             // Get the query identifier
             string queryId = req.Query["QueryId"];
+            string queryName = req.Query["QueryName"];
 
             if (string.IsNullOrWhiteSpace(queryId))
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 dynamic data = JsonConvert.DeserializeObject(requestBody);
                 queryId = queryId ?? data?.QueryId;
+                queryName = queryName ?? data?.QueryName;
             }
 
             QueryRequest<Get_League_Summary_Definition> queryRequest = new QueryRequest<Get_League_Summary_Definition>();
             queryRequest.QueryUniqueIdentifier = new Guid(queryId);
-            queryRequest.QueryName = "";
+            queryRequest.QueryName = queryName;
 
             // start an orchestrator to run all the projections...
             string instanceId = await orchestrationClient.StartNewAsync("GetLeagueSummaryQueryProjectionProcessOrchestrator", queryRequest);
