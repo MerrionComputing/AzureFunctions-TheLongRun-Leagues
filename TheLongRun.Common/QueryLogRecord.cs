@@ -38,7 +38,12 @@ namespace TheLongRun.Common
             /// Fire off an event grid event with the specified custom topic name to notify that the
             /// query results are available
             /// </summary>
-            CustomEventGridTopic = 3
+            CustomEventGridTopic = 3,
+            /// <summary>
+            /// Raise an event to notify a durable function orchestration that has been paused waiting for
+            /// this query to complete that it is now good to go
+            /// </summary>
+            DurableFunctionOrchestration = 4
         }
 
         /// <summary>

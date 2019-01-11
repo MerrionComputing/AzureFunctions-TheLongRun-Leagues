@@ -182,83 +182,9 @@ namespace TheLongRunLeaguesFunction.Queries
             return resp;
         }
 
-        /// <summary>
-        /// Log the result from a projection projections that are needed to be run to answer this query
-        /// </summary>
-        [ApplicationName("The Long Run")]
-        [DomainName(Constants.Domain_Query )]
-        [FunctionName("LogQueryProjectionResultActivity")]
-        public static async Task<ActivityResponse> LogQueryProjectionResultActivity(
-            [ActivityTrigger] DurableActivityContext context,
-            ILogger log,
-            CQRSAzure.EventSourcing.IWriteContext writeContext = null)
-        {
-
-            ActivityResponse resp = new ActivityResponse() { FunctionName = "LogQueryProjectionResultActivity" };
-
-            // get the ProjectionResultsRecord
-            ProjectionResultsRecord<object> data = context.GetInput<ProjectionResultsRecord<object>>();
-            if (null != data)
-            {
-                await QueryLogRecord.LogProjectionResult(data.CorrelationIdentifier ,
-                                                         data.ParentRequestName ,
-                                                         data.ProjectionName ,
-                                                         data.DomainName,
-                                                         data.AggregateTypeName,
-                                                         data.EntityUniqueIdentifier,
-                                                         data.CurrentAsOfDate,
-                                                         data.Result ,
-                                                         data.CurrentSequenceNumber,
-                                                         writeContext);
-
-                resp.Message = $"Saved projection result to query {data.ParentRequestName} - {data.CorrelationIdentifier} ";
-            }
-            else
-            {
-                resp.Message = "Unable to get projection result from context";
-                resp.FatalError = true;
-            }
-
-            return resp;
-
-        }
 
 
-        //LogQueryProjectionInFlightActivity
-        [ApplicationName("The Long Run")]
-        [DomainName(Constants.Domain_Query)]
-        [FunctionName("LogQueryProjectionInFlightActivity")]
-        public static async Task<ActivityResponse> LogQueryProjectionInFlightActivity(
-            [ActivityTrigger] DurableActivityContext context,
-            ILogger log,
-            CQRSAzure.EventSourcing.IWriteContext writeContext = null)
-        {
 
-            ActivityResponse resp = new ActivityResponse() { FunctionName = "LogQueryProjectionInFlightActivity" };
 
-            ProjectionRequest projectionRequest = context.GetInput<ProjectionRequest>();
-            if (null != projectionRequest )
-            {
-                await QueryLogRecord.LogProjectionStarted(projectionRequest.CorrelationIdentifier ,
-                    projectionRequest.ParentRequestName  ,
-                    projectionRequest.ProjectionName ,
-                    projectionRequest.DomainName ,
-                    projectionRequest.AggregateTypeName ,
-                    projectionRequest.EntityUniqueIdentifier ,
-                    projectionRequest.AsOfDate ,
-                    projectionRequest.CorrelationIdentifier.ToString()   ,
-                    writeContext 
-                    );
-
-                resp.Message = $"Started running projection  query {projectionRequest.ProjectionName} - {projectionRequest.EntityUniqueIdentifier} ({projectionRequest.AsOfDate}) ";
-            }
-            else
-            {
-                resp.Message = "Unable to get projection request from context";
-                resp.FatalError = true;
-            }
-
-            return resp;
-        }
     }
 }

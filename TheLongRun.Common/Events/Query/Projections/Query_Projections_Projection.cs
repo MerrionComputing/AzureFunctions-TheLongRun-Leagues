@@ -305,5 +305,19 @@ namespace TheLongRun.Common.Events.Query.Projections
         /// This is required as the different query types may have different backing store locations
         /// </remarks>
         public string QueryName { get; set; }
+
+        /// <summary>
+        /// The unique identifier of the orchestration to call-back to notify when the projection
+        /// is complete
+        /// </summary>
+        public string CallbackOrchestrationIdentifier { get; set; }
+
+        /// <summary>
+        /// The up-to date to run the projection to
+        /// </summary>
+        /// <remarks>
+        /// If this is not set then the projection runs to the current end of the event stream
+        /// </remarks>
+        public Nullable<DateTime> AsOfDate { get; set; } 
     }
 }
