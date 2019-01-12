@@ -81,14 +81,14 @@ namespace TheLongRunLeaguesFunction.Projections
                 notifyOrchestration = notifyOrchestration ?? eventData?.NotifyOrchestration;
             }
 
-            if (! string.IsNullOrWhiteSpace(queryId) )
+            if (!string.IsNullOrWhiteSpace(queryId))
             {
                 Query_Projections_Projection_Request payload = new Query_Projections_Projection_Request()
                 {
                     QueryName = queryName,
                     UniqueIdentifier = queryId,
                     AsOfDate = asOfDate,
-                    CallbackOrchestrationIdentifier= notifyOrchestration
+                    CallbackOrchestrationIdentifier = notifyOrchestration
                 };
 
                 // call the orchestrator...
@@ -113,6 +113,10 @@ namespace TheLongRunLeaguesFunction.Projections
                     retryInterval);
 
             }
+            else
+            {
+                return req.CreateResponse(System.Net.HttpStatusCode.BadRequest, "Please pass a query name and query identifier in the query string or in the request body");
+            }
 
         }
 
@@ -131,14 +135,66 @@ namespace TheLongRunLeaguesFunction.Projections
             {
 
                 // get all the projection requests for the query
+                List<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", request);
+                if (null != allProjections)
+                {
+                    #region Logging
+                    if (null != log)
+                    {
+                        log.LogInformation($"Query {request.QueryName}.{request.UniqueIdentifier} has {allProjections.Count} projections total ");
+                    }
+                    #endregion
 
-                // run dem
+                    // Run them - This should be done by fan-out/fan-in
+                    List<Task<ProjectionResultsRecord<object >>> allProjectionTasks = new List<Task<ProjectionResultsRecord<object >>>();
 
+                    // run all the outstanding projections in parallel
+                    foreach (Query_Projections_Projection_Return projectionRequest in allProjections)
+                    {
+                        if (projectionRequest.ProjectionState == Query_Projections_Projection_Return.QueryProjectionState.Queued)
+                        {
+                            ProjectionRequest projRequest = new ProjectionRequest()
+                            {
+                                ParentRequestName = request.QueryName ,
+                                CorrelationIdentifier = new Guid(request.UniqueIdentifier) ,
+                                DomainName = projectionRequest.Projection.DomainName  ,
+                                AggregateTypeName = projectionRequest.Projection.AggregateTypeName ,
+                                EntityUniqueIdentifier = projectionRequest.Projection.InstanceKey,
+                                AsOfDate = null,
+                                ProjectionName = projectionRequest.Projection.ProjectionTypeName
+                            };
+
+                            // mark it as in-flight
+                            response = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionInFlightActivity", projRequest);
+
+                            if (null != response)
+                            {
+                                context.SetCustomStatus(response);
+                            }
+
+                            // and start running it...
+                            allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<object>>("RunProjectionActivity", projRequest));
+                        }
+
+                       // TODO : Run the projections in parallel...
+                       await  Task.WhenAll(allProjectionTasks);
+
+                        // and save their results to the query 
+                        foreach (var returnValue in allProjectionTasks)
+                        {
+                            response = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionResultActivity", returnValue ); 
+                            if (null != response)
+                            {
+                                context.SetCustomStatus(response);
+                            }
+                        }
+                    }
+                }
 
                 // when all done - trigger the calling orchestration to come out of hibernation
                 if (! string.IsNullOrWhiteSpace(request.CallbackOrchestrationIdentifier ) )
                 {
-                     
+                      
                 }
 
                 
@@ -195,7 +251,6 @@ namespace TheLongRunLeaguesFunction.Projections
         }
 
 
-        //LogQueryProjectionInFlightActivity
         [ApplicationName("The Long Run")]
         [DomainName(Constants.Domain_Query)]
         [FunctionName("LogQueryProjectionInFlightActivity")]
@@ -228,6 +283,8 @@ namespace TheLongRunLeaguesFunction.Projections
                 resp.Message = "Unable to get projection request from context";
                 resp.FatalError = true;
             }
+
+            
 
             return resp;
         }

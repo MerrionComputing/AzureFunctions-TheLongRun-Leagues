@@ -160,6 +160,8 @@ namespace TheLongRunLeaguesFunction.Queries
             // Get the query definition form the context...
             QueryRequest<Get_League_Summary_Definition> queryRequest = context.GetInput<QueryRequest<Get_League_Summary_Definition>>();
 
+            
+
             try
             {
                 if (null != queryRequest)
@@ -247,6 +249,8 @@ namespace TheLongRunLeaguesFunction.Queries
                                     return null;
                                 }
                             }
+
+                             
 
                             // Get all the outstanding projection requests
                             Query_Projections_Projection_Request projectionQueryRequest = new Query_Projections_Projection_Request() { UniqueIdentifier = queryRequest.QueryUniqueIdentifier.ToString(), QueryName = queryRequest.QueryName  };
