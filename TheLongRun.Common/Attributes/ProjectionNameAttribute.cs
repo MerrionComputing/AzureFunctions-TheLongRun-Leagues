@@ -44,13 +44,32 @@ namespace TheLongRun.Common.Attributes
         {
             if (_projectionName.EndsWith("-Projection"))
             {
-                return new FunctionNameAttribute(_projectionName)
-;
+                return new FunctionNameAttribute(_projectionName);
             }
             else
             {
                 return new FunctionNameAttribute(_projectionName + @"-Projection");
             }
+        }
+
+        public static string GetProjectionName(Type projectionType)
+        {
+
+            ProjectionNameAttribute attribute = (ProjectionNameAttribute)Attribute.GetCustomAttributes(projectionType, typeof(ProjectionNameAttribute)).FirstOrDefault();
+            if (null != attribute )
+            {
+                return attribute.Name;
+            }
+
+            // Try the CQRS projection name attribute
+            CQRSAzure.EventSourcing.ProjectionNameAttribute   cqrsattribute = (CQRSAzure.EventSourcing.ProjectionNameAttribute)Attribute.GetCustomAttributes(projectionType, typeof(CQRSAzure.EventSourcing.ProjectionNameAttribute)).FirstOrDefault();
+            if (null != cqrsattribute)
+            {
+                return cqrsattribute.ProjectionName ;
+            }
+
+            // If no attribute found, just return the type name
+            return projectionType.Name;
         }
 
     }

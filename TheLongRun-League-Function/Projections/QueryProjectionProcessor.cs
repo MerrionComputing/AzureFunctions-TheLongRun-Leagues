@@ -7,11 +7,13 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TheLongRun.Common;
 using TheLongRun.Common.Attributes;
+using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Events.Query.Projections;
 using TheLongRun.Common.Orchestration;
 
@@ -208,6 +210,104 @@ namespace TheLongRunLeaguesFunction.Projections
             return response;
         }
 
+        //RunProjectionActivity
+        /// <summary>
+        /// Run the specified projection and return the results to the caller orchestration
+        /// </summary>
+        /// <returns></returns>
+        [ApplicationName("The Long Run")]
+        [FunctionName("RunProjectionActivity")]
+        public static async Task<ProjectionResultsRecord<object>> RunProjectionActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            ILogger log)
+        {
+
+            ProjectionRequest request = context.GetInput<ProjectionRequest>();
+
+            if (null != request )
+            {
+
+                Projection projectionEvents = new Projection(request.DomainName ,
+                    request.AggregateTypeName ,
+                    request.EntityUniqueIdentifier ,
+                    request.ProjectionName );
+
+
+                if (null != projectionEvents)
+                {
+                    // Get an instance of the projection we want to run....
+                    CQRSAzure.EventSourcing.ProjectionBaseUntyped projectionToRun = Projection.CreateProjectionInstance(request.ProjectionName ) ;
+                    
+                    if (null != projectionToRun )
+                    {
+                        IProjectionResponse projectionResponse = await projectionEvents.ProcessAsync(projectionToRun); 
+                        if (null != projectionResponse )
+                        {
+
+                            // make a response object
+                            IEnumerable<object> projectionResultObjects = Projection.GetProjectionResults(projectionToRun.CurrentValues);
+
+                            object results = null;
+                            if (null != projectionResultObjects)
+                            {
+                                if (projectionResultObjects.Count() == 1)
+                                {
+                                    results = projectionResultObjects.FirstOrDefault();
+                                }
+                                else
+                                {
+                                    results = projectionResultObjects;
+                                }
+                            }
+
+                            return new ProjectionResultsRecord<object>()
+                            {
+                                DomainName = request.DomainName,
+                                AggregateTypeName = request.AggregateTypeName,
+                                EntityUniqueIdentifier = request.EntityUniqueIdentifier,
+                                CurrentAsOfDate = projectionResponse.AsOfDate.GetValueOrDefault(DateTime.UtcNow) ,
+                                CorrelationIdentifier = request.CorrelationIdentifier,
+                                ParentRequestName = request.ParentRequestName,
+                                Result = results 
+                            };
+                        }
+                        else
+                        {
+                            #region Logging
+                            if (null != log)
+                            {
+                                log.LogWarning($"Unable to read projection request details from {context.InstanceId} ");
+                            }
+                            #endregion
+                            return new ProjectionResultsRecord<object>() {
+                                DomainName = request.DomainName,
+                                AggregateTypeName = request.AggregateTypeName,
+                                EntityUniqueIdentifier = request.EntityUniqueIdentifier ,
+                                CurrentAsOfDate= request.AsOfDate.GetValueOrDefault(DateTime.UtcNow ),
+                                CorrelationIdentifier= request.CorrelationIdentifier ,
+                                ParentRequestName= request.ParentRequestName ,
+                                Result = null 
+                            };
+
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.LogWarning($"Unable to read projection request details from {context.InstanceId} ");
+                }
+                #endregion
+            }
+
+            // No results 
+            return null;
+        }
+
 
         /// <summary>
         /// Log the result from a projection projections that are needed to be run to answer this query
@@ -217,9 +317,11 @@ namespace TheLongRunLeaguesFunction.Projections
         [FunctionName("LogQueryProjectionResultActivity")]
         public static async Task<ActivityResponse> LogQueryProjectionResultActivity(
             [ActivityTrigger] DurableActivityContext context,
-            ILogger log,
-            CQRSAzure.EventSourcing.IWriteContext writeContext = null)
+            ILogger log
+            )
         {
+
+            CQRSAzure.EventSourcing.IWriteContext writeContext = null; // TODO: Pass this as a parameter
 
             ActivityResponse resp = new ActivityResponse() { FunctionName = "LogQueryProjectionResultActivity" };
 
@@ -256,9 +358,11 @@ namespace TheLongRunLeaguesFunction.Projections
         [FunctionName("LogQueryProjectionInFlightActivity")]
         public static async Task<ActivityResponse> LogQueryProjectionInFlightActivity(
             [ActivityTrigger] DurableActivityContext context,
-            ILogger log,
-            CQRSAzure.EventSourcing.IWriteContext writeContext = null)
+            ILogger log)
         {
+
+            // TODO: Pass this as a parameter
+            CQRSAzure.EventSourcing.IWriteContext writeContext = null;
 
             ActivityResponse resp = new ActivityResponse() { FunctionName = "LogQueryProjectionInFlightActivity" };
 

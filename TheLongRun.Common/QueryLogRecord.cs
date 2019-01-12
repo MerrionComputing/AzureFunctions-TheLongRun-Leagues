@@ -196,7 +196,8 @@ namespace TheLongRun.Common
                     qryEvents.SetContext(writeContext);
                 }
 
-                await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRunStarted(domainName,
+                await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRunStarted(
+                    domainName,
                     aggregateTypeName,
                     aggregateInstanceKey,
                     projectionTypeName,

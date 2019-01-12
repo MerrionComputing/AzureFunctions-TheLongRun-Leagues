@@ -17,6 +17,7 @@ namespace Leagues.League.projection
 
     [DomainNameAttribute("Leagues")]
     [Category("Organisation")]
+    [ProjectionName("League Summary Information") ]
     public partial class League_Summary_Information 
         : CQRSAzure.EventSourcing.ProjectionBaseUntyped, 
         ILeague_Summary_Information

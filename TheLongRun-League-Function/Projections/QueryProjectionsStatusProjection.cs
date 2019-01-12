@@ -11,6 +11,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using System.Net;
 using System.Collections.Generic;
+using TheLongRun.Common.Events.Query;
 
 namespace TheLongRunLeaguesFunction.Projections
 {
@@ -144,32 +145,44 @@ namespace TheLongRunLeaguesFunction.Projections
                         if ((qryProjection.CurrentSequenceNumber > 0) || (qryProjection.ProjectionValuesChanged()))
                         {
                             // 1 - add the completed projections
-                            foreach (var prj in qryProjection.ProcessedRequests)
+                            foreach (TheLongRun.Common.Events.Query.ProjectionValueReturned prj in qryProjection.ProcessedRequests)
                             {
                                 ret.Add(new Query_Projections_Projection_Return()
                                 {
                                     ProjectionState = Query_Projections_Projection_Return.QueryProjectionState.Complete,
-                                    Projection = new ProjectionAttribute(prj.DomainName, prj.AggregateType, prj.AggregateInstanceKey, prj.ProjectionTypeName)
+                                    Projection = new ProjectionAttribute(
+                                        prj.DomainName, 
+                                        prj.AggregateType, 
+                                        prj.AggregateInstanceKey, 
+                                        prj.ProjectionTypeName)
                                 });
                             }
 
                             // 2- add the in-progress ones
-                            foreach (var prj in qryProjection.RequestsInProgress)
+                            foreach (TheLongRun.Common.Events.Query.ProjectionRunStarted prj in qryProjection.RequestsInProgress)
                             {
                                 ret.Add(new Query_Projections_Projection_Return()
                                 {
                                     ProjectionState = Query_Projections_Projection_Return.QueryProjectionState.InProgress,
-                                    Projection = new ProjectionAttribute(prj.DomainName, prj.AggregateType, prj.AggregateInstanceKey, prj.ProjectionTypeName)
+                                    Projection = new ProjectionAttribute(
+                                        prj.DomainName, 
+                                        prj.AggregateType, 
+                                        prj.AggregateInstanceKey, 
+                                        prj.ProjectionTypeName)
                                 });
                             }
 
                             // 3 - add the queued ones
-                            foreach (var prj in qryProjection.UnprocessedRequests)
+                            foreach (TheLongRun.Common.Events.Query.ProjectionRequested prj in qryProjection.UnprocessedRequests)
                             {
                                 ret.Add(new Query_Projections_Projection_Return()
                                 {
                                     ProjectionState = Query_Projections_Projection_Return.QueryProjectionState.Queued,
-                                    Projection = new ProjectionAttribute(prj.DomainName, prj.AggregateType, prj.AggregateInstanceKey, prj.ProjectionTypeName)
+                                    Projection = new ProjectionAttribute(
+                                        prj.DomainName, 
+                                        prj.AggregateType, 
+                                        prj.AggregateInstanceKey, 
+                                        prj.ProjectionTypeName)
                                 });
                             }
                         }

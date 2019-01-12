@@ -4,9 +4,9 @@ using System.Text;
 
 namespace TheLongRun.Common
 {
-    public class ProjectionResultsRecord<TRecordType>
-    {
 
+    public class ProjectionResultsRecord
+    {
         /// <summary>
         /// The unique identifier of what called the projection to be run
         /// </summary>
@@ -45,7 +45,14 @@ namespace TheLongRun.Common
         /// <summary>
         /// The as-of sequence number the results were returned for
         /// </summary>
-        public  uint CurrentSequenceNumber { get; set; }
+        public uint CurrentSequenceNumber { get; set; }
+
+    }
+
+    public class ProjectionResultsRecord<TRecordType>
+        : ProjectionResultsRecord
+    {
+
 
         /// <summary>
         /// The actual data part of the projection result

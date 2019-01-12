@@ -226,17 +226,18 @@ namespace TheLongRunLeaguesFunction.Queries
                         {
                             // Request all the projections needed to answer this query
                             resp = await context.CallActivityAsync<ActivityResponse>("GetLeagueSummaryQueryProjectionRequestActivity", queryRequest);
-                            #region Logging
-                            if (null != log)
-                            {
-                                if (null != resp)
-                                {
-                                    log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
-                                }
-                            }
-                            #endregion
+                           
                             if (null != resp)
                             {
+                                #region Logging
+                                if (null != log)
+                                {
+                                    if (null != resp)
+                                    {
+                                        log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                                    }
+                                }
+                                #endregion
                                 context.SetCustomStatus(resp);
                                 if (resp.FatalError)
                                 {
@@ -252,78 +253,33 @@ namespace TheLongRunLeaguesFunction.Queries
 
                              
 
-                            // Get all the outstanding projection requests
+                            // Get all the outstanding projection requests by calling a sub-orchestrator
                             Query_Projections_Projection_Request projectionQueryRequest = new Query_Projections_Projection_Request() { UniqueIdentifier = queryRequest.QueryUniqueIdentifier.ToString(), QueryName = queryRequest.QueryName  };
-                            List<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", projectionQueryRequest);
+                            resp = await context.CallSubOrchestratorAsync<ActivityResponse>("QueryProjectionProcessorOrchestrator", projectionQueryRequest );
                             
-                            if (null != allProjections)
+                            if (null != resp)
                             {
-
-                                // This should be done by fan-out/fan-in
-                                List<Task<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>> allProjectionTasks = new List<Task<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>>();
-
-                                // run all the outstanding projections in parallel
-                                foreach (Query_Projections_Projection_Return projectionRequest in allProjections)
+                                #region Logging
+                                if (null != log)
                                 {
-                                    if (projectionRequest.ProjectionState == Query_Projections_Projection_Return.QueryProjectionState.Queued)
+                                    if (null != resp)
                                     {
-                                        ProjectionRequest projRequest = new ProjectionRequest()
-                                        {
-                                            ParentRequestName= "Get League Summary",
-                                            CorrelationIdentifier = queryId,
-                                            DomainName = "Leagues",
-                                            AggregateTypeName = "League",
-                                            EntityUniqueIdentifier = projectionRequest.Projection.InstanceKey,
-                                            AsOfDate = null,
-                                            ProjectionName = projectionRequest.Projection.ProjectionTypeName
-                                        };
-
-                                        // mark it as in-flight
-                                        resp = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionInFlightActivity", projRequest);
-
-                                        if (null != resp)
-                                        {
-                                            context.SetCustomStatus(resp);
-                                        }
-
-                                        // and start running it...
-                                        allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<Get_League_Summary_Definition_Return>>("RunLeagueSummaryInformationProjectionActivity", projRequest));
+                                        log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
                                     }
                                 }
-
-                                // and persist their results to the query
-                                context.SetCustomStatus($"Running {allProjectionTasks.Count } projections in parallel");
-
-                                await Task.WhenAll(allProjectionTasks);
-
-                                context.SetCustomStatus($"Completed running {allProjectionTasks.Count } projections in parallel");
-
-                                foreach (var returnValue in allProjectionTasks)
+                                #endregion
+                                context.SetCustomStatus(resp);
+                                if (resp.FatalError)
                                 {
-                                    ProjectionResultsRecord<Get_League_Summary_Definition_Return> projectionResponse = returnValue.Result ;
-                                    // add in the extra details
-                                    projectionResponse.CorrelationIdentifier = queryRequest.QueryUniqueIdentifier ;
-                                    projectionResponse.ParentRequestName = queryRequest.QueryName ;
-                                    // log the result...
-                                    resp = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionResultActivity", projectionResponse);
                                     #region Logging
                                     if (null != log)
                                     {
-                                        log.LogInformation ($"Logged projection response for {projectionResponse.ProjectionName} on {projectionResponse.EntityUniqueIdentifier} for query {projectionResponse.CorrelationIdentifier}");
+                                        log.LogError($"Fatal error in {resp.FunctionName} - {resp.Message} ");
                                     }
                                     #endregion
-                                    if (null != resp)
-                                    {
-                                        context.SetCustomStatus(resp);
-                                    }
+                                    return null;
                                 }
                             }
-                            else
-                            {
-                                resp.Message = "GetQueryProjectionsStatusProjectionActivity returned no results";
-                                context.SetCustomStatus(resp);
-                            }
-
 
                             // Output the results
                             resp = await context.CallActivityAsync<ActivityResponse>("GetLeagueSummaryOutputResultsActivity", queryRequest);

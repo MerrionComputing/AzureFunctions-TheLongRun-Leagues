@@ -49,5 +49,19 @@ namespace TheLongRun.Common.Attributes
                 return new FunctionNameAttribute(Name + @"-Classifier");
             }
         }
+
+
+        public static string GetClassifierName(Type classifierType)
+        {
+
+            ClassifierNameAttribute attribute = (ClassifierNameAttribute)Attribute.GetCustomAttributes(classifierType, typeof(ClassifierNameAttribute)).FirstOrDefault();
+            if (null != attribute)
+            {
+                return attribute.Name;
+            }
+
+            // If no attribute found, just return the type name
+            return classifierType.Name;
+        }
     }
 }
