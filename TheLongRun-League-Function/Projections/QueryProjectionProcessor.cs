@@ -136,6 +136,23 @@ namespace TheLongRunLeaguesFunction.Projections
             if (null != request)
             {
 
+                Guid UniqueIdentifierGuid;
+                if (!Guid.TryParse(request.UniqueIdentifier, out UniqueIdentifierGuid))
+                {
+                    if (!Guid.TryParse(request.CallbackOrchestrationIdentifier, out UniqueIdentifierGuid))
+                    {
+                        if (!Guid.TryParse(context.ParentInstanceId, out UniqueIdentifierGuid))
+                        {
+                            if (!Guid.TryParse(context.InstanceId, out UniqueIdentifierGuid))
+                            {
+                                UniqueIdentifierGuid = Guid.NewGuid();
+                            }
+                        }
+                    }
+                }
+
+                
+
                 // get all the projection requests for the query
                 List<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", request);
                 if (null != allProjections)
@@ -155,14 +172,20 @@ namespace TheLongRunLeaguesFunction.Projections
                     {
                         if (projectionRequest.ProjectionState == Query_Projections_Projection_Return.QueryProjectionState.Queued)
                         {
+
+                            if (null != projectionRequest)
+                            {
+                                context.SetCustomStatus(projectionRequest);
+                            }
+
                             ProjectionRequest projRequest = new ProjectionRequest()
                             {
-                                ParentRequestName = request.QueryName ,
-                                CorrelationIdentifier = new Guid(request.UniqueIdentifier) ,
-                                DomainName = projectionRequest.Projection.DomainName  ,
-                                AggregateTypeName = projectionRequest.Projection.AggregateTypeName ,
+                                ParentRequestName = request.QueryName,
+                                CorrelationIdentifier = UniqueIdentifierGuid,
+                                DomainName = projectionRequest.Projection.DomainName,
+                                AggregateTypeName = projectionRequest.Projection.AggregateTypeName,
                                 EntityUniqueIdentifier = projectionRequest.Projection.InstanceKey,
-                                AsOfDate = null,
+                                AsOfDate = request.AsOfDate,
                                 ProjectionName = projectionRequest.Projection.ProjectionTypeName
                             };
 
@@ -172,22 +195,60 @@ namespace TheLongRunLeaguesFunction.Projections
                             if (null != response)
                             {
                                 context.SetCustomStatus(response);
-                            }
 
-                            // and start running it...
-                            allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<object>>("RunProjectionActivity", projRequest));
+                                if (!response.FatalError)
+                                {
+                                    // and start running it...
+                                    allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<object>>("RunProjectionActivity", projRequest));
+                                }
+                                else
+                                {
+                                    #region Logging
+                                    if (null != log )
+                                    {
+                                        log.LogWarning($"Unable to log projection in flight {response.Message } ");
+                                    }
+                                    #endregion
+                                }
+                            }
                         }
 
-                       // TODO : Run the projections in parallel...
-                       await  Task.WhenAll(allProjectionTasks);
+                       // Run the projections in parallel...
+                       await Task.WhenAll(allProjectionTasks);
 
                         // and save their results to the query 
                         foreach (var returnValue in allProjectionTasks)
                         {
-                            response = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionResultActivity", returnValue ); 
-                            if (null != response)
+                            ProjectionResultsRecord<object> result = returnValue.Result;
+                            if (null != result)
                             {
-                                context.SetCustomStatus(response);
+                                if (!result.Error)
+                                {
+                                    response = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionResultActivity", result);
+                                }
+                                else
+                                {
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.LogError($"Error running projection {result.ProjectionName} - {result.StatusMessage} ");
+                                    }
+                                    #endregion
+                                    response.Message = $"Error running projection {result.ProjectionName} - {result.StatusMessage} ";
+                                }
+                                if (null != response)
+                                {
+                                    context.SetCustomStatus(response);
+                                }
+                            }
+                            else
+                            {
+                                #region Logging
+                                if (null != log)
+                                {
+                                    log.LogError($"Projection {returnValue.Id} did not return any values : {returnValue.Exception}");
+                                }
+                                #endregion
                             }
                         }
                     }
@@ -210,7 +271,7 @@ namespace TheLongRunLeaguesFunction.Projections
             return response;
         }
 
-        //RunProjectionActivity
+
         /// <summary>
         /// Run the specified projection and return the results to the caller orchestration
         /// </summary>
@@ -226,6 +287,28 @@ namespace TheLongRunLeaguesFunction.Projections
 
             if (null != request )
             {
+
+                if (! IsProjectionRequestValid(request))
+                {
+                    #region Logging
+                    if (null != log)
+                    {
+                        log.LogError($"Invalid projection request {request}");
+                    }
+                    #endregion
+                    return new ProjectionResultsRecord<object>()
+                    {
+                        Error = true,
+                        StatusMessage= $"Invalid projection request {request}",
+                        DomainName = request.DomainName,
+                        AggregateTypeName = request.AggregateTypeName,
+                        EntityUniqueIdentifier = request.EntityUniqueIdentifier,
+                        CurrentAsOfDate = request.AsOfDate.GetValueOrDefault(DateTime.UtcNow),
+                        CorrelationIdentifier = request.CorrelationIdentifier,
+                        ParentRequestName = request.ParentRequestName,
+                        Result = null
+                    };
+                }
 
                 Projection projectionEvents = new Projection(request.DomainName ,
                     request.AggregateTypeName ,
@@ -262,6 +345,8 @@ namespace TheLongRunLeaguesFunction.Projections
 
                             return new ProjectionResultsRecord<object>()
                             {
+                                Error = false ,
+                                StatusMessage = $"Successfully returned projection request details for {context.InstanceId}",
                                 DomainName = request.DomainName,
                                 AggregateTypeName = request.AggregateTypeName,
                                 EntityUniqueIdentifier = request.EntityUniqueIdentifier,
@@ -280,6 +365,8 @@ namespace TheLongRunLeaguesFunction.Projections
                             }
                             #endregion
                             return new ProjectionResultsRecord<object>() {
+                                Error = true,
+                                StatusMessage = $"Unable to read projection request details from {context.InstanceId}",
                                 DomainName = request.DomainName,
                                 AggregateTypeName = request.AggregateTypeName,
                                 EntityUniqueIdentifier = request.EntityUniqueIdentifier ,
@@ -306,6 +393,35 @@ namespace TheLongRunLeaguesFunction.Projections
 
             // No results 
             return null;
+        }
+
+        private static bool IsProjectionRequestValid(ProjectionRequest request)
+        {
+            if (null == request )
+            {
+                return false;
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(request.DomainName ))
+                {
+                    // Domain name is mandatory
+                    return false;
+                }
+                if (string.IsNullOrWhiteSpace(request.AggregateTypeName ) )
+                {
+                    return false;
+                }
+                if (string.IsNullOrWhiteSpace(request.EntityUniqueIdentifier ) )
+                {
+                    return false;
+                }
+                if (string.IsNullOrWhiteSpace(request.ProjectionName )  )
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
 

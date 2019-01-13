@@ -8,6 +8,8 @@ using TheLongRun.Common.Attributes;
 using CQRSAzure.EventSourcing;
 using TheLongRun.Common.Orchestration;
 using System.Dynamic;
+using System.IO;
+using System.Reflection;
 
 namespace TheLongRun.Common.Bindings
 {
@@ -216,6 +218,40 @@ namespace TheLongRun.Common.Bindings
                     }
                 }
             }
+
+            // add any from not-yet loaded assemblies
+            var assemblyDirectory = new System.IO.DirectoryInfo (  Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            if ((null != assemblyDirectory) && (assemblyDirectory.Exists))
+            {
+                foreach (FileInfo fiDll in assemblyDirectory.GetFiles("*.dll"))
+                {
+                    if ((!fiDll.Name.StartsWith("System."))
+                         && (!fiDll.Name.StartsWith("Microsoft."))
+                         && (!fiDll.Name.StartsWith("CQRSAzure.")))
+                    {
+                        Assembly reflectionAssembly = Assembly.LoadFrom(fiDll.FullName);
+                        if (null != reflectionAssembly)
+                        {
+
+                            if (!reflectionAssembly.IsDynamic)
+                            {
+                                foreach (Type exportedType in reflectionAssembly.GetTypes())
+                                {
+                                    if (exportedType.IsSubclassOf(typeof(CQRSAzure.EventSourcing.ProjectionBaseUntyped)))
+                                    {
+                                        string projectionName = Attributes.ProjectionNameAttribute.GetProjectionName(exportedType);
+                                        if (!_registeredProjections.ContainsKey(projectionName))
+                                        {
+                                            _registeredProjections.Add(projectionName, exportedType);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 
         }
 

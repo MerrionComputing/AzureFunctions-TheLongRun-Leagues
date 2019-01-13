@@ -47,6 +47,16 @@ namespace TheLongRun.Common
         /// </summary>
         public uint CurrentSequenceNumber { get; set; }
 
+        /// <summary>
+        /// This is set to true if an error occured so the projection result should not be trusted
+        /// </summary>
+        public bool Error { get; set; }
+
+        /// <summary>
+        /// Additional information that can be fed back to the caller for logging or progress display
+        /// </summary>
+        public string StatusMessage { get; set; }
+
     }
 
     public class ProjectionResultsRecord<TRecordType>

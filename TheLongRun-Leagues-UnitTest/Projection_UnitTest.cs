@@ -28,9 +28,8 @@ namespace Tests
         [Test]
         public void CreateProjectionInstance_Test()
         {
-            string expectedName = TheLongRun.Common.Attributes.ProjectionNameAttribute.GetProjectionName(typeof(League_Summary_Information));
 
-            var testProjection = Projection.CreateProjectionInstance(expectedName );
+            var testProjection = Projection.CreateProjectionInstance("League Summary Information");
             Assert.IsNotNull(testProjection);
 
         }
@@ -66,6 +65,28 @@ namespace Tests
 
             IEnumerable<object> asObjects = Projection.GetProjectionResults(properties);
             actual = asObjects.Count();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ProjectionRequest_RouwndTrip_Test()
+        {
+
+            string expected = "The long run leagues";
+            string actual = "Not set";
+
+            ProjectionRequest testObj = new ProjectionRequest() {
+            ParentRequestName = "Get League Details",
+            DomainName= "Leagues",
+            AggregateTypeName= "League",
+            EntityUniqueIdentifier = "The long run leagues",
+            AsOfDate=null,
+            ProjectionName = "League Detail Information",
+            CorrelationIdentifier= Guid.NewGuid()};
+
+            actual = testObj.EntityUniqueIdentifier;
+
 
             Assert.AreEqual(expected, actual);
         }
