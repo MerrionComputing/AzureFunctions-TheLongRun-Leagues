@@ -52,5 +52,18 @@ namespace TheLongRun.Common
         /// </remarks>
         public Nullable<DateTime > AsOfDate { get; set; }
 
+
+        public override string ToString()
+        {
+            if (AsOfDate.HasValue )
+            {
+                return $"Run projection {ProjectionName} for {DomainName}.{AggregateTypeName}.{EntityUniqueIdentifier} as at {AsOfDate}";
+            }
+            else
+            {
+                return $"Run projection {ProjectionName} for {DomainName}.{AggregateTypeName}.{EntityUniqueIdentifier}  to current latest record";
+            }
+        }
+
     }
 }

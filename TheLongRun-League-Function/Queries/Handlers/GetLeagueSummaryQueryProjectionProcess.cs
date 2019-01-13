@@ -184,7 +184,22 @@ namespace TheLongRunLeaguesFunction.Queries
 
 
 
+        //GetLeagueSummaryQueryProjectionProcessActivity
+        [ApplicationName("The Long Run")]
+        [DomainName("Leagues")]
+        [AggregateRoot("League")]
+        [QueryName("Get League Summary")]
+        [FunctionName("GetLeagueSummaryQueryProjectionProcessActivity")]
+        public static async Task<ActivityResponse> GetLeagueSummaryQueryProjectionProcessActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            ILogger log)
+        {
 
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "GetLeagueSummaryQueryProjectionRequestActivity" };
 
+            ret.Message = "Obsolete: this function has been replaced by the generic projection processor";
+            
+            return await Task<ActivityResponse>.FromResult( ret) ;
+        }
     }
 }

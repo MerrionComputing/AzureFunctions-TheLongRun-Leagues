@@ -70,6 +70,28 @@ namespace Tests
         }
 
         [Test]
+        public void GetProjectionResults_WithSpaces_Test()
+        {
+            string expected = "The Long Run Leagues";
+            string actual = "Not Set";
+
+            List<ProjectionSnapshotProperty> properties = new List<ProjectionSnapshotProperty>();
+            properties.Add(ProjectionSnapshotProperty.Create<string>("Title", "Mr.", 0));
+            properties.Add(ProjectionSnapshotProperty.Create<string>("Title", "Ms.", 1));
+            properties.Add(ProjectionSnapshotProperty.Create<string>("Title", "Mr.", 2));
+            properties.Add(ProjectionSnapshotProperty.Create<string>("Forename", "Duncan", 0));
+            properties.Add(ProjectionSnapshotProperty.Create<string>("Surname", "Jones", 0));
+            properties.Add(ProjectionSnapshotProperty.Create<string>("Domain", expected, 0));
+
+            IEnumerable<object> asObjects = Projection.GetProjectionResults(properties);
+            dynamic  first = asObjects.FirstOrDefault();
+
+            actual = first.Domain;
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
         public void ProjectionRequest_RouwndTrip_Test()
         {
 
