@@ -43,7 +43,7 @@ namespace TheLongRun.Common
         /// <summary>
         /// The unique identifier of the instance to run the projection for
         /// </summary>
-        public string EntityUniqueIdentifier { get; set; }
+        public string AggregateInstanceUniqueIdentifier { get; set; }
 
         /// <summary>
         /// The date/time to run the projection up to 
@@ -56,24 +56,24 @@ namespace TheLongRun.Common
         public void UrlEncode()
         {
             ProjectionName = WebUtility.UrlEncode(ProjectionName);
-            EntityUniqueIdentifier = WebUtility.UrlEncode(EntityUniqueIdentifier);
+            AggregateInstanceUniqueIdentifier = WebUtility.UrlEncode(AggregateInstanceUniqueIdentifier);
         }
 
         public void UrlDecode()
         {
             ProjectionName = WebUtility.UrlDecode(ProjectionName);
-            EntityUniqueIdentifier = WebUtility.UrlDecode(EntityUniqueIdentifier);
+            AggregateInstanceUniqueIdentifier = WebUtility.UrlDecode(AggregateInstanceUniqueIdentifier);
         }
 
         public override string ToString()
         {
             if (AsOfDate.HasValue )
             {
-                return $"Run projection {ProjectionName} for {DomainName}.{AggregateTypeName}.{EntityUniqueIdentifier} as at {AsOfDate}";
+                return $"Run projection {ProjectionName} for {DomainName}.{AggregateTypeName}.{AggregateInstanceUniqueIdentifier} as at {AsOfDate}";
             }
             else
             {
-                return $"Run projection {ProjectionName} for {DomainName}.{AggregateTypeName}.{EntityUniqueIdentifier}  to current latest record";
+                return $"Run projection {ProjectionName} for {DomainName}.{AggregateTypeName}.{AggregateInstanceUniqueIdentifier}  to current latest record";
             }
         }
 

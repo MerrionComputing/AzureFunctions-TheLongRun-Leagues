@@ -45,12 +45,12 @@ namespace TheLongRun.Common.Attributes
         /// <summary>
         /// The unique identifier of the specific instance of the aggregate
         /// </summary>
-        private readonly string _aggregateInstanceKey;
-        public string InstanceKey
+        private readonly string _instanceKey;
+        public string InstanceKey 
         {
             get
             {
-                return _aggregateInstanceKey;
+                return _instanceKey;
             }
         }
 
@@ -70,12 +70,12 @@ namespace TheLongRun.Common.Attributes
 
         public ClassifierAttribute(string domainName,
                                 string aggregateTypeName,
-                                string aggregateInstanceKey,
+                                string instanceKey,
                                 string classifierTypeName)
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
-            _aggregateInstanceKey = aggregateInstanceKey;
+            _instanceKey = instanceKey;
             _classifierTypeName = classifierTypeName;
         }
 

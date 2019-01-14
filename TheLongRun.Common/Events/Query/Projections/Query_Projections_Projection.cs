@@ -167,8 +167,36 @@ namespace TheLongRun.Common.Events.Query.Projections
                 }
                 #endregion
                 // add this to the unprocessed list
-                unprocessedRequests.Add(eventHandled); 
+                if (IsValidRequest(eventHandled))
+                {
+                    unprocessedRequests.Add(eventHandled);
+                }
             }
+        }
+
+        private bool IsValidRequest(ProjectionRequested eventHandled)
+        {
+            if (null == eventHandled )
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(eventHandled.DomainName) )
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(eventHandled.AggregateType ) )
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(eventHandled.AggregateInstanceKey ))
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(eventHandled.ProjectionTypeName ))
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -236,10 +264,39 @@ namespace TheLongRun.Common.Events.Query.Projections
                     unprocessedRequests.RemoveAt(unprocessedIndex);
                 }
 
-                // add it to the in-flight requests list
-                inflightRequests.Add(eventHandled);
+                if (IsValidRequest(eventHandled))
+                {
+                    // add it to the in-flight requests list
+                    inflightRequests.Add(eventHandled);
+                }
             }
         }
+
+        private bool IsValidRequest(ProjectionRunStarted eventHandled)
+        {
+            if (null == eventHandled)
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(eventHandled.DomainName))
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(eventHandled.AggregateType))
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(eventHandled.AggregateInstanceKey))
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(eventHandled.ProjectionTypeName))
+            {
+                return false;
+            }
+            return true;
+        }
+
 
         public Query_Projections_Projection(ILogger logIn = null)
         {

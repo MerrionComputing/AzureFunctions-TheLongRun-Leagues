@@ -46,7 +46,7 @@ namespace TheLongRunLeaguesFunction.Projections
             if (null != projectionRequest)
             {
                 return await ProcessLeagueSummaryInformationProjection(projectionRequest.ProjectionName,
-                    projectionRequest.EntityUniqueIdentifier,
+                    projectionRequest.AggregateInstanceUniqueIdentifier,
                     log);
             }
             else

@@ -113,7 +113,7 @@ namespace TheLongRunLeaguesFunction.Queries
                                 CorrelationIdentifier = queryRequest.QueryUniqueIdentifier,
                                 DomainName = "Leagues",
                                 AggregateTypeName = "League",
-                                EntityUniqueIdentifier = projectionRequest.Projection.InstanceKey,
+                                AggregateInstanceUniqueIdentifier = projectionRequest.Projection.InstanceKey,
                                 AsOfDate = null,
                                 ProjectionName = projectionRequest.Projection.ProjectionTypeName
                             };

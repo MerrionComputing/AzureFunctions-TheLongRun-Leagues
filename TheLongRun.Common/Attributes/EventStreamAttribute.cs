@@ -42,23 +42,23 @@ namespace TheLongRun.Common.Attributes
         /// <summary>
         /// The unique identifier of the specific instance of the aggregate
         /// </summary>
-        private readonly string _aggregateInstanceKey;
+        private readonly string _instanceKey;
         [AutoResolve]
         public string InstanceKey
         {
             get
             {
-                return _aggregateInstanceKey;
+                return _instanceKey;
             }
         }
 
         public EventStreamAttribute(string domainName,
             string aggregateTypeName,
-            string aggregateInstanceKey)
+            string instanceKey)
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
-            _aggregateInstanceKey = aggregateInstanceKey;
+            _instanceKey = instanceKey;
         }
     }
 }

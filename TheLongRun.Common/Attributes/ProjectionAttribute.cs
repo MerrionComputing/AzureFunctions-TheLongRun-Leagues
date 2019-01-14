@@ -51,13 +51,13 @@ namespace TheLongRun.Common.Attributes
         /// <summary>
         /// The unique identifier of the specific instance of the aggregate
         /// </summary>
-        private readonly string _aggregateInstanceKey;
+        private readonly string _instanceKey;
         [AutoResolve]
         public string InstanceKey
         {
             get
             {
-                return _aggregateInstanceKey;
+                return _instanceKey;
             }
         }
 
@@ -78,12 +78,12 @@ namespace TheLongRun.Common.Attributes
 
         public ProjectionAttribute(string domainName,
                                 string aggregateTypeName,
-                                string aggregateInstanceKey,
+                                string instanceKey,
                                 string projectionTypeName)
         {
             _domainName = domainName;
             _aggregateTypeName = aggregateTypeName;
-            _aggregateInstanceKey = aggregateInstanceKey;
+            _instanceKey = instanceKey;
             _projectionTypeName = projectionTypeName;
 
         }

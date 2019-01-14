@@ -102,7 +102,7 @@ namespace Tests
             ParentRequestName = "Get League Details",
             DomainName= "Leagues",
             AggregateTypeName= "League",
-            EntityUniqueIdentifier = "The long run leagues",
+            AggregateInstanceUniqueIdentifier = "The long run leagues",
             AsOfDate=null,
             ProjectionName = "League Detail Information",
             CorrelationIdentifier= Guid.NewGuid()};
@@ -110,7 +110,7 @@ namespace Tests
             testObj.UrlEncode();
             testObj.UrlDecode(); 
 
-            actual = testObj.EntityUniqueIdentifier;
+            actual = testObj.AggregateInstanceUniqueIdentifier;
 
 
             Assert.AreEqual(expected, actual);
