@@ -37,7 +37,7 @@ namespace TheLongRunLeaguesFunction.Projections
             #region Logging
             if (null != log)
             {
-                log.LogInformation($"RunLeagueSummaryInformationProjectionActivity started - instance {context.InstanceId} ");
+                log.LogInformation($"GetLeagueSummaryCreateQueryRequestActivity started - instance {context.InstanceId} ");
             }
             #endregion
 
