@@ -4,9 +4,9 @@ using System.Text;
 
 namespace TheLongRun.Common
 {
-    public class ProjectionResultsRecord<TRecordType>
-    {
 
+    public class ProjectionResultsRecord
+    {
         /// <summary>
         /// The unique identifier of what called the projection to be run
         /// </summary>
@@ -45,7 +45,24 @@ namespace TheLongRun.Common
         /// <summary>
         /// The as-of sequence number the results were returned for
         /// </summary>
-        public  uint CurrentSequenceNumber { get; set; }
+        public uint CurrentSequenceNumber { get; set; }
+
+        /// <summary>
+        /// This is set to true if an error occured so the projection result should not be trusted
+        /// </summary>
+        public bool Error { get; set; }
+
+        /// <summary>
+        /// Additional information that can be fed back to the caller for logging or progress display
+        /// </summary>
+        public string StatusMessage { get; set; }
+
+    }
+
+    public class ProjectionResultsRecord<TRecordType>
+        : ProjectionResultsRecord
+    {
+
 
         /// <summary>
         /// The actual data part of the projection result

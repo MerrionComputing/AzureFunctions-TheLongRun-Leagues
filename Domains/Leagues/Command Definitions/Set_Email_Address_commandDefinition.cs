@@ -53,11 +53,11 @@ namespace Leagues.League.commandDefinition
             }
         }
         
-        public int Notes
+        public string Notes
         {
             get
             {
-                return base.GetParameterValue<int>("Notes", 0);
+                return base.GetParameterValue<string>("Notes", 0);
             }
             set
             {

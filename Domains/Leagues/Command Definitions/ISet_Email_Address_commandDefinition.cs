@@ -31,7 +31,7 @@ namespace Leagues.League.commandDefinition
             get;
         }
         
-        int Notes
+        string Notes
         {
             get;
         }

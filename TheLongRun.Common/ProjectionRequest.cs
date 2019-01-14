@@ -15,9 +15,29 @@ namespace TheLongRun.Common
     {
 
         /// <summary>
+        /// The unique identifier of what called the projection to be run
+        /// </summary>
+        public Guid CorrelationIdentifier { get; set; }
+
+        /// <summary>
+        /// The name of the query or command that called this projection
+        /// </summary>
+        public string ParentRequestName { get; set; }
+
+        /// <summary>
         /// The name by which this type of projection is known
         /// </summary>
         public string ProjectionName { get; set; }
+
+        /// <summary>
+        /// The domain in which the projection was run
+        /// </summary>
+        public string DomainName { get; set; }
+
+        /// <summary>
+        /// The aggregate type over which the projection was run
+        /// </summary>
+        public string AggregateTypeName { get; set; }
 
         /// <summary>
         /// The unique identifier of the instance to run the projection for
@@ -31,6 +51,19 @@ namespace TheLongRun.Common
         /// If not specified this projection will be run to the current end of the stream
         /// </remarks>
         public Nullable<DateTime > AsOfDate { get; set; }
+
+
+        public override string ToString()
+        {
+            if (AsOfDate.HasValue )
+            {
+                return $"Run projection {ProjectionName} for {DomainName}.{AggregateTypeName}.{EntityUniqueIdentifier} as at {AsOfDate}";
+            }
+            else
+            {
+                return $"Run projection {ProjectionName} for {DomainName}.{AggregateTypeName}.{EntityUniqueIdentifier}  to current latest record";
+            }
+        }
 
     }
 }

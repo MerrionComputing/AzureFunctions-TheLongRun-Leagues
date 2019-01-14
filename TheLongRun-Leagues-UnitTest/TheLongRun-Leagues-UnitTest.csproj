@@ -24,4 +24,31 @@
     <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="CQRSAzure.CommandDefinition">
+      <HintPath>..\lib\CQRSAzure.CommandDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.CommandHandler">
+      <HintPath>..\lib\CQRSAzure.CommandHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.EventSourcing">
+      <HintPath>..\lib\CQRSAzure.EventSourcing.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.EventSourcing.Implementation">
+      <HintPath>..\lib\CQRSAzure.EventSourcing.Implementation.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.Hosting">
+      <HintPath>..\lib\CQRSAzure.Hosting.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.IdentifierGroup">
+      <HintPath>..\lib\CQRSAzure.IdentifierGroup.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.QueryDefinition">
+      <HintPath>..\lib\CQRSAzure.QueryDefinition.dll</HintPath>
+    </Reference>
+    <Reference Include="CQRSAzure.QueryHandler">
+      <HintPath>..\lib\CQRSAzure.QueryHandler.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

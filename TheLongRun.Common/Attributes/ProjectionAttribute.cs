@@ -39,6 +39,7 @@ namespace TheLongRun.Common.Attributes
         /// The aggregate type to which the event stream belongs
         /// </summary>
         private readonly string _aggregateTypeName;
+        [AutoResolve]
         public string AggregateTypeName
         {
             get
@@ -64,6 +65,7 @@ namespace TheLongRun.Common.Attributes
         /// The specific projection type to execute
         /// </summary>
         private readonly string _projectionTypeName;
+        [AutoResolve]
         public string ProjectionTypeName
         {
             get

@@ -15,13 +15,27 @@
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Domains\Leagues\Command Definitions\Leagues.CommandDefinition.csproj" />
-    <ProjectReference Include="..\Domains\Leagues\Command Handlers\Leagues.CommandHandler.csproj" />
-    <ProjectReference Include="..\Domains\Leagues\Event Sourcing\Leagues.EventSourcing.csproj" />
-    <ProjectReference Include="..\Domains\Leagues\Identifier Groups\Leagues.IdentityGroup.csproj" />
-    <ProjectReference Include="..\Domains\Leagues\Query Definitions\Leagues.QueryDefinition.csproj" />
-    <ProjectReference Include="..\Domains\Leagues\Query Handlers\Leagues.QueryHandler.csproj" />
-    <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj" />
+    <ProjectReference Include="..\Domains\Leagues\Command Definitions\Leagues.CommandDefinition.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Domains\Leagues\Command Handlers\Leagues.CommandHandler.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Domains\Leagues\Event Sourcing\Leagues.EventSourcing.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Domains\Leagues\Identifier Groups\Leagues.IdentityGroup.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Domains\Leagues\Query Definitions\Leagues.QueryDefinition.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Domains\Leagues\Query Handlers\Leagues.QueryHandler.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\TheLongRun.Common\TheLongRun.Common.csproj">
+      <Private>true</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="CQRSAzure.CommandDefinition">
