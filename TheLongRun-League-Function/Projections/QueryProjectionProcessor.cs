@@ -188,6 +188,7 @@ namespace TheLongRunLeaguesFunction.Projections
                                 AsOfDate = request.AsOfDate,
                                 ProjectionName = projectionRequest.Projection.ProjectionTypeName
                             };
+                            projRequest.UrlEncode();
 
                             // mark it as in-flight
                             response = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionInFlightActivity", projRequest);
@@ -214,6 +215,7 @@ namespace TheLongRunLeaguesFunction.Projections
                                 AsOfDate = request.AsOfDate,
                                 ProjectionName = projectionRequest.Projection.ProjectionTypeName
                             };
+                            projRequest.UrlEncode();
 
                             // and start running it...
                             allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<object>>("RunProjectionActivity", projRequest));
@@ -227,8 +229,10 @@ namespace TheLongRunLeaguesFunction.Projections
                     foreach (var returnValue in allProjectionTasks)
                     {
                         ProjectionResultsRecord<object> result = returnValue.Result;
+                        
                         if (null != result)
                         {
+                            result.UrlEncode();
                             if (!result.Error)
                             {
                                 response = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionResultActivity", result);
@@ -559,6 +563,8 @@ namespace TheLongRunLeaguesFunction.Projections
             ProjectionResultsRecord<object> data = context.GetInput<ProjectionResultsRecord<object>>();
             if (null != data)
             {
+                data.UrlDecode();
+
                 await QueryLogRecord.LogProjectionResult(data.CorrelationIdentifier,
                                                          data.ParentRequestName,
                                                          data.ProjectionName,
@@ -597,8 +603,12 @@ namespace TheLongRunLeaguesFunction.Projections
             ActivityResponse resp = new ActivityResponse() { FunctionName = "LogQueryProjectionInFlightActivity" };
 
             ProjectionRequest projectionRequest = context.GetInput<ProjectionRequest>();
+            
+
             if (null != projectionRequest)
             {
+                projectionRequest.UrlDecode();
+
                 await QueryLogRecord.LogProjectionStarted(projectionRequest.CorrelationIdentifier,
                     projectionRequest.ParentRequestName,
                     projectionRequest.ProjectionName,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace TheLongRun.Common
@@ -56,6 +57,21 @@ namespace TheLongRun.Common
         /// Additional information that can be fed back to the caller for logging or progress display
         /// </summary>
         public string StatusMessage { get; set; }
+
+
+        public void UrlEncode()
+        {
+            ProjectionName = WebUtility.UrlEncode(ProjectionName);
+            EntityUniqueIdentifier = WebUtility.UrlEncode(EntityUniqueIdentifier);
+            StatusMessage = WebUtility.UrlEncode(StatusMessage);
+        }
+
+        public void UrlDecode()
+        {
+            ProjectionName = WebUtility.UrlDecode(ProjectionName);
+            EntityUniqueIdentifier = WebUtility.UrlDecode(EntityUniqueIdentifier);
+            StatusMessage  = WebUtility.UrlDecode(StatusMessage);
+        }
 
     }
 

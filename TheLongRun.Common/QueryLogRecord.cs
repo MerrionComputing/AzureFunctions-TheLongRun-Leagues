@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs;
@@ -144,7 +145,9 @@ namespace TheLongRun.Common
                 {
                     qryEvents.SetContext(writeContext);
                 }
-                await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValidationErrorOccured (queryName , fatalError, errorMessage ));
+                await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.QueryParameterValidationErrorOccured (queryName , 
+                    fatalError, 
+                    errorMessage ));
             }
         }
 
@@ -168,8 +171,8 @@ namespace TheLongRun.Common
                 }
                 await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRequested(domainName,
                     aggregateTypeName ,
-                    aggregateInstanceKey,
-                    projectionName,
+                    WebUtility.UrlDecode(aggregateInstanceKey),
+                    WebUtility.UrlDecode(projectionName),
                     asOfDate));
             }
         }
@@ -199,8 +202,8 @@ namespace TheLongRun.Common
                 await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionRunStarted(
                     domainName,
                     aggregateTypeName,
-                    aggregateInstanceKey,
-                    projectionTypeName,
+                    WebUtility.UrlDecode(aggregateInstanceKey),
+                    WebUtility.UrlDecode(projectionTypeName),
                     asOfDate.GetValueOrDefault(DateTime.UtcNow),
                     projectionRunneridentifier
                     ));
@@ -230,8 +233,8 @@ namespace TheLongRun.Common
 
                 await qryEvents.AppendEvent(new TheLongRun.Common.Events.Query.ProjectionValueReturned (domainName,
                     aggregateTypeName,
-                    aggregateInstanceKey,
-                    projectionTypeName,
+                    WebUtility.UrlDecode(aggregateInstanceKey),
+                    WebUtility.UrlDecode(projectionTypeName),
                     asOfDate.GetValueOrDefault(DateTime.UtcNow) ,
                     projectionValues,
                     sequenceNumber ));

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace TheLongRun.Common
@@ -52,6 +53,17 @@ namespace TheLongRun.Common
         /// </remarks>
         public Nullable<DateTime > AsOfDate { get; set; }
 
+        public void UrlEncode()
+        {
+            ProjectionName = WebUtility.UrlEncode(ProjectionName);
+            EntityUniqueIdentifier = WebUtility.UrlEncode(EntityUniqueIdentifier);
+        }
+
+        public void UrlDecode()
+        {
+            ProjectionName = WebUtility.UrlDecode(ProjectionName);
+            EntityUniqueIdentifier = WebUtility.UrlDecode(EntityUniqueIdentifier);
+        }
 
         public override string ToString()
         {
