@@ -107,8 +107,6 @@ namespace Tests
             ProjectionName = "League Detail Information",
             CorrelationIdentifier= Guid.NewGuid()};
 
-            testObj.UrlEncode();
-            testObj.UrlDecode(); 
 
             actual = testObj.AggregateInstanceUniqueIdentifier;
 

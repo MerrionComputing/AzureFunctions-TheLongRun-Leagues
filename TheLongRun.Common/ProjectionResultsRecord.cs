@@ -59,19 +59,7 @@ namespace TheLongRun.Common
         public string StatusMessage { get; set; }
 
 
-        public void UrlEncode()
-        {
-            ProjectionName = WebUtility.UrlEncode(ProjectionName);
-            EntityUniqueIdentifier = WebUtility.UrlEncode(EntityUniqueIdentifier);
-            StatusMessage = WebUtility.UrlEncode(StatusMessage);
-        }
 
-        public void UrlDecode()
-        {
-            ProjectionName = WebUtility.UrlDecode(ProjectionName);
-            EntityUniqueIdentifier = WebUtility.UrlDecode(EntityUniqueIdentifier);
-            StatusMessage  = WebUtility.UrlDecode(StatusMessage);
-        }
 
     }
 

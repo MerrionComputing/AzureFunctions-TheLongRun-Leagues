@@ -140,7 +140,10 @@ namespace TheLongRunLeaguesFunction.Queries
                AsOfDate= asOfDate
             };
 
-            IEnumerable<string> allQueryIds = await context.CallActivityAsync<IEnumerable<string>>("GetAllQueriesIdentifierGroupActivity", groupRequest );
+            IEnumerable<string> allQueryIds = await context.CallActivityWithRetryAsync<IEnumerable<string>>("GetAllQueriesIdentifierGroupActivity",
+                DomainSettings.QueryRetryOptions(),
+                groupRequest );
+
 
             if (null != allQueryIds)
             {
@@ -165,7 +168,8 @@ namespace TheLongRunLeaguesFunction.Queries
                         UniqueIdentifier = queryId
                     };
 
-                    allTasks.Add(context.CallActivityAsync<Query_Summary_Projection_Return>("GetQueryStatusInformationProjectionActivity",
+                    allTasks.Add(context.CallActivityWithRetryAsync <Query_Summary_Projection_Return>("GetQueryStatusInformationProjectionActivity",
+                        DomainSettings.QueryRetryOptions(),
                         request));
                 }
 

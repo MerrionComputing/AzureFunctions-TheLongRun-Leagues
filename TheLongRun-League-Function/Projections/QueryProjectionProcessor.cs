@@ -154,7 +154,10 @@ namespace TheLongRunLeaguesFunction.Projections
 
 
                 // get all the projection requests for the query
-                List<Query_Projections_Projection_Return> allProjections = await context.CallActivityAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity", request);
+                List<Query_Projections_Projection_Return> allProjections = await context.CallActivityWithRetryAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity",
+                    DomainSettings.QueryRetryOptions(), 
+                    request);
+
                 if (null != allProjections)
                 {
                     #region Logging
@@ -190,10 +193,11 @@ namespace TheLongRunLeaguesFunction.Projections
                                 context.SetCustomStatus(projRequest);
                             }
 
-                            projRequest.UrlEncode();
 
                             // mark it as in-flight
-                            response = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionInFlightActivity", projRequest);
+                            response = await context.CallActivityWithRetryAsync <ActivityResponse>("LogQueryProjectionInFlightActivity",
+                                DomainSettings.QueryRetryOptions(), 
+                                projRequest);
 
                             if (null != response)
                             {
@@ -217,10 +221,12 @@ namespace TheLongRunLeaguesFunction.Projections
                                 AsOfDate = request.AsOfDate,
                                 ProjectionName = projectionRequest.Projection.ProjectionTypeName
                             };
-                            projRequest.UrlEncode();
+
 
                             // and start running it...
-                            allProjectionTasks.Add(context.CallActivityAsync<ProjectionResultsRecord<object>>("RunProjectionActivity", projRequest));
+                            allProjectionTasks.Add(context.CallActivityWithRetryAsync<ProjectionResultsRecord<object>>("RunProjectionActivity",
+                                DomainSettings.QueryRetryOptions(), 
+                                projRequest));
                         }
                     }
 
@@ -234,10 +240,13 @@ namespace TheLongRunLeaguesFunction.Projections
                         
                         if (null != result)
                         {
-                            result.UrlEncode();
+ 
                             if (!result.Error)
                             {
-                                response = await context.CallActivityAsync<ActivityResponse>("LogQueryProjectionResultActivity", result);
+                    
+                                response = await context.CallActivityWithRetryAsync<ActivityResponse>("LogQueryProjectionResultActivity",
+                                    DomainSettings.QueryRetryOptions() ,
+                                    result);
                             }
                             else
                             {
@@ -557,7 +566,6 @@ namespace TheLongRunLeaguesFunction.Projections
             ProjectionResultsRecord<object> data = context.GetInput<ProjectionResultsRecord<object>>();
             if (null != data)
             {
-                data.UrlDecode();
 
                 await QueryLogRecord.LogProjectionResult(data.CorrelationIdentifier,
                                                          data.ParentRequestName,
@@ -601,7 +609,6 @@ namespace TheLongRunLeaguesFunction.Projections
 
             if (null != projectionRequest)
             {
-                projectionRequest.UrlDecode();
 
                 await QueryLogRecord.LogProjectionStarted(
                     projectionRequest.CorrelationIdentifier,

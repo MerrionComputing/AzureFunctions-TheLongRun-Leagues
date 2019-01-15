@@ -141,7 +141,9 @@ namespace TheLongRunLeaguesFunction
 
             if (null != cmdRequest)
             {
-                ActivityResponse resp = await context.CallActivityAsync<ActivityResponse>("CreateLeagueCommandLogParametersActivity", cmdRequest);
+                ActivityResponse resp = await context.CallActivityWithRetryAsync<ActivityResponse>("CreateLeagueCommandLogParametersActivity",
+                    DomainSettings.CommandRetryOptions(),
+                    cmdRequest);
 
                 #region Logging
                 if (null != log)
@@ -160,7 +162,10 @@ namespace TheLongRunLeaguesFunction
                 if (! resp.FatalError )
                 {
                     // validate the command
-                    bool valid = await context.CallActivityAsync<bool>("CreateLeagueCommandValidationAction", cmdRequest); 
+                    bool valid = await context.CallActivityWithRetryAsync<bool>("CreateLeagueCommandValidationAction",
+                        DomainSettings.CommandRetryOptions(),
+                        cmdRequest); 
+
                     if (! valid)
                     {
                         resp.Message = $"Validation failed for command {cmdRequest.CommandName} id: {cmdRequest.CommandUniqueIdentifier }";
@@ -172,7 +177,10 @@ namespace TheLongRunLeaguesFunction
                 if (!resp.FatalError)
                 {
                     // execute the command
-                    resp = await context.CallActivityAsync<ActivityResponse>("CreateLeagueCommandHandlerAction", cmdRequest );
+                    resp = await context.CallActivityWithRetryAsync<ActivityResponse>("CreateLeagueCommandHandlerAction",
+                        DomainSettings.CommandRetryOptions(),
+                        cmdRequest );
+
                     #region Logging
                     if (null != log)
                     {

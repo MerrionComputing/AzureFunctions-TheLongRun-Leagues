@@ -53,17 +53,7 @@ namespace TheLongRun.Common
         /// </remarks>
         public Nullable<DateTime > AsOfDate { get; set; }
 
-        public void UrlEncode()
-        {
-            ProjectionName = WebUtility.UrlEncode(ProjectionName);
-            AggregateInstanceUniqueIdentifier = WebUtility.UrlEncode(AggregateInstanceUniqueIdentifier);
-        }
 
-        public void UrlDecode()
-        {
-            ProjectionName = WebUtility.UrlDecode(ProjectionName);
-            AggregateInstanceUniqueIdentifier = WebUtility.UrlDecode(AggregateInstanceUniqueIdentifier);
-        }
 
         public override string ToString()
         {

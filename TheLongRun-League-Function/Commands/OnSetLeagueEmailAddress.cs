@@ -121,7 +121,10 @@ namespace TheLongRunLeaguesFunction
  
             if (null != cmdRequest)
             {
-                ActivityResponse resp = await context.CallActivityAsync<ActivityResponse>("SetLeagueEmailAddressCommandLogParametersActivity", cmdRequest);
+                ActivityResponse resp = await context.CallActivityWithRetryAsync<ActivityResponse>("SetLeagueEmailAddressCommandLogParametersActivity",
+                    DomainSettings.CommandRetryOptions(), 
+                    cmdRequest);
+
                 #region Logging
                 if (null != log)
                 {
@@ -139,11 +142,17 @@ namespace TheLongRunLeaguesFunction
                 if (!resp.FatalError)
                 {
                     // 1) Validate the command
-                    bool valid = await context.CallActivityAsync<bool>("SetLeagueEmailAddressCommandValidationActivity", cmdRequest);
+                    bool valid = await context.CallActivityWithRetryAsync<bool>("SetLeagueEmailAddressCommandValidationActivity",
+                        DomainSettings.CommandRetryOptions(),
+                        cmdRequest);
+
                     if (valid)
                     {
                         // 2) Perform the operation of the command
-                        resp = await context.CallActivityAsync<ActivityResponse>("SetLeagueEmailAddressCommandHandlerActivity", cmdRequest);
+                        resp = await context.CallActivityWithRetryAsync <ActivityResponse>("SetLeagueEmailAddressCommandHandlerActivity",
+                            DomainSettings.CommandRetryOptions(),
+                            cmdRequest);
+
                         #region Logging
                         if (null != log)
                         {

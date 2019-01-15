@@ -172,7 +172,9 @@ namespace TheLongRunLeaguesFunction.Queries
                     }
 
                     // Log the query request in its own own query event stream
-                    Guid queryId = await context.CallActivityAsync<Guid>("GetLeagueSummaryCreateQueryRequestActivity", queryRequest);
+                    Guid queryId = await context.CallActivityWithRetryAsync<Guid>("GetLeagueSummaryCreateQueryRequestActivity",
+                        DomainSettings.QueryRetryOptions(), 
+                        queryRequest);
 
                     if (queryId.Equals(Guid.Empty))
                     {
@@ -190,7 +192,9 @@ namespace TheLongRunLeaguesFunction.Queries
                     {
                         queryRequest.QueryUniqueIdentifier = queryId;
                         // Save the parameters to the event stream
-                        ActivityResponse resp = await context.CallActivityAsync<ActivityResponse>("GetLeagueSummaryLogParametersActivity", queryRequest);
+                        ActivityResponse resp = await context.CallActivityWithRetryAsync <ActivityResponse>("GetLeagueSummaryLogParametersActivity",
+                            DomainSettings.QueryRetryOptions(), 
+                            queryRequest);
 
                         #region Logging
                         if (null != log)
@@ -209,7 +213,9 @@ namespace TheLongRunLeaguesFunction.Queries
                         }
 
                         // next validate the query
-                        bool valid = await context.CallActivityAsync<bool>("GetLeagueSummaryValidateActivity", queryRequest);
+                        bool valid = await context.CallActivityWithRetryAsync <bool>("GetLeagueSummaryValidateActivity",
+                            DomainSettings.QueryRetryOptions(), 
+                            queryRequest);
 
                         if (!valid)
                         {
@@ -225,7 +231,9 @@ namespace TheLongRunLeaguesFunction.Queries
                         else
                         {
                             // Request all the projections needed to answer this query
-                            resp = await context.CallActivityAsync<ActivityResponse>("GetLeagueSummaryQueryProjectionRequestActivity", queryRequest);
+                            resp = await context.CallActivityWithRetryAsync <ActivityResponse>("GetLeagueSummaryQueryProjectionRequestActivity",
+                                DomainSettings.QueryRetryOptions(), 
+                                queryRequest);
                            
                             if (null != resp)
                             {
@@ -255,7 +263,9 @@ namespace TheLongRunLeaguesFunction.Queries
 
                             // Get all the outstanding projection requests by calling a sub-orchestrator
                             Query_Projections_Projection_Request projectionQueryRequest = new Query_Projections_Projection_Request() { UniqueIdentifier = queryRequest.QueryUniqueIdentifier.ToString(), QueryName = queryRequest.QueryName  };
-                            resp = await context.CallSubOrchestratorAsync<ActivityResponse>("QueryProjectionProcessorOrchestrator", projectionQueryRequest );
+                            resp = await context.CallSubOrchestratorWithRetryAsync<ActivityResponse>("QueryProjectionProcessorOrchestrator",
+                                DomainSettings.QueryRetryOptions(), 
+                                projectionQueryRequest );
                             
                             if (null != resp)
                             {
@@ -282,7 +292,10 @@ namespace TheLongRunLeaguesFunction.Queries
                             }
 
                             // Output the results
-                            resp = await context.CallActivityAsync<ActivityResponse>("GetLeagueSummaryOutputResultsActivity", queryRequest);
+                            resp = await context.CallActivityWithRetryAsync<ActivityResponse>("GetLeagueSummaryOutputResultsActivity",
+                                DomainSettings.QueryRetryOptions(), 
+                                queryRequest);
+
                             #region Logging
                             if (null != log)
                             {
@@ -308,7 +321,9 @@ namespace TheLongRunLeaguesFunction.Queries
                             }
 
                             // Get the results for ourselves to return...to do this the query must be complete...
-                            return await context.CallActivityAsync<Get_League_Summary_Definition_Return>("GetLeagueSummaryGetResultsActivity", queryRequest);
+                            return await context.CallActivityWithRetryAsync <Get_League_Summary_Definition_Return>("GetLeagueSummaryGetResultsActivity",
+                                DomainSettings.QueryRetryOptions(), 
+                                queryRequest);
                         }
 
                     }
