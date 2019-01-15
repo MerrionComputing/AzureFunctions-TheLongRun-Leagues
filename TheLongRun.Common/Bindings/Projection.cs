@@ -181,6 +181,19 @@ namespace TheLongRun.Common.Bindings
                 returnType = Type.GetType(projectionTypeName, false);
             }
 
+            if (null == returnType )
+            {
+                // try and get a near match
+                foreach (Type possibleMatch in _registeredProjections.Values )
+                {
+                    if (possibleMatch.Name.Equals(projectionTypeName ) )
+                    {
+                        returnType = possibleMatch;
+                        break;
+                    }
+                }
+            }
+
             if (null != returnType)
             {
                 if (returnType.IsSubclassOf(typeof(CQRSAzure.EventSourcing.ProjectionBaseUntyped)))
@@ -189,6 +202,7 @@ namespace TheLongRun.Common.Bindings
                     return (CQRSAzure.EventSourcing.ProjectionBaseUntyped)Activator.CreateInstance(returnType);
                 }
             }
+
 
             // if we got here then there is no matching projection class we can make
             return null;

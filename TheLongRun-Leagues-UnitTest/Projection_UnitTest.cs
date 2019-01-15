@@ -35,6 +35,15 @@ namespace Tests
         }
 
         [Test]
+        public void CreateProjectionInstance_Underscored_Test()
+        {
+
+            var testProjection = Projection.CreateProjectionInstance("League_Summary_Information");
+            Assert.IsNotNull(testProjection);
+
+        }
+
+        [Test]
         public void MakeValidPropertyName_Test()
         {
 
