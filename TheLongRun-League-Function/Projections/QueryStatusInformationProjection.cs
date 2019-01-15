@@ -68,7 +68,8 @@ namespace TheLongRunLeaguesFunction.Projections
             }
             else
             {
-                return req.CreateResponse(HttpStatusCode.OK, ret);
+                return req.CreateResponse(HttpStatusCode.OK, ret,
+                    new System.Net.Http.Formatting.JsonMediaTypeFormatter());
             }
         }
 

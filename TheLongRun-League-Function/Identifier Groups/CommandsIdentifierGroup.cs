@@ -77,7 +77,8 @@ namespace TheLongRunLeaguesFunction.Identifier_Groups
             else
             {
                 IEnumerable<string> ret = await AllCommandsIdentifierGroupProcess(request, log);
-                return req.CreateResponse(HttpStatusCode.OK, ret);
+                return req.CreateResponse(HttpStatusCode.OK, ret,
+                    new System.Net.Http.Formatting.JsonMediaTypeFormatter());
             }
 
         }

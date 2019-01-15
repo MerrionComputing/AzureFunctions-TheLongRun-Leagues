@@ -359,7 +359,8 @@ namespace TheLongRunLeaguesFunction.Projections
 
             if (null != response )
             {
-                return req.CreateResponse(HttpStatusCode.OK, response);
+                return req.CreateResponse(HttpStatusCode.OK, response, 
+                    new System.Net.Http.Formatting.JsonMediaTypeFormatter());
             }
             else
             {
