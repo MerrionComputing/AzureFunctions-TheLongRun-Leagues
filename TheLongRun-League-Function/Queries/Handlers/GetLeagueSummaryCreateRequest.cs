@@ -55,6 +55,9 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
 
                 if (null != queryEvents)
                 {
+
+                    await queryEvents.CreateIfNotExists(); 
+
                     // Set the context for the events to be written using
                     queryEvents.SetContext(new WriteContext("GetLeagueSummaryCreateQueryRequestActivity", context.InstanceId));
 

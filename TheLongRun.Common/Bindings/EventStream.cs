@@ -85,6 +85,14 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
+        /// <summary>
+        /// Explicitly create the event stream if it does not already exist
+        /// </summary>
+        public async Task CreateIfNotExists()
+        {
+             await _writer.CreateIfNotExists();
+        }
+
         private readonly string _connectionStringName;
         public string ConnectionStringName
         {
