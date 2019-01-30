@@ -1,0 +1,5 @@
+﻿Model
+=====
+
+This folder contains classes used to link the logical domain model to the actual Azure durable functions that implement the different parts 
+of it - to allow them to call each other without knowing the specifics of the functions and underlying data stores used
