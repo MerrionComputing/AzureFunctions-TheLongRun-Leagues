@@ -1,5 +1,5 @@
 # AzureFunctions-TheLongRun-Leagues
-Demo code for CQRS on Azure using Event Grid and Durable Functions
+Demo code for CQRS on Azure using _Event Grid_ and _Durable Functions_
 
 This project contains the Azure Functions App used to demonstrate the concept of running a *CQRS* / *Event Sourcing* backed system on a serverless Azure Functions backbone.
 
