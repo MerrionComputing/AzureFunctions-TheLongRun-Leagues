@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TheLongRun.Common.Attributes;
 
 namespace TheLongRun.Common.Model
 {
@@ -16,6 +17,34 @@ namespace TheLongRun.Common.Model
             get
             {
                 return _entityTypeName;
+            }
+        }
+
+
+        /// <summary>
+        /// The name of the connection string used to access this particular entity type
+        /// </summary>
+        /// <remarks>
+        /// If not set the standard rules will be used to try and derive the connection string
+        /// </remarks>
+        private readonly string _connectionStringName;
+        public string ConnectionStringName
+        {
+            get
+            {
+                return _connectionStringName;
+            }
+        }
+
+        /// <summary>
+        /// The underlying storage type to use 
+        /// </summary>
+        private readonly string _storageType = @"BlobStream";
+        public string StorageType
+        {
+            get
+            {
+                return _storageType;
             }
         }
 
@@ -87,9 +116,25 @@ namespace TheLongRun.Common.Model
             _identifierGroupDefinitions.AddIdentifierGroupDefinition(identifierGroupDefinitionToAdd);
         }
 
-        public EntityType(string entityTypeName)
+        public EntityType(string entityTypeName,
+            string domainParentName = @"",
+            string connectionStringName = @"",
+            string storageType = @"BlobStream")
         {
             _entityTypeName = entityTypeName;
+            if (! string.IsNullOrWhiteSpace(connectionStringName) )
+            {
+                _connectionStringName = connectionStringName;
+            }
+            else
+            {
+                // make a default connection string to use
+                _connectionStringName = ConnectionStringNameAttribute.DefaultConnectionStringName(domainParentName, entityTypeName);
+            }
+            if (! string.IsNullOrWhiteSpace(storageType ))
+            {
+                _storageType = storageType;
+            }
             _projectionDefinitions = new ProjectionDefinitions();
             _classifierDefinitions = new ClassifierDefinitions();
             _eventTypes = new EventTypes();
@@ -139,5 +184,21 @@ namespace TheLongRun.Common.Model
             entityType.AddProjectionDefinition (projectionToAdd);
             return entityType;
         }
+
+        /// <summary>
+        /// Set the domain name to use for this entity
+        /// </summary>
+        /// <param name="entityToModify">
+        /// The entity definition
+        /// </param>
+        /// <param name="domainName">
+        /// The name of the parent domain containing the entity
+        /// </param>
+        public static EntityType SetDomain(this EntityType entityToModify, string domainName)
+        {
+            return new EntityType(entityToModify.Name, domainName, entityToModify.ConnectionStringName, entityToModify.StorageType);
+        }
+
+
     }
 }

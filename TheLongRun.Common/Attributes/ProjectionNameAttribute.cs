@@ -42,14 +42,7 @@ namespace TheLongRun.Common.Attributes
         /// </returns>
         public FunctionNameAttribute GetDefaultFunctionName()
         {
-            if (_projectionName.EndsWith("-Projection"))
-            {
-                return new FunctionNameAttribute(_projectionName);
-            }
-            else
-            {
-                return new FunctionNameAttribute(_projectionName + @"-Projection");
-            }
+            return new FunctionNameAttribute(MakeProjectionFunctionName(_projectionName));
         }
 
         public static string GetProjectionName(Type projectionType)
@@ -70,6 +63,18 @@ namespace TheLongRun.Common.Attributes
 
             // If no attribute found, just return the type name
             return projectionType.Name;
+        }
+
+        public static string MakeProjectionFunctionName(string projectionName)
+        {
+            if (projectionName.EndsWith("-Projection"))
+            {
+                return projectionName;
+            }
+            else
+            {
+                return projectionName + @"-Projection";
+            }
         }
 
     }

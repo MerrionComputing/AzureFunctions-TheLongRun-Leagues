@@ -94,5 +94,30 @@ namespace TheLongRun.Common.Model
             return domains;
         }
 
+        /// <summary>
+        /// Load this domains model with all the domains, queries, commands, entities and so on contained in the given
+        /// reference assembly
+        /// </summary>
+        /// <param name="domains">
+        /// The set of domains in this model
+        /// </param>
+        /// <param name="assemblySource">
+        /// Assembly containing zero or more classes and methods marked with attributes which indicate the 
+        /// domain/query/command/entity etc. to which they pertain
+        /// </param>
+        /// <remarks>
+        /// This uses reflection so may be slow for large assemblies
+        /// </remarks>
+        public static Domains LoadFromAssembly(this Domains domains, 
+            System.Reflection.Assembly assemblySource)
+        {
+            if (null != assemblySource )
+            {
+                // Need to work out how to do this...
+                throw new NotImplementedException("Loading a domains model from assembly not implemented yet");
+            }
+
+            return domains;
+        }
     }
 }

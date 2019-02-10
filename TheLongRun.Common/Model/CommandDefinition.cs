@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TheLongRun.Common.Attributes;
 
 namespace TheLongRun.Common.Model
 {
@@ -8,6 +9,7 @@ namespace TheLongRun.Common.Model
     /// A single command definition within the domain
     /// </summary>
     public class CommandDefinition
+        : IDurableFunctionBackedDefinition
     {
 
         /// <summary>
@@ -25,10 +27,31 @@ namespace TheLongRun.Common.Model
             }
         }
 
+        /// <summary>
+        /// The name of the durable function that provides the operation of this command
+        /// </summary>
+        private readonly string _durableFunctionName;
+        public string DurableFunctionName
+        {
+            get
+            {
+                return DurableFunctionName;
+            }
+        }
 
-        public CommandDefinition(string commandDefinitionName)
+        public CommandDefinition(string commandDefinitionName,
+            string durableFunctionName = @"")
         {
             _commandDefinitionName = commandDefinitionName;
+            if (! string.IsNullOrWhiteSpace(durableFunctionName ) )
+            {
+                _durableFunctionName = durableFunctionName;
+            }
+            else
+            {
+                // default to the standard default command name
+                _durableFunctionName = CommandNameAttribute.MakeCommandFunctionName(commandDefinitionName);
+            }
         }
 
     }

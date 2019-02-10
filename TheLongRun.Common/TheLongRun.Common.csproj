@@ -126,6 +126,7 @@
     <Compile Include="Model\EventTypes.cs" />
     <Compile Include="Model\IdentifierGroupDefinition.cs" />
     <Compile Include="Model\IdentifierGroupDefinitions.cs" />
+    <Compile Include="Model\IDurableFunctionBackedDefinition.cs" />
     <Compile Include="Model\ProjectionDefinition.cs" />
     <Compile Include="Model\ProjectionDefinitions.cs" />
     <Compile Include="Model\QueryDefinition.cs" />

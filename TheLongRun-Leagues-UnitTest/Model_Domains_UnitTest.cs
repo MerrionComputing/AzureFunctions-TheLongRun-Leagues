@@ -29,7 +29,9 @@ namespace Tests
         {
             Domains testObj = new Domains()
                 .Add(new Domain("Test Domain")
-                .Add(new EntityType("Test Entity") ));
+                .Add(new EntityType("Test Entity", 
+                   domainParentName: "Test Domain", 
+                   connectionStringName: "TestEntityConnectionString") ));
 
             Assert.IsNotNull(testObj["Test Domain"]
                 .EntityTypes["Test Entity"] );

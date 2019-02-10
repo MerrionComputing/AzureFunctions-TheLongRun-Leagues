@@ -115,7 +115,7 @@ namespace TheLongRun.Common.Model
         /// </summary>
         public static Domain Add(this Domain domain, EntityType  entityToAdd)
         {
-            domain.AddEntityType(entityToAdd);
+            domain.AddEntityType(entityToAdd.SetDomain(domain.Name ) );
             return domain;
         }
     }

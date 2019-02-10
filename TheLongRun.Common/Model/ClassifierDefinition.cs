@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TheLongRun.Common.Attributes;
 
 namespace TheLongRun.Common.Model
 {
@@ -8,6 +9,7 @@ namespace TheLongRun.Common.Model
     /// A single classifier for a domain entity type
     /// </summary>
     public class ClassifierDefinition
+        : IDurableFunctionBackedDefinition
     {
 
         /// <summary>
@@ -22,9 +24,32 @@ namespace TheLongRun.Common.Model
             }
         }
 
-        public ClassifierDefinition(string classifierDefinitionName)
+        /// <summary>
+        /// The name of the durable function that provides the operation of this identifier group
+        /// </summary>
+        private readonly string _durableFunctionName;
+        public string DurableFunctionName
+        {
+            get
+            {
+                return DurableFunctionName;
+            }
+        }
+
+
+        public ClassifierDefinition(string classifierDefinitionName,
+            string durableFunctionName = @"")
         {
             _classifierDefinitionName = classifierDefinitionName;
+            if (!string.IsNullOrWhiteSpace(durableFunctionName))
+            {
+                _durableFunctionName = durableFunctionName;
+            }
+            else
+            {
+                // default to the standard default classifier function name
+                _durableFunctionName = ClassifierNameAttribute.MakeClassifierFunctionName(classifierDefinitionName);
+            }
         }
 
     }

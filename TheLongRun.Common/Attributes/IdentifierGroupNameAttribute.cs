@@ -41,13 +41,18 @@ namespace TheLongRun.Common.Attributes
         /// </returns>
         public FunctionNameAttribute GetDefaultFunctionName()
         {
-            if (Name.EndsWith("-IdentifierGroup"))
+            return new FunctionNameAttribute(MakeIdentifierGroupFunctionName(Name));
+        }
+
+        public static string MakeIdentifierGroupFunctionName(string identifierGroupName)
+        {
+            if (identifierGroupName.EndsWith("-IdentifierGroup"))
             {
-                return new FunctionNameAttribute(Name);
+                return identifierGroupName;
             }
             else
             {
-                return new FunctionNameAttribute(Name + @"-IdentifierGroup");
+                return identifierGroupName + @"-IdentifierGroup";
             }
         }
     }

@@ -40,14 +40,7 @@ namespace TheLongRun.Common.Attributes
         /// </returns>
         public FunctionNameAttribute GetDefaultFunctionName()
         {
-            if (Name.EndsWith("-Classifier"))
-            {
-                return new FunctionNameAttribute(Name);
-            }
-            else
-            {
-                return new FunctionNameAttribute(Name + @"-Classifier");
-            }
+            return new FunctionNameAttribute(MakeClassifierFunctionName(Name));
         }
 
 
@@ -62,6 +55,18 @@ namespace TheLongRun.Common.Attributes
 
             // If no attribute found, just return the type name
             return classifierType.Name;
+        }
+
+        public static string MakeClassifierFunctionName(string classifierName)
+        {
+            if (classifierName.EndsWith("-Classifier"))
+            {
+                return classifierName;
+            }
+            else
+            {
+                return classifierName + @"-Classifier";
+            }
         }
     }
 }
