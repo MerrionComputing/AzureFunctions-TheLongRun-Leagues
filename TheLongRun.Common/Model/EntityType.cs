@@ -119,7 +119,11 @@ namespace TheLongRun.Common.Model
         public EntityType(string entityTypeName,
             string domainParentName = @"",
             string connectionStringName = @"",
-            string storageType = @"BlobStream")
+            string storageType = @"BlobStream",
+            ProjectionDefinitions projectionDefinitions = null,
+            ClassifierDefinitions classifierDefinitions = null,
+            EventTypes eventTypes = null,
+            IdentifierGroupDefinitions identifierGroupDefinitions = null)
         {
             _entityTypeName = entityTypeName;
             if (! string.IsNullOrWhiteSpace(connectionStringName) )
@@ -135,10 +139,42 @@ namespace TheLongRun.Common.Model
             {
                 _storageType = storageType;
             }
-            _projectionDefinitions = new ProjectionDefinitions();
-            _classifierDefinitions = new ClassifierDefinitions();
-            _eventTypes = new EventTypes();
-            _identifierGroupDefinitions = new IdentifierGroupDefinitions();
+
+            if (null == projectionDefinitions)
+            {
+                _projectionDefinitions = new ProjectionDefinitions();
+            }
+            else
+            {
+                _projectionDefinitions = projectionDefinitions;
+            }
+
+            if (null == classifierDefinitions)
+            {
+                _classifierDefinitions = new ClassifierDefinitions();
+            }
+            else
+            {
+                _classifierDefinitions = classifierDefinitions;
+            }
+
+            if (null == eventTypes)
+            {
+                _eventTypes = new EventTypes();
+            }
+            else
+            {
+                _eventTypes = eventTypes;
+            }
+
+            if (null == identifierGroupDefinitions)
+            {
+                _identifierGroupDefinitions = new IdentifierGroupDefinitions();
+            }
+            else
+            {
+                _identifierGroupDefinitions = identifierGroupDefinitions;
+            }
         }
 
     }
@@ -196,7 +232,14 @@ namespace TheLongRun.Common.Model
         /// </param>
         public static EntityType SetDomain(this EntityType entityToModify, string domainName)
         {
-            return new EntityType(entityToModify.Name, domainName, entityToModify.ConnectionStringName, entityToModify.StorageType);
+            return new EntityType(entityToModify.Name, 
+                domainName, 
+                entityToModify.ConnectionStringName, 
+                entityToModify.StorageType,
+                entityToModify.ProjectionDefinitions ,
+                entityToModify.ClassifierDefinitions,
+                entityToModify.EventTypes,
+                entityToModify.IdentifierGroupDefinitions );
         }
 
 

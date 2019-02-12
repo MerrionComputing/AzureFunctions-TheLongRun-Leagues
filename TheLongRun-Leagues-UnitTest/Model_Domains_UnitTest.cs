@@ -83,5 +83,27 @@ namespace Tests
 
         }
 
+        [Test]
+        public void Fluent_BiggerModel_Test()
+        {
+
+            Domains testDomains =  new Domains()
+                .Add(new Domain("Leagues")
+                  .Add(new EntityType("League", domainParentName: "Leagues", connectionStringName: "LeagueStorageConnectionString")
+                    .Add(new ProjectionDefinition("Command Status", "GetCommandStatusInformationProjection"))
+                    .Add(new IdentifierGroupDefinition("All Leagues", "GetAllLeaguesIdentifierGroup")))
+                  .Add(new CommandDefinition("Create League", "OnCreateLeagueCommand"))
+                  .Add(new CommandDefinition("Set Email Address", "OnSetLeagueEmailAddressCommandHandler"))
+                  .Add(new QueryDefinition("Get League Summary", "OnGetLeagueSummaryQueryHandler"))
+                );
+
+
+            Assert.IsNotNull(testDomains["Leagues"]
+                .EntityTypes["League"]
+                .IdentifierGroupDefinitions["All Leagues"]);
+        }
+
+
+
     }
 }
