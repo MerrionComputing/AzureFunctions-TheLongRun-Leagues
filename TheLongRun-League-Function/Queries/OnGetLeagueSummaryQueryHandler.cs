@@ -55,8 +55,7 @@ namespace TheLongRunLeaguesFunction.Queries
             #region Logging
             if (null != log)
             {
-                log.LogDebug("Function triggered in OnGetLeagueSummaryQuery");
-                
+                log.LogDebug("Function triggered in OnGetLeagueSummaryQuery");         
             }
 
             if (null == eventGridEvent)
@@ -106,18 +105,26 @@ namespace TheLongRunLeaguesFunction.Queries
 
                 if (null != queryRequest)
                 {
-                    log.LogInformation($"Running query handler with durable functions orchestration");
-                    log.LogInformation($"{queryRequest.QueryName} with league {queryRequest.GetParameters().League_Name}");
+                    if (null != log)
+                    {
+                        log.LogInformation($"Running query handler with durable functions orchestration");
+                        log.LogInformation($"{queryRequest.QueryName} with league {queryRequest.GetParameters().League_Name}");
+                    }
 
                     // Using Azure Durable functions to do the query chaining
                     string instanceId = await getLeagueSummaryQueryHandlerOrchestrationClient.StartNewAsync("OnGetLeagueSummaryQueryHandlerOrchestrator", queryRequest);
 
-                    log.LogInformation($"Started OnGetLeagueSummaryQueryHandlerOrchestrator orchestration with ID = '{instanceId}'.");
+                    if (null != log)
+                    {
+                        log.LogInformation($"Started OnGetLeagueSummaryQueryHandlerOrchestrator orchestration with ID = '{instanceId}'.");
+                    }
 
                     var status = await getLeagueSummaryQueryHandlerOrchestrationClient.GetStatusAsync(instanceId);
 
-                    log.LogInformation($"Orchestration  '{instanceId}' has status {status.RuntimeStatus} : {status.Output}.");
-
+                    if (null != log)
+                    {
+                        log.LogInformation($"Orchestration  '{instanceId}' has status {status.RuntimeStatus} : {status.Output}.");
+                    }
                 }
                 else
                 {
@@ -135,8 +142,6 @@ namespace TheLongRunLeaguesFunction.Queries
                 }
                 throw;
             }
-
-
         }
 
 
@@ -192,7 +197,9 @@ namespace TheLongRunLeaguesFunction.Queries
                     {
                         queryRequest.QueryUniqueIdentifier = queryId;
                         // Save the parameters to the event stream
-                        ActivityResponse resp = await context.CallActivityWithRetryAsync <ActivityResponse>("GetLeagueSummaryLogParametersActivity",
+                        ActivityResponse resp = null;
+
+                        resp = await context.CallActivityWithRetryAsync <ActivityResponse>("GetLeagueSummaryLogParametersActivity",
                             DomainSettings.QueryRetryOptions(), 
                             queryRequest);
 
@@ -213,9 +220,23 @@ namespace TheLongRunLeaguesFunction.Queries
                         }
 
                         // next validate the query
-                        bool valid = await context.CallActivityWithRetryAsync <bool>("GetLeagueSummaryValidateActivity",
+                        bool valid = false;
+
+                        try
+                        {
+                            valid =await context.CallActivityWithRetryAsync <bool>("GetLeagueSummaryValidateActivity",
                             DomainSettings.QueryRetryOptions(), 
                             queryRequest);
+                        }
+                        catch (FunctionFailedException ffs)
+                        {
+                            if (null == resp)
+                            {
+                                resp = new ActivityResponse() { FunctionName = "QueryProjectionProcessorOrchestrator" };
+                            }
+                            resp.Message = ffs.Message;
+                            resp.FatalError = true;
+                        }
 
                         if (!valid)
                         {
@@ -230,11 +251,23 @@ namespace TheLongRunLeaguesFunction.Queries
                         }
                         else
                         {
-                            // Request all the projections needed to answer this query
-                            resp = await context.CallActivityWithRetryAsync <ActivityResponse>("GetLeagueSummaryQueryProjectionRequestActivity",
+                            try
+                            {
+                                // Request all the projections needed to answer this query
+                                resp = await context.CallActivityWithRetryAsync <ActivityResponse>("GetLeagueSummaryQueryProjectionRequestActivity",
                                 DomainSettings.QueryRetryOptions(), 
                                 queryRequest);
-                           
+                            }
+                            catch (FunctionFailedException ffs)
+                            {
+                                if (null == resp)
+                                {
+                                    resp = new ActivityResponse() { FunctionName = "QueryProjectionProcessorOrchestrator" };
+                                }
+                                resp.Message = ffs.Message;
+                                resp.FatalError = true;
+                            }
+
                             if (null != resp)
                             {
                                 #region Logging
@@ -258,15 +291,26 @@ namespace TheLongRunLeaguesFunction.Queries
                                     return null;
                                 }
                             }
-
-                             
-
+                        
                             // Get all the outstanding projection requests by calling a sub-orchestrator
                             Query_Projections_Projection_Request projectionQueryRequest = new Query_Projections_Projection_Request() { UniqueIdentifier = queryRequest.QueryUniqueIdentifier.ToString(), QueryName = queryRequest.QueryName  };
-                            resp = await context.CallSubOrchestratorWithRetryAsync<ActivityResponse>("QueryProjectionProcessorOrchestrator",
-                                DomainSettings.QueryRetryOptions(), 
-                                projectionQueryRequest );
-                            
+
+                            try
+                            {
+                                resp = await context.CallSubOrchestratorWithRetryAsync<ActivityResponse>("QueryProjectionProcessorOrchestrator",
+                                    DomainSettings.QueryRetryOptions(),
+                                    projectionQueryRequest);
+                            }
+                            catch (FunctionFailedException ffs)
+                            {
+                                if (null == resp)
+                                {
+                                    resp = new ActivityResponse() { FunctionName = "QueryProjectionProcessorOrchestrator" };
+                                }
+                                resp.Message = ffs.Message;
+                                resp.FatalError = true;
+                            }
+
                             if (null != resp)
                             {
                                 #region Logging
@@ -291,10 +335,22 @@ namespace TheLongRunLeaguesFunction.Queries
                                 }
                             }
 
-                            // Output the results
-                            resp = await context.CallActivityWithRetryAsync<ActivityResponse>("GetLeagueSummaryOutputResultsActivity",
+                            try
+                            {
+                                // Output the results
+                                resp = await context.CallActivityWithRetryAsync<ActivityResponse>("GetLeagueSummaryOutputResultsActivity",
                                 DomainSettings.QueryRetryOptions(), 
                                 queryRequest);
+                            }
+                            catch (FunctionFailedException ffs)
+                            {
+                                if (null == resp)
+                                {
+                                    resp = new ActivityResponse() { FunctionName = "QueryProjectionProcessorOrchestrator" };
+                                }
+                                resp.Message = ffs.Message;
+                                resp.FatalError = true;
+                            }
 
                             #region Logging
                             if (null != log)
@@ -321,9 +377,11 @@ namespace TheLongRunLeaguesFunction.Queries
                             }
 
                             // Get the results for ourselves to return...to do this the query must be complete...
-                            return await context.CallActivityWithRetryAsync <Get_League_Summary_Definition_Return>("GetLeagueSummaryGetResultsActivity",
+                            Get_League_Summary_Definition_Return ret =  await context.CallActivityWithRetryAsync <Get_League_Summary_Definition_Return>("GetLeagueSummaryGetResultsActivity",
                                 DomainSettings.QueryRetryOptions(), 
                                 queryRequest);
+
+                            return ret;
                         }
 
                     }
