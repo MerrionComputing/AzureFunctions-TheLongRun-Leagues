@@ -378,6 +378,7 @@ namespace TheLongRunLeaguesFunction.Projections
             if (null != request)
             {
 
+
                 if (!IsProjectionRequestValid(request))
                 {
                     #region Logging
@@ -408,8 +409,11 @@ namespace TheLongRunLeaguesFunction.Projections
 
                 if (null != projectionEvents)
                 {
+                    CQRSAzure.EventSourcing.ProjectionBaseUntyped projectionToRun = null;
+
                     // Get an instance of the projection we want to run....
-                    CQRSAzure.EventSourcing.ProjectionBaseUntyped projectionToRun = Projection.CreateProjectionInstance(request.ProjectionName);
+                   projectionToRun = Projection.CreateProjectionInstance(request.ProjectionName);
+                    
 
                     if (null != projectionToRun)
                     {

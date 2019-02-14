@@ -178,7 +178,11 @@ namespace TheLongRun.Common.Bindings
             }
             else
             {
-                returnType = Type.GetType(projectionTypeName, false);
+                // use custom assembly resolve handler
+                using (new AzureFunctionsResolveAssembly())
+                {
+                    returnType = Type.GetType(projectionTypeName, false);
+                }
             }
 
             if (null == returnType )
@@ -213,50 +217,54 @@ namespace TheLongRun.Common.Bindings
         {
             _registeredProjections = new Dictionary<string, Type>();
 
-            foreach (System.Reflection.Assembly  assy in AppDomain.CurrentDomain.GetAssemblies())
+            // use custom assembly resolve handler
+            using (new AzureFunctionsResolveAssembly())
             {
-                if ( (! assy.FullName.StartsWith("System.")) 
-                    && (!assy.FullName.StartsWith("Microsoft."))
-                    && (!assy.FullName.StartsWith("CQRSAzure.")))
+                foreach (System.Reflection.Assembly assy in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    if (!assy.IsDynamic)
+                    if ((!assy.FullName.StartsWith("System."))
+                        && (!assy.FullName.StartsWith("Microsoft."))
+                        && (!assy.FullName.StartsWith("CQRSAzure.")))
                     {
-                        foreach (Type exportedType in assy.GetTypes())
+                        if (!assy.IsDynamic)
                         {
-                            if (exportedType.IsSubclassOf(typeof(CQRSAzure.EventSourcing.ProjectionBaseUntyped)))
+                            foreach (Type exportedType in assy.GetTypes())
                             {
-                                string projectionName = Attributes.ProjectionNameAttribute.GetProjectionName(exportedType);
-                                _registeredProjections.Add(projectionName, exportedType);
+                                if (exportedType.IsSubclassOf(typeof(CQRSAzure.EventSourcing.ProjectionBaseUntyped)))
+                                {
+                                    string projectionName = Attributes.ProjectionNameAttribute.GetProjectionName(exportedType);
+                                    _registeredProjections.Add(projectionName, exportedType);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // add any from not-yet loaded assemblies
-            var assemblyDirectory = new System.IO.DirectoryInfo (  Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            if ((null != assemblyDirectory) && (assemblyDirectory.Exists))
-            {
-                foreach (FileInfo fiDll in assemblyDirectory.GetFiles("*.dll"))
+                // add any from not-yet loaded assemblies
+                var assemblyDirectory = new System.IO.DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+                if ((null != assemblyDirectory) && (assemblyDirectory.Exists))
                 {
-                    if ((!fiDll.Name.StartsWith("System."))
-                         && (!fiDll.Name.StartsWith("Microsoft."))
-                         && (!fiDll.Name.StartsWith("CQRSAzure.")))
+                    foreach (FileInfo fiDll in assemblyDirectory.GetFiles("*.dll"))
                     {
-                        Assembly reflectionAssembly = Assembly.LoadFrom(fiDll.FullName);
-                        if (null != reflectionAssembly)
+                        if ((!fiDll.Name.StartsWith("System."))
+                             && (!fiDll.Name.StartsWith("Microsoft."))
+                             && (!fiDll.Name.StartsWith("CQRSAzure.")))
                         {
-
-                            if (!reflectionAssembly.IsDynamic)
+                            Assembly reflectionAssembly = Assembly.LoadFrom(fiDll.FullName);
+                            if (null != reflectionAssembly)
                             {
-                                foreach (Type exportedType in reflectionAssembly.GetTypes())
+
+                                if (!reflectionAssembly.IsDynamic)
                                 {
-                                    if (exportedType.IsSubclassOf(typeof(CQRSAzure.EventSourcing.ProjectionBaseUntyped)))
+                                    foreach (Type exportedType in reflectionAssembly.GetTypes())
                                     {
-                                        string projectionName = Attributes.ProjectionNameAttribute.GetProjectionName(exportedType);
-                                        if (!_registeredProjections.ContainsKey(projectionName))
+                                        if (exportedType.IsSubclassOf(typeof(CQRSAzure.EventSourcing.ProjectionBaseUntyped)))
                                         {
-                                            _registeredProjections.Add(projectionName, exportedType);
+                                            string projectionName = Attributes.ProjectionNameAttribute.GetProjectionName(exportedType);
+                                            if (!_registeredProjections.ContainsKey(projectionName))
+                                            {
+                                                _registeredProjections.Add(projectionName, exportedType);
+                                            }
                                         }
                                     }
                                 }
