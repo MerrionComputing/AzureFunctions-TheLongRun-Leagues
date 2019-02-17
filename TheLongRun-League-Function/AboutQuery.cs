@@ -24,9 +24,9 @@ namespace TheLongRunLeaguesFunction
         public static async Task<HttpResponseMessage> AboutQueryRun(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req,
             ILogger log,
-            [EventStream("The Long Run", "Test Case", "123")] EventStream esTest,
-            [Projection("The Long Run", "Test Case", "123", "Test Projection")] Projection prjTest,
-            [Classifier("The Long Run", "Test Case", "123", "Test Classifier")] Classifier clsTest)
+            [EventStream(Constants.Domain_Query, "Test Case", "123")] EventStream esTest,
+            [Projection(Constants.Domain_Query, "Test Case", "123", "Test Projection")] Projection prjTest,
+            [Classifier(Constants.Domain_Query, "Test Case", "123", "Test Classifier")] Classifier clsTest)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 

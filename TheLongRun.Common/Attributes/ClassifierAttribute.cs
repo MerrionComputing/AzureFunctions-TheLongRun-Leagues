@@ -46,6 +46,7 @@ namespace TheLongRun.Common.Attributes
         /// The unique identifier of the specific instance of the aggregate
         /// </summary>
         private readonly string _instanceKey;
+        [AutoResolve]
         public string InstanceKey 
         {
             get

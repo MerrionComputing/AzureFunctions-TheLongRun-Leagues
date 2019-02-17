@@ -17,6 +17,10 @@ namespace TheLongRunLeaguesFunction
     {
         public void Configure(IWebJobsBuilder builder)
         {
+
+            // Initialise any common services
+            TheLongRun.Common.CQRSAzureBindings.InitializeServices(builder.Services);
+
             // Add the standard (built-in) bindings 
             builder.AddBuiltInBindings();
 
@@ -24,6 +28,7 @@ namespace TheLongRunLeaguesFunction
             builder.AddExtension<InjectConfiguration>();
 
             
+
         }
     }
 

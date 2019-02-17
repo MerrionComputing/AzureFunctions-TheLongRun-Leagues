@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CQRSAzure.EventSourcing;
+using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Microsoft.Extensions.DependencyInjection;
+using TheLongRun.Common.Attributes;
+using TheLongRun.Common.Bindings;
 
 namespace TheLongRun.Common
 {
@@ -54,34 +58,101 @@ namespace TheLongRun.Common
         }
 
         /// <summary>
+        /// Initialise any common services for dependency injection
+        /// </summary>
+        /// <param name="services">
+        /// The service collection to which common services can be added
+        /// </param>
+        public static void InitializeServices(IServiceCollection services)
+        {
+
+            // Add logging services 
+            services.AddLogging();
+
+
+        }
+
+        /// <summary>
         /// Initailise any common dependency injection configuration settings
         /// </summary>
         /// <param name="context"></param>
         public static void InitializeInjectionConfiguration(ExtensionConfigContext context)
         {
 
-            var services = new ServiceCollection();
-            var serviceProvider = services.BuildServiceProvider(true);
 
             // Set up the dependency injection stuff for the custom bindings 
             // 1: EventStream
             context
                 .AddBindingRule<Attributes.EventStreamAttribute>()
-                .Bind(new Bindings.EventStreamAttributeBindingProvider() )
+                .BindToInput<Bindings.EventStream >(BuildEventStreamFromAttribute)
                 ;
 
             // 2: Classifier
             context
                 .AddBindingRule<Attributes.ClassifierAttribute >()
-                .Bind(new Bindings.ClassifierAttributeBindingProvider())
+                .BindToInput<Bindings.Classifier>(BuildClassifierFromAttribute)
                 ;
 
             // 3: Projection
             context
               .AddBindingRule<Attributes.ProjectionAttribute >()
-              .Bind(new Bindings.ProjectionAttributeBindingProvider())
+              .BindToInput<Bindings.Projection >(BuildProjectionFromAttribute)
               ;
 
+        }
+
+
+
+
+        /// <summary>
+        /// Create a new event stream from the attribute passed in
+        /// </summary>
+        /// <param name="attribute">
+        /// The EventStreamAttribute tagging the parameter to crreate by dependency injection
+        /// </param>
+        /// <param name="context">
+        /// The context within which this binding is occuring
+        /// </param>
+        /// <returns>
+        /// A task that can create an event stream when required
+        /// </returns>
+        public static Task<EventStream> BuildEventStreamFromAttribute(EventStreamAttribute attribute, 
+            ValueBindingContext context)
+        {
+            // If possible get the connection string to use
+
+            // If possible, get the write context to use
+
+            // Use this and the attribute to create a new event stream instance
+            return Task < EventStream >.FromResult( new EventStream(attribute));
+        }
+
+        /// <summary>
+        /// Create a classifier instance from the classifier attribute tagging the imput parameter
+        /// </summary>
+        /// <param name="attribute">
+        /// The ClassifierAttribute defining the classifier to create
+        /// </param>
+        /// <param name="context">
+        /// The context within which this binding is occuring
+        /// </param>
+        public static Task<Classifier> BuildClassifierFromAttribute(ClassifierAttribute attribute, 
+            ValueBindingContext context)
+        {
+            // If possible get the connection string to use
+
+            // Use this and the attribute to create a new classifier instance
+            return Task<Classifier>.FromResult(new Classifier(attribute));
+        }
+
+
+        public static Task<Projection> BuildProjectionFromAttribute(ProjectionAttribute attribute,
+            ValueBindingContext context)
+        {
+            // If possible get the connection string to use
+
+            // Use this and the attribute to create a new classifier instance
+            return Task<Projection>.FromResult(new Projection(attribute));
         }
 
         /// <summary>
