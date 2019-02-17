@@ -9,7 +9,7 @@ namespace TheLongRun.Common.Attributes
     /// <summary>
     /// An attribute to mark an event stream to use for output for appending events to
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false )]
     [Binding]
     public sealed class EventStreamAttribute
         : Attribute , IEventStreamUntypedIdentity

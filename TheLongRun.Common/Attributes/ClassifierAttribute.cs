@@ -11,7 +11,7 @@ namespace TheLongRun.Common.Attributes
     /// This is not a trigger - we decide on a case by case basis what triggers a classifier
     /// and the same classifier may have different invocations
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
     [Binding]
     public class ClassifierAttribute
         : Attribute,

@@ -1,5 +1,7 @@
-﻿using CQRSAzure.EventSourcing;
-
+﻿using System;
+using CQRSAzure.EventSourcing;
+using Microsoft.Azure.WebJobs.Host.Config;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TheLongRun.Common
 {
@@ -49,6 +51,37 @@ namespace TheLongRun.Common
             /// InitialSize="20000" 
             /// </remarks>
             File = 2
+        }
+
+        /// <summary>
+        /// Initailise any common dependency injection configuration settings
+        /// </summary>
+        /// <param name="context"></param>
+        public static void InitializeInjectionConfiguration(ExtensionConfigContext context)
+        {
+
+            var services = new ServiceCollection();
+            var serviceProvider = services.BuildServiceProvider(true);
+
+            // Set up the dependency injection stuff for the custom bindings 
+            // 1: EventStream
+            context
+                .AddBindingRule<Attributes.EventStreamAttribute>()
+                .Bind(new Bindings.EventStreamAttributeBindingProvider() )
+                ;
+
+            // 2: Classifier
+            context
+                .AddBindingRule<Attributes.ClassifierAttribute >()
+                .Bind(new Bindings.ClassifierAttributeBindingProvider())
+                ;
+
+            // 3: Projection
+            context
+              .AddBindingRule<Attributes.ProjectionAttribute >()
+              .Bind(new Bindings.ProjectionAttributeBindingProvider())
+              ;
+
         }
 
         /// <summary>

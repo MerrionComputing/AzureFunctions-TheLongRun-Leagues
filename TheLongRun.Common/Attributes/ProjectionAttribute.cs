@@ -15,7 +15,7 @@ namespace TheLongRun.Common.Attributes
     /// This is not a trigger - we decide on a case by case basis what triggers a projection
     /// and the same projection may have different invocations
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Parameter,AllowMultiple = false)]
     [Binding]
     public sealed class ProjectionAttribute
         : Attribute ,

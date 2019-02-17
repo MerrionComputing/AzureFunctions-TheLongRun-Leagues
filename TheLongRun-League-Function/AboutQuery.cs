@@ -7,6 +7,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using TheLongRun.Common;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
+using TheLongRun.Common.Attributes;
+using TheLongRun.Common.Bindings;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -21,15 +23,39 @@ namespace TheLongRunLeaguesFunction
         [FunctionName("AboutQuery")]
         public static async Task<HttpResponseMessage> AboutQueryRun(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req,
-            ExecutionContext context,
-            ILogger log)
+            ILogger log,
+            [EventStream("The Long Run", "Test Case", "123")] EventStream esTest,
+            [Projection("The Long Run", "Test Case", "123", "Test Projection")] Projection prjTest,
+            [Classifier("The Long Run", "Test Case", "123", "Test Classifier")] Classifier clsTest)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            if (null != context )
+
+            if (null != esTest )
             {
-                log.LogInformation($"App directory: {context.FunctionAppDirectory}");
-                log.LogInformation($"Function directory: {context.FunctionDirectory }");
+                log.LogInformation($"Event stream created {esTest}");
+            }
+            else
+            {
+                log.LogWarning($"Unable to create event stream parameter");
+            }
+
+            if (null != prjTest)
+            {
+                log.LogInformation($"Projection created {prjTest}");
+            }
+            else
+            {
+                log.LogWarning($"Unable to create projection parameter");
+            }
+
+            if (null != clsTest)
+            {
+                log.LogInformation($"Classifier created {clsTest}");
+            }
+            else
+            {
+                log.LogWarning($"Unable to create classifier parameter");
             }
 
             // parse query parameter
