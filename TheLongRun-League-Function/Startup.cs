@@ -51,7 +51,7 @@ namespace TheLongRunLeaguesFunction
             // and then add any core ones from TheLongRun.Common
             CQRSAzureBindings.InitializeInjectionConfiguration(context);
             
-
+           
         }
     }
 }

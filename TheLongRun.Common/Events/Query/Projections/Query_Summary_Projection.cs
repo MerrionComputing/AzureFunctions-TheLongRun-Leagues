@@ -210,7 +210,6 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 HandleEvent(eventToHandle as ProjectionRequested);
             }
-
         }
 
         public override bool HandlesEventType(Type eventType)

@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs.Description;
 using System;
 
 using CQRSAzure.EventSourcing;
+using Microsoft.Azure.WebJobs.Host.Bindings;
 
 namespace TheLongRun.Common.Attributes
 {
@@ -14,6 +15,7 @@ namespace TheLongRun.Common.Attributes
     public sealed class EventStreamAttribute
         : Attribute , IEventStreamUntypedIdentity
     {
+
 
         /// <summary>
         /// The domain name the aggregate instance belongs to

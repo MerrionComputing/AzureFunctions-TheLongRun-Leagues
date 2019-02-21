@@ -119,8 +119,9 @@ namespace TheLongRun.Common
         public static Task<EventStream> BuildEventStreamFromAttribute(EventStreamAttribute attribute, 
             ValueBindingContext context)
         {
-            // If possible get the connection string to use
 
+            // If possible get the connection string to use
+                
             // If possible, get the write context to use
 
             // Use this and the attribute to create a new event stream instance

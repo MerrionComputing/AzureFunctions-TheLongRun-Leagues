@@ -17,12 +17,14 @@ namespace Leagues.League.projection
 
     [DomainNameAttribute("Leagues")]
     [Category("Organisation")]
-    [ProjectionName("League Summary Information") ]
-    public partial class League_Summary_Information 
-        : CQRSAzure.EventSourcing.ProjectionBaseUntyped, 
+    [ProjectionName("League Summary Information")]
+    public partial class League_Summary_Information
+        : CQRSAzure.EventSourcing.ProjectionBaseUntyped,
+        CQRSAzure.EventSourcing.IHandleEvent<Formed>,
+        CQRSAzure.EventSourcing.IHandleEvent<Contact_Details_Changed>,
         ILeague_Summary_Information
     {
-        
+
         /// <summary>
         /// Current location of the league
         /// </summary>
@@ -33,7 +35,7 @@ namespace Leagues.League.projection
                 return base.GetPropertyValue<string>("Location");
             }
         }
-        
+
         /// <summary>
         /// The twitter handle used by this league 
         /// </summary>
@@ -47,7 +49,7 @@ namespace Leagues.League.projection
                 return base.GetPropertyValue<string>("Twitter_Handle");
             }
         }
-        
+
         /// <summary>
         /// The date this league was incorporated
         /// </summary>
@@ -58,7 +60,7 @@ namespace Leagues.League.projection
                 return base.GetPropertyValue<System.DateTime>("Date_Incorporated");
             }
         }
-        
+
         public override bool SupportsSnapshots
         {
             get
@@ -66,24 +68,33 @@ namespace Leagues.League.projection
                 return true;
             }
         }
-        
+
         /// <summary>
         /// A new league was formed
         /// </summary>
-        public void HandleEvent(IFormed eventToHandle)
+        public void HandleEvent(Formed eventToHandle)
         {
-            // Date Incorporated is set when a league is initially formed
-            // Location is intially set when the league is formed
+            if (null != eventToHandle)
+            {
+                // Date Incorporated is set when a league is initially formed
+                base.AddOrUpdateValue<DateTime>(nameof(Date_Incorporated), 0, eventToHandle.Date_Incorporated);
+                // Location is intially set when the league is formed
+                base.AddOrUpdateValue<string>(nameof(Location), 0, eventToHandle.Location);
+            }
         }
-        
+
         /// <summary>
         /// The contact details for the league have changed
         /// </summary>
-        public void HandleEvent(IContact_Details_Changed eventToHandle)
+        public void HandleEvent(Contact_Details_Changed eventToHandle)
         {
-            // Twitter handle is set whenever the contact details change
+            if (null != eventToHandle)
+            {
+                // Twitter handle is set whenever the contact details change
+                base.AddOrUpdateValue<string>("Twitter_Handle", 0, eventToHandle.Twitter_Handle);
+            }
         }
-        
+
         public override void HandleEventJSon(String eventFullName, JObject eventToHandle)
         {
             if ((eventFullName == typeof(Formed).FullName))
@@ -97,7 +108,7 @@ namespace Leagues.League.projection
                 this.HandleEvent<Contact_Details_Changed>(eventToHandle.ToObject<Contact_Details_Changed>());
             }
         }
-        
+
         /// <summary>
         /// Does the projection handle this event type
         /// </summary>
@@ -111,6 +122,10 @@ namespace Leagues.League.projection
         /// </remarks>
         public override bool HandlesEventTypeByName(String eventTypeFullName)
         {
+            if (string.IsNullOrWhiteSpace(eventTypeFullName))
+            {
+                return false;
+            }
             if ((eventTypeFullName == typeof(Formed).FullName))
             {
                 return true;
@@ -121,7 +136,7 @@ namespace Leagues.League.projection
             }
             return false;
         }
-        
+
         /// <summary>
         /// Does the projection handle this event type
         /// </summary>
@@ -145,20 +160,23 @@ namespace Leagues.League.projection
             }
             return false;
         }
-        
+
         public override void HandleEvent<TEvent>(TEvent eventToHandle)
-        
         {
-            if ((eventToHandle.GetType() == typeof(Formed)))
+            if (null != eventToHandle)
             {
-                // Handle the Formed event
-                this.HandleEvent<Formed>(eventToHandle as Formed);
+                if (eventToHandle.GetType() == typeof(Formed))
+                {
+                    HandleEvent(eventToHandle as Formed);
+                }
+
+                if (eventToHandle.GetType() == typeof(Contact_Details_Changed))
+                {
+                    HandleEvent(eventToHandle as Contact_Details_Changed);
+                }
             }
-            if ((eventToHandle.GetType() == typeof(Contact_Details_Changed)))
-            {
-                // Handle the Contact Details Changed event
-                this.HandleEvent<Contact_Details_Changed>(eventToHandle as Contact_Details_Changed);
-            }
+
         }
+
     }
 }

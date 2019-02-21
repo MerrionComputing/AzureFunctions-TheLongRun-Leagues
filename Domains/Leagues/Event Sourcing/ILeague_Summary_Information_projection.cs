@@ -14,9 +14,7 @@ namespace Leagues.League.projection
 {
 
     public partial interface ILeague_Summary_Information : 
-        IProjectionUntyped, 
-        IHandleEvent<IFormed>, 
-        IHandleEvent<IContact_Details_Changed>
+        IProjectionUntyped
     {
         
         /// <summary>
