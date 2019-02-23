@@ -49,7 +49,14 @@ namespace Leagues.League.commandDefinition
         {
             get
             {
-                return base.GetParameterValue<string>(nameof(LeagueName ), 0);
+                if (base.ParameterExists(nameof(LeagueName), 0))
+                {
+                    return base.GetParameterValue<string>(nameof(LeagueName), 0);
+                }
+                else
+                {
+                    return @"";
+                }
             }
             set
             {
@@ -67,11 +74,18 @@ namespace Leagues.League.commandDefinition
         {
             get
             {
-                return base.GetParameterValue<System.DateTime>("Date Incorporated", 0);
+                if (base.ParameterExists(nameof(Date_Incorporated), 0))
+                {
+                    return base.GetParameterValue<System.DateTime>(nameof(Date_Incorporated), 0);
+                }
+                else
+                {
+                    return System.DateTime.MinValue ;
+                }
             }
             set
             {
-                base.SetParameterValue("Date Incorporated", 0, ref value);
+                base.SetParameterValue(nameof(Date_Incorporated), 0, ref value);
             }
         }
         
@@ -82,11 +96,18 @@ namespace Leagues.League.commandDefinition
         {
             get
             {
-                return base.GetParameterValue<string>("Location", 0);
+                if (base.ParameterExists(nameof(Location), 0))
+                {
+                    return base.GetParameterValue<string>(nameof(Location ), 0);
+                }
+                else
+                {
+                    return @"";
+                }
             }
             set
             {
-                base.SetParameterValue("Location", 0, ref value);
+                base.SetParameterValue(nameof(Location ), 0, ref value);
             }
         }
         
@@ -97,11 +118,18 @@ namespace Leagues.League.commandDefinition
         {
             get
             {
-                return base.GetParameterValue<string>("Twitter Handle", 0);
+                if (base.ParameterExists(nameof(Twitter_Handle), 0))
+                {
+                    return base.GetParameterValue<string>(nameof(Twitter_Handle) , 0);
+                }
+                else
+                {
+                    return @"";
+                }
             }
             set
             {
-                base.SetParameterValue("Twitter Handle", 0, ref value);
+                base.SetParameterValue(nameof(Twitter_Handle), 0, ref value);
             }
         }
         
@@ -112,11 +140,18 @@ namespace Leagues.League.commandDefinition
         {
             get
             {
-                return base.GetParameterValue<string>("Email Address", 0);
+                if (base.ParameterExists(nameof(Email_Address), 0))
+                {
+                    return base.GetParameterValue<string>(nameof(Email_Address), 0);
+                }
+                else
+                {
+                    return @"";
+                }
             }
             set
             {
-                base.SetParameterValue("Email Address", 0, ref value);
+                base.SetParameterValue(nameof(Email_Address ), 0, ref value);
             }
         }
     }

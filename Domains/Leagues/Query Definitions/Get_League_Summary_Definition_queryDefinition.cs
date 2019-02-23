@@ -46,11 +46,18 @@ namespace Leagues.League.queryDefinition
         {
             get
             {
-                return base.GetParameterValue<string>("League Name", 0);
+                if (base.ParameterExists(nameof(League_Name), 0))
+                {
+                    return base.GetParameterValue<string>(nameof(League_Name), 0);
+                }
+                else
+                {
+                    return @"";
+                }
             }
             set
             {
-                base.SetParameterValue("League Name", 0, ref value);
+                base.SetParameterValue(nameof(League_Name), 0, ref value);
             }
         }
 

@@ -45,11 +45,19 @@ namespace Leagues.League.commandDefinition
         {
             get
             {
-                return base.GetParameterValue<string>("New Email Address", 0);
+                if (base.ParameterExists(nameof(New_Email_Address), 0))
+                {
+                    return base.GetParameterValue<string>(nameof(New_Email_Address), 0);
+                }
+                else
+                {
+                    // Default to an empty string as not every receiver can deal with NULL
+                    return @"";
+                }
             }
             set
             {
-                base.SetParameterValue("New Email Address", 0, ref value);
+                base.SetParameterValue(nameof(New_Email_Address), 0, ref value);
             }
         }
         
@@ -57,11 +65,19 @@ namespace Leagues.League.commandDefinition
         {
             get
             {
-                return base.GetParameterValue<string>("Notes", 0);
+                if (base.ParameterExists(nameof(Notes),0))
+                {
+                    return base.GetParameterValue<string>(nameof(Notes), 0);
+                }
+                else
+                {
+                    // Default to an empty string as not every receiver can deal with NULL
+                    return @"";
+                }
             }
             set
             {
-                base.SetParameterValue("Notes", 0, ref value);
+                base.SetParameterValue(nameof(Notes), 0, ref value);
             }
         }
         
@@ -76,11 +92,18 @@ namespace Leagues.League.commandDefinition
         {
             get
             {
-                return base.GetParameterValue<string>("LeagueName", 0);
+                if (base.ParameterExists(nameof(LeagueName ), 0))
+                {
+                    return base.GetParameterValue<string>(nameof(LeagueName ), 0);
+                }
+                else
+                {
+                    return @"";
+                }
             }
             set
             {
-                base.SetParameterValue("LeagueName", 0, ref value);
+                base.SetParameterValue(nameof(LeagueName ), 0, ref value);
             }
         }
     }
