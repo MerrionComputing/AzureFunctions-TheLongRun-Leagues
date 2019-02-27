@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using CQRSAzure.EventSourcing;
 using Microsoft.Azure.WebJobs.Host;
@@ -33,6 +34,66 @@ namespace TheLongRun.Common.Events.Query.Projections
             get
             {
                 return targets;
+            }
+        }
+
+        /// <summary>
+        /// The subset of outputs for sending by webhook
+        /// </summary>
+        public IEnumerable<string> WebhookTargets
+        {
+            get
+            {
+                if (null != targets )
+                {
+                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.WebHook).Select(f => f.Key).AsEnumerable();
+                }
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        /// <summary>
+        /// The subset of outputs for saving as blobs
+        /// </summary>
+        public IEnumerable<string> BlobTargets
+        {
+            get
+            {
+                if (null != targets)
+                {
+                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.AzureBlobStorage).Select(f => f.Key).AsEnumerable();
+                }
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        /// <summary>
+        /// The subset of outputs for executing as event grid targets
+        /// </summary>
+        public IEnumerable<string> EventGridTargets
+        {
+            get
+            {
+                if (null != targets)
+                {
+                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.CustomEventGridTopic).Select(f => f.Key).AsEnumerable();
+                }
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        /// <summary>
+        /// The subset of outputs for executing as durable function orchestration triggers
+        /// </summary>
+        public IEnumerable<string> DurableFunctionOrchestrationTargets
+        {
+            get
+            {
+                if (null != targets)
+                {
+                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.DurableFunctionOrchestration).Select(f => f.Key).AsEnumerable();
+                }
+                return Enumerable.Empty<string>();
             }
         }
 
