@@ -397,7 +397,8 @@ namespace TheLongRunLeaguesFunction.Projections
                         CurrentAsOfDate = request.AsOfDate.GetValueOrDefault(DateTime.UtcNow),
                         CorrelationIdentifier = request.CorrelationIdentifier,
                         ParentRequestName = request.ParentRequestName,
-                        Result = null
+                        Result = null,
+                        ProjectionName = request.ProjectionName
                     };
                 }
 
@@ -447,7 +448,8 @@ namespace TheLongRunLeaguesFunction.Projections
                                 CurrentAsOfDate = projectionResponse.AsOfDate.GetValueOrDefault(DateTime.UtcNow),
                                 CorrelationIdentifier = request.CorrelationIdentifier,
                                 ParentRequestName = request.ParentRequestName,
-                                Result = results
+                                Result = results,
+                                ProjectionName = request.ProjectionName 
                             };
                         }
                         else
@@ -468,7 +470,8 @@ namespace TheLongRunLeaguesFunction.Projections
                                 CurrentAsOfDate = request.AsOfDate.GetValueOrDefault(DateTime.UtcNow),
                                 CorrelationIdentifier = request.CorrelationIdentifier,
                                 ParentRequestName = request.ParentRequestName,
-                                Result = null
+                                Result = null,
+                                ProjectionName = request.ProjectionName
                             };
                         }
                     }
@@ -490,7 +493,8 @@ namespace TheLongRunLeaguesFunction.Projections
                             CurrentAsOfDate = request.AsOfDate.GetValueOrDefault(DateTime.UtcNow),
                             CorrelationIdentifier = request.CorrelationIdentifier,
                             ParentRequestName = request.ParentRequestName,
-                            Result = null
+                            Result = null,
+                            ProjectionName = request.ProjectionName
                         };
                     }
                 }
