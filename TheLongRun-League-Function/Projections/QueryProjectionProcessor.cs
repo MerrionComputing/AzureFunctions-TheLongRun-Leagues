@@ -154,9 +154,10 @@ namespace TheLongRunLeaguesFunction.Projections
 
 
                 // get all the projection requests for the query
-                List<Query_Projections_Projection_Return> allProjections = await context.CallActivityWithRetryAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity",
-                    DomainSettings.QueryRetryOptions(), 
-                    request);
+                List<Query_Projections_Projection_Return> allProjections = await context
+                      .CallActivityWithRetryAsync<List<Query_Projections_Projection_Return>>("GetQueryProjectionsStatusProjectionActivity",
+                      DomainSettings.QueryRetryOptions(), 
+                      request);
 
                 if (null != allProjections)
                 {

@@ -112,7 +112,9 @@ namespace TheLongRunLeaguesFunction.Queries
                     }
 
                     // Using Azure Durable functions to do the query chaining
-                    string instanceId = await getLeagueSummaryQueryHandlerOrchestrationClient.StartNewAsync("OnGetLeagueSummaryQueryHandlerOrchestrator", queryRequest);
+                    string instanceId = await getLeagueSummaryQueryHandlerOrchestrationClient
+                        .StartNewAsync("OnGetLeagueSummaryQueryHandlerOrchestrator",
+                        queryRequest);
 
                     if (null != log)
                     {
@@ -232,7 +234,7 @@ namespace TheLongRunLeaguesFunction.Queries
                         {
                             if (null == resp)
                             {
-                                resp = new ActivityResponse() { FunctionName = "QueryProjectionProcessorOrchestrator" };
+                                resp = new ActivityResponse() { FunctionName = "GetLeagueSummaryValidateActivity" };
                             }
                             resp.Message = ffs.Message;
                             resp.FatalError = true;
@@ -262,7 +264,7 @@ namespace TheLongRunLeaguesFunction.Queries
                             {
                                 if (null == resp)
                                 {
-                                    resp = new ActivityResponse() { FunctionName = "QueryProjectionProcessorOrchestrator" };
+                                    resp = new ActivityResponse() { FunctionName = "GetLeagueSummaryQueryProjectionRequestActivity" };
                                 }
                                 resp.Message = ffs.Message;
                                 resp.FatalError = true;
@@ -346,7 +348,7 @@ namespace TheLongRunLeaguesFunction.Queries
                             {
                                 if (null == resp)
                                 {
-                                    resp = new ActivityResponse() { FunctionName = "QueryProjectionProcessorOrchestrator" };
+                                    resp = new ActivityResponse() { FunctionName = "GetLeagueSummaryOutputResultsActivity" };
                                 }
                                 resp.Message = ffs.Message;
                                 resp.FatalError = true;
