@@ -69,4 +69,23 @@ namespace TheLongRun.Common
         public TResults Results { get; internal set; }
 
     }
+
+    /// <summary>
+    /// A record with results and a destination to which they should be sent
+    /// </summary>
+    /// <typeparam name="TResults">
+    /// The data type of the results returned for the query
+    /// </typeparam>
+    public class QueryOutputRecord<TResult>
+        : QueryResultsRecord<TResult> 
+    {
+
+
+        /// <summary>
+        /// The target (URL, filename or whatever) to send the output to
+        /// </summary>
+        public string Target { get; set; }
+
+    }
+
 }

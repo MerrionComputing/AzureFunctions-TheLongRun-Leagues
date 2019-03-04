@@ -16,11 +16,12 @@ namespace TheLongRun.Common.Events.Query.Projections
     /// A projection to get the set of defined outputs to which a query result should be returned
     /// </summary>
     /// <remarks>
-    /// This projection does not care about the status of the query
+    /// This projection does not care about the status of the query, it just returns the set of output targets 
+    /// defined for the query should it run to completion
     /// </remarks>
     public class Query_Outputs_Projection
         : CQRSAzure.EventSourcing.ProjectionBaseUntyped, 
-        CQRSAzure.EventSourcing.IHandleEvent<OutputLocationSet>,
+          CQRSAzure.EventSourcing.IHandleEvent<OutputLocationSet>,
         IProjectionUntyped
     {
 

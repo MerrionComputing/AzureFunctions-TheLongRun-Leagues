@@ -41,10 +41,14 @@ namespace TheLongRun.Common
             /// </summary>
             CustomEventGridTopic = 3,
             /// <summary>
+            /// Add a message to the given service bus queue to be dealt with by any subscriber(s)
+            /// </summary>
+            ServiceBus = 4,
+            /// <summary>
             /// Raise an event to notify a durable function orchestration that has been paused waiting for
             /// this query to complete that it is now good to go
             /// </summary>
-            DurableFunctionOrchestration = 4
+            DurableFunctionOrchestration = 5
         }
 
         /// <summary>

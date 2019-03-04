@@ -15,6 +15,7 @@ using TheLongRun.Common.Events.Query.Projections;
 using System;
 using Microsoft.Extensions.Logging;
 using TheLongRun.Common.Orchestration;
+using Newtonsoft.Json;
 
 namespace TheLongRunLeaguesFunction.Queries
 {
@@ -187,9 +188,10 @@ namespace TheLongRunLeaguesFunction.Queries
                                     Get_League_Summary_Definition_Return projectionReturn = new Get_League_Summary_Definition_Return(queryGuid,
                                         qryProjectionState.ProcessedRequests[0].AggregateInstanceKey);
 
+                                    Leagues.League.projection.League_Summary_Information projectionResult = null;
                                     if (qryProjectionState.ProcessedRequests[0].ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information).Name)
                                     {
-                                        Leagues.League.projection.League_Summary_Information projectionResult = ((Newtonsoft.Json.Linq.JObject)qryProjectionState.ProcessedRequests[0].ReturnedValue).ToObject<Leagues.League.projection.League_Summary_Information>();
+                                        projectionResult = ((Newtonsoft.Json.Linq.JObject)qryProjectionState.ProcessedRequests[0].ReturnedValue).ToObject<Leagues.League.projection.League_Summary_Information>();
                                         if (null != projectionResult)
                                         {
                                             projectionReturn.Location = projectionResult.Location;
@@ -219,16 +221,69 @@ namespace TheLongRunLeaguesFunction.Queries
                                             log.LogDebug($"Sending results to output targets in OutputResultsGetLeagueSummaryQuery");
                                         }
                                         #endregion
-                                        foreach (string location in qryOutputs.Targets.Keys )
+
+
+                                        foreach (string location in qryOutputs.WebhookTargets )
                                         {
                                             #region Logging
                                             if (null != log)
                                             {
-                                                log.LogDebug($"Target : { location} - type {qryOutputs.Targets[location]} in OutputResultsGetLeagueSummaryQuery");
+                                                log.LogDebug($"Target : { location} - being sent by webhook in OutputResultsGetLeagueSummaryQuery");
                                             }
                                             #endregion
-                                            // Send the output to the location...
-                                            QueryLogRecord.SendOutput(location, qryOutputs.Targets[location], ret);
+
+                                            // ret = await context.CallActivityAsync<ActivityResponse>("QueryOutputToWebhookActivity", projectionResponse);
+                                            if (null != projectionReturn)
+                                            {
+                                                var payloadAsJSON = new StringContent(JsonConvert.SerializeObject(projectionReturn));
+                                                using (var client = new HttpClient())
+                                                {
+                                                    var response = await client.PostAsync(location, payloadAsJSON);
+                                                    if (! response.IsSuccessStatusCode )
+                                                    {
+                                                        ret.Message = $"Failed to send output to {location} webhook - {response.StatusCode} : {response.ReasonPhrase} ";
+                                                        #region Logging
+                                                        if (null != log)
+                                                        {
+                                                            log.LogError($"{ret.FunctionName } : {ret.Message}" );
+                                                        }
+                                                        #endregion
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        foreach (string location in qryOutputs.EventGridTargets)
+                                        {
+                                            #region Logging
+                                            if (null != log)
+                                            {
+                                                log.LogDebug($"Target : { location} - being sent by event grid message in OutputResultsGetLeagueSummaryQuery");
+                                            }
+                                            #endregion
+
+                                        }
+
+                                        foreach (string location in qryOutputs.BlobTargets)
+                                        {
+                                            #region Logging
+                                            if (null != log)
+                                            {
+                                                log.LogDebug($"Target : { location} - being persisted as a blob in OutputResultsGetLeagueSummaryQuery");
+                                            }
+                                            #endregion
+
+                                        }
+
+                                        foreach (string location in qryOutputs.DurableFunctionOrchestrationTargets)
+                                        {
+                                            #region Logging
+                                            if (null != log)
+                                            {
+                                                log.LogDebug($"Target : { location} - being used to trigger a durable function to wake up in OutputResultsGetLeagueSummaryQuery");
+                                            }
+                                            #endregion
+
                                         }
 
                                         ret.Message = $"Sent results to output targets ({qryOutputs.Targets.Keys.Count}) in OutputResultsGetLeagueSummaryQuery";
