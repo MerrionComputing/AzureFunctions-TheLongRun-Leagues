@@ -201,6 +201,28 @@ namespace TheLongRunLeaguesFunction.Queries
                         // Save the parameters to the event stream
                         ActivityResponse resp = null;
 
+                        // If there are outputs set, log them...
+                        resp = await context.CallActivityWithRetryAsync<ActivityResponse>("QueryLogOutputTargetActivity",
+                            DomainSettings.QueryRetryOptions(),
+                            queryRequest);
+
+                        #region Logging
+                        if (null != log)
+                        {
+                            if (null != resp)
+                            {
+                                log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                            }
+                        }
+                        #endregion
+
+
+                        if (null != resp)
+                        {
+                            context.SetCustomStatus(resp);
+                        }
+
+
                         resp = await context.CallActivityWithRetryAsync <ActivityResponse>("GetLeagueSummaryLogParametersActivity",
                             DomainSettings.QueryRetryOptions(), 
                             queryRequest);
