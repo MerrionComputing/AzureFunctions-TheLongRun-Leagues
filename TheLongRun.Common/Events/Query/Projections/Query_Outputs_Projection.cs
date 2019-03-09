@@ -84,6 +84,21 @@ namespace TheLongRun.Common.Events.Query.Projections
         }
 
         /// <summary>
+        /// The subset of outputs for executing as SignalR targets
+        /// </summary>
+        public IEnumerable<string> SignalRTargets
+        {
+            get
+            {
+                if (null != targets)
+                {
+                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.SignalR ).Select(f => f.Key).AsEnumerable();
+                }
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        /// <summary>
         /// The subset of outputs for executing as durable function orchestration triggers
         /// </summary>
         public IEnumerable<string> DurableFunctionOrchestrationTargets

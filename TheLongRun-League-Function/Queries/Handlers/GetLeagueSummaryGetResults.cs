@@ -163,8 +163,8 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
 
                                     if (qryProjectionState.ProcessedRequests[0].ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information).Name)
                                     {
-                                        Leagues.League.projection.League_Summary_Information projectionResult = ((Newtonsoft.Json.Linq.JObject)qryProjectionState.ProcessedRequests[0].ReturnedValue).ToObject<Leagues.League.projection.League_Summary_Information>();
-                                        if (null != projectionResult)
+                                        dynamic  projectionResult = (qryProjectionState.ProcessedRequests[0].ReturnedValue);
+                                        if (null != projectionResult )
                                         {
                                             ret.Location = projectionResult.Location;
                                             ret.Date_Incorporated = projectionResult.Date_Incorporated;

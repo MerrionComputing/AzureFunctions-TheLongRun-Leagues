@@ -188,10 +188,10 @@ namespace TheLongRunLeaguesFunction.Queries
                                     Get_League_Summary_Definition_Return projectionReturn = new Get_League_Summary_Definition_Return(queryGuid,
                                         qryProjectionState.ProcessedRequests[0].AggregateInstanceKey);
 
-                                    Leagues.League.projection.League_Summary_Information projectionResult = null;
+
                                     if (qryProjectionState.ProcessedRequests[0].ProjectionTypeName == typeof(Leagues.League.projection.League_Summary_Information).Name)
                                     {
-                                        projectionResult = ((Newtonsoft.Json.Linq.JObject)qryProjectionState.ProcessedRequests[0].ReturnedValue).ToObject<Leagues.League.projection.League_Summary_Information>();
+                                        dynamic projectionResult = (qryProjectionState.ProcessedRequests[0].ReturnedValue);
                                         if (null != projectionResult)
                                         {
                                             projectionReturn.Location = projectionResult.Location;

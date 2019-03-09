@@ -45,10 +45,14 @@ namespace TheLongRun.Common
             /// </summary>
             ServiceBus = 4,
             /// <summary>
+            /// Send the answer out by a SignalR message
+            /// </summary>
+            SignalR = 5,
+            /// <summary>
             /// Raise an event to notify a durable function orchestration that has been paused waiting for
             /// this query to complete that it is now good to go
             /// </summary>
-            DurableFunctionOrchestration = 5
+            DurableFunctionOrchestration = 6
         }
 
         /// <summary>
