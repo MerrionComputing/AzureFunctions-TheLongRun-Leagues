@@ -125,7 +125,7 @@ namespace TheLongRunLeaguesFunction.Queries
             if (Guid.TryParse(queryId, out queryGuid))
             {
                 // Get the current state of the query...
-                Projection getQueryState = new Projection(@"Query",
+                Projection getQueryState = new Projection(Constants.Domain_Query,
                     queryName,
                     queryGuid.ToString(),
                     nameof(Query_Summary_Projection));
@@ -209,6 +209,10 @@ namespace TheLongRunLeaguesFunction.Queries
                                         }
                                     }
 
+
+                                    // Call the outputs processing sub-orchestration
+                                    
+
                                     // Get all the output targets
                                     Query_Outputs_Projection qryOutputs = new Query_Outputs_Projection(log);
                                     await getQueryState.Process(qryOutputs);
@@ -232,7 +236,6 @@ namespace TheLongRunLeaguesFunction.Queries
                                             }
                                             #endregion
 
-                                            // ret = await context.CallActivityAsync<ActivityResponse>("QueryOutputToWebhookActivity", projectionResponse);
                                             if (null != projectionReturn)
                                             {
                                                 var payloadAsJSON = new StringContent(JsonConvert.SerializeObject(projectionReturn));

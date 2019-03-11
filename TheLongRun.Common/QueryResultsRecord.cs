@@ -86,6 +86,23 @@ namespace TheLongRun.Common
         /// </summary>
         public string Target { get; set; }
 
+
+        public static QueryOutputRecord<TResult> Create(TResult resultData, 
+            string targetOutput,
+            string queryName,
+            Guid queryIdentifier)
+        {
+            QueryOutputRecord<TResult> ret = new QueryOutputRecord<TResult>()
+            {
+                QueryName = queryName,
+                QueryUniqueIdentifier = queryIdentifier,
+                Results = resultData,
+                Target = targetOutput
+            };
+
+            return ret;
+
+        }
     }
 
 }

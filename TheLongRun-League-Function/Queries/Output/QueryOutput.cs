@@ -8,6 +8,9 @@ using TheLongRun.Common;
 using System.Net.Http;
 using Newtonsoft.Json;
 using TheLongRun.Common.Bindings;
+using TheLongRun.Common.Events.Query.Projections;
+using System;
+using System.Collections.Generic;
 
 namespace TheLongRunLeaguesFunction.Queries.Output
 {
@@ -76,6 +79,114 @@ namespace TheLongRunLeaguesFunction.Queries.Output
         }
 
         /// <summary>
+        /// Sub orchestration to output all the results from a query to all of the ouput locations registered for it
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        [ApplicationName("The Long Run")]
+        [FunctionName("QueryOutputProcessorOrchestrator")]
+        public static async Task<ActivityResponse> QueryOutputProcessorOrchestrator(
+             [OrchestrationTrigger] DurableOrchestrationContext context,
+             Microsoft.Extensions.Logging.ILogger log)
+        {
+            ActivityResponse response = new ActivityResponse() { FunctionName = "QueryOutputProcessorOrchestrator" };
+
+            // Get the Query_Outputs_Request from the context...
+            Query_Outputs_Request request = context.GetInput<Query_Outputs_Request>();
+
+            if (null != request)
+            {
+                // Read the outputs for the given query
+                Guid queryGuid;
+
+                if (Guid.TryParse(request.UniqueIdentifier, out queryGuid))
+                {
+                    // Get the current state of the query...
+                    Projection getQueryState = new Projection(Constants.Domain_Query,
+                        request.QueryName,
+                        queryGuid.ToString(),
+                        nameof(Query_Summary_Projection));
+
+
+                    if (null != getQueryState)
+                    {
+                        // Get all the output targets
+                        Query_Outputs_Projection qryOutputs = new Query_Outputs_Projection(log);
+                        await getQueryState.Process(qryOutputs);
+
+                        if ((qryOutputs.CurrentSequenceNumber > 0) || (qryOutputs.ProjectionValuesChanged()))
+                        {
+                            #region Logging
+                            if (null != log)
+                            {
+                                log.LogDebug($"Sending results to output targets from {request.QueryName} : {request.UniqueIdentifier} ");
+                            }
+                            #endregion
+
+                            List<Task<ActivityResponse>> allOutputTasks = new List<Task<ActivityResponse>>();
+
+                            foreach (string location in qryOutputs.WebhookTargets)
+                            {
+                                #region Logging
+                                if (null != log)
+                                {
+                                    log.LogDebug($"Target : { location} - being sent by webhook in OutputResultsGetLeagueSummaryQuery");
+                                }
+                                #endregion
+
+                                if (null != request.Results)
+                                {
+                                    // Create a QueryOutputRecord<object>
+                                    QueryOutputRecord<object> outputRequest = QueryOutputRecord<object>.Create(request.Results,
+                                        location,
+                                        request.QueryName,
+                                        queryGuid);
+
+                                    // add a task to ouputit it via webhook....
+                                    allOutputTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("QueryOutputToWebhookActivity",
+                                            DomainSettings.QueryRetryOptions(),
+                                            outputRequest));
+                                }
+                            }
+
+
+                            // TODO: All the other output methods
+
+                            // Await for all the outputs to have run in parallel...
+                            await Task.WhenAll(allOutputTasks);
+
+                            foreach (var returnedResponse in allOutputTasks)
+                            {
+                                if (returnedResponse.Result.FatalError )
+                                {
+                                    response.FatalError = true;
+                                    response.Message = returnedResponse.Result.Message;
+                                }
+
+                                #region Logging
+                                if (null != log)
+                                {
+                                    log.LogDebug($"Sent results to output targets from {returnedResponse.Result.FunctionName} : {returnedResponse.Result.Message } ");
+                                }
+                                #endregion
+                                context.SetCustomStatus(returnedResponse.Result);
+                            }
+
+                        }
+                    }
+                }
+            }
+            else
+            {
+                response.Message = $"Unable to get outputs request details in sub orchestration {context.InstanceId} ";
+                response.FatalError = true;
+            }
+
+            return response;
+        }
+
+        /// <summary>
         /// Run the specified projection and return the results to the caller orchestration
         /// </summary>
         /// <remarks>
@@ -120,6 +231,8 @@ namespace TheLongRunLeaguesFunction.Queries.Output
             return ret;
 
         }
+
+
 
     }
 }
