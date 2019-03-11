@@ -359,34 +359,46 @@ namespace TheLongRunLeaguesFunction.Queries
                                 }
                             }
 
-                            try
-                            {
-                                // Output the results
-                                resp = await context.CallActivityWithRetryAsync<ActivityResponse>("GetLeagueSummaryOutputResultsActivity",
+                            // Get the results for ourselves to return...to do this the query must be complete...
+                            Get_League_Summary_Definition_Return ret =  await context.CallActivityWithRetryAsync <Get_League_Summary_Definition_Return>("GetLeagueSummaryGetResultsActivity",
                                 DomainSettings.QueryRetryOptions(), 
                                 queryRequest);
+
+                            // Output them to every registered output destination
+                            Query_Outputs_Request request = new Query_Outputs_Request()
+                            {
+                                Results = JObject.FromObject( ret) ,
+                                QueryName= queryRequest.QueryName,
+                                UniqueIdentifier =  queryRequest.QueryUniqueIdentifier.ToString()
+                            };
+
+                            try
+                            {
+                                resp = await context.CallSubOrchestratorWithRetryAsync<ActivityResponse>("QueryOutputProcessorOrchestrator",
+                                    DomainSettings.QueryRetryOptions(),
+                                    projectionQueryRequest);
                             }
                             catch (FunctionFailedException ffs)
                             {
                                 if (null == resp)
                                 {
-                                    resp = new ActivityResponse() { FunctionName = "GetLeagueSummaryOutputResultsActivity" };
+                                    resp = new ActivityResponse() { FunctionName = "QueryOutputProcessorOrchestrator" };
                                 }
                                 resp.Message = ffs.Message;
                                 resp.FatalError = true;
                             }
 
-                            #region Logging
-                            if (null != log)
-                            {
-                                if (null != resp)
-                                {
-                                    log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
-                                }
-                            }
-                            #endregion
                             if (null != resp)
                             {
+                                #region Logging
+                                if (null != log)
+                                {
+                                    if (null != resp)
+                                    {
+                                        log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                                    }
+                                }
+                                #endregion
                                 context.SetCustomStatus(resp);
                                 if (resp.FatalError)
                                 {
@@ -400,10 +412,6 @@ namespace TheLongRunLeaguesFunction.Queries
                                 }
                             }
 
-                            // Get the results for ourselves to return...to do this the query must be complete...
-                            Get_League_Summary_Definition_Return ret =  await context.CallActivityWithRetryAsync <Get_League_Summary_Definition_Return>("GetLeagueSummaryGetResultsActivity",
-                                DomainSettings.QueryRetryOptions(), 
-                                queryRequest);
 
                             return ret;
                         }

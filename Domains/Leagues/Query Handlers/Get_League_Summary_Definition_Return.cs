@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CQRSAzure.EventSourcing;
 using CQRSAzure.QueryDefinition;
 using Leagues;
+using Newtonsoft.Json.Linq;
 
 namespace Leagues.League.queryDefinition
 {
@@ -53,5 +54,9 @@ namespace Leagues.League.queryDefinition
             leagueName = leagueNameIn;
         }
 
+        public static implicit operator JObject(Get_League_Summary_Definition_Return v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
