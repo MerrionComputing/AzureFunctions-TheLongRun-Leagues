@@ -102,7 +102,7 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
             if (Guid.TryParse(queryId, out queryGuid))
             {
                 // Get the current state of the query...
-                Projection getQueryState = new Projection(@"Query",
+                Projection getQueryState = new Projection(Constants.Domain_Query,
                     queryName,
                     queryGuid.ToString(),
                     nameof(Query_Summary_Projection));

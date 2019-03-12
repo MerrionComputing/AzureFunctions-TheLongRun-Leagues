@@ -19,26 +19,14 @@ namespace Leagues.League.queryDefinition
         /// <summary>
         /// The unique identifier of the query for which this result was returned
         /// </summary>
-        private readonly Guid queryId;
-        public Guid QueryIdentifier
-        {
-            get
-            {
-                return queryId;
-            }
-        }
+        public Guid QueryIdentifier { get; set; }
+
 
         /// <summary>
         /// The unique identifier for the league for which this query data are returned
         /// </summary>
-        private readonly string leagueName;
-        public string LeagueName
-        {
-            get
-            {
-                return leagueName;
-            }
-        }
+        public string LeagueName { get; set; }
+
 
         public string Location { get; set; }
 
@@ -50,13 +38,15 @@ namespace Leagues.League.queryDefinition
             Guid queryIdIn,
             string leagueNameIn)
         {
-            queryId = queryIdIn;
-            leagueName = leagueNameIn;
+            QueryIdentifier  = queryIdIn;
+            LeagueName  = leagueNameIn;
         }
 
-        public static implicit operator JObject(Get_League_Summary_Definition_Return v)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// Empty constructor for serialisation
+        /// </summary>
+        public Get_League_Summary_Definition_Return()
+        { }
+
     }
 }

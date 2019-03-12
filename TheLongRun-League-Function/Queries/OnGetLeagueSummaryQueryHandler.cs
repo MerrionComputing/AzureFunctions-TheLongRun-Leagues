@@ -376,7 +376,7 @@ namespace TheLongRunLeaguesFunction.Queries
                             {
                                 resp = await context.CallSubOrchestratorWithRetryAsync<ActivityResponse>("QueryOutputProcessorOrchestrator",
                                     DomainSettings.QueryRetryOptions(),
-                                    projectionQueryRequest);
+                                    request);
                             }
                             catch (FunctionFailedException ffs)
                             {
