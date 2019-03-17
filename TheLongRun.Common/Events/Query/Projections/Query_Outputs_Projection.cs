@@ -27,10 +27,10 @@ namespace TheLongRun.Common.Events.Query.Projections
 
         #region Private members
         private ILogger log = null;
-        private Dictionary<string, QueryLogRecord.QueryReturnTarget> targets = new Dictionary<string, QueryLogRecord.QueryReturnTarget>();
+        private Dictionary<string, QueryResponseTarget.QueryReturnTarget> targets = new Dictionary<string, QueryResponseTarget.QueryReturnTarget>();
         #endregion
 
-        public Dictionary<string, QueryLogRecord.QueryReturnTarget> Targets
+        public Dictionary<string, QueryResponseTarget.QueryReturnTarget> Targets
         {
             get
             {
@@ -47,7 +47,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.WebHook).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.WebHook).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }
@@ -62,7 +62,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.AzureBlobStorage).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.AzureBlobStorage).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }
@@ -77,7 +77,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.CustomEventGridTopic).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.CustomEventGridTopic).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }
@@ -92,7 +92,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.SignalR).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.SignalR).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }
@@ -107,7 +107,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryLogRecord.QueryReturnTarget.DurableFunctionOrchestration).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.DurableFunctionOrchestration).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }

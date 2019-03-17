@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.Files;
 using TheLongRun.Common.Attributes;
 using System.Threading.Tasks;
 using TheLongRun.Common.Orchestration;
@@ -11,6 +12,7 @@ using TheLongRun.Common.Bindings;
 using TheLongRun.Common.Events.Query.Projections;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace TheLongRunLeaguesFunction.Queries.Output
 {
@@ -56,17 +58,26 @@ namespace TheLongRunLeaguesFunction.Queries.Output
                     // Set the context for the events to be written using
                     queryEvents.SetContext(new WriteContext(ret.FunctionName, context.InstanceId));
 
-                    // set the parameter(s)
-                    await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.OutputLocationSet
-                        (queryRequest.ReturnPath, queryRequest.ReturnTarget ));
-
-                    if (null != log)
+                    if (null != queryRequest.ResponseTargets)
                     {
-                        // Unable to get the request details from the orchestration
-                        log.LogInformation($"{ret.FunctionName } : Set output path {queryRequest.ReturnPath} : {queryRequest.ReturnTarget} ");
-                    }
+                        foreach (var responseTarget in queryRequest.ResponseTargets)
+                        {
 
-                    ret.Message = $"Set output path {queryRequest.ReturnPath} : {queryRequest.ReturnTarget} ";
+
+                            // set the parameter(s)
+                            await queryEvents.AppendEvent(new TheLongRun.Common.Events.Query.OutputLocationSet
+                                (responseTarget.ReturnPath, responseTarget.ReturnTarget));
+
+                            #region Logging
+                            if (null != log)
+                            {
+                                // Unable to get the request details from the orchestration
+                                log.LogInformation($"{ret.FunctionName } : Set output path {responseTarget.ReturnPath} : {responseTarget.ReturnTarget} ");
+                            }
+                            #endregion
+                        }
+
+                    }
                 }
                 else
                 {
@@ -150,6 +161,29 @@ namespace TheLongRunLeaguesFunction.Queries.Output
                                 }
                             }
 
+                            foreach (string location in qryOutputs.BlobTargets )
+                            {
+                                #region Logging
+                                if (null != log)
+                                {
+                                    log.LogDebug($"Target : { location} - being persisted to a Blob in OutputResultsGetLeagueSummaryQuery");
+                                }
+                                #endregion
+
+                                if (null != request.Results)
+                                {
+                                    // Create a QueryOutputRecord<object>
+                                    QueryOutputRecord<object> outputRequest = QueryOutputRecord<object>.Create(request.Results,
+                                        location,
+                                        request.QueryName,
+                                        queryGuid);
+
+                                    // add a task to ouputit it via webhook....
+                                    allOutputTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("QueryOutputToBlobActivity",
+                                            DomainSettings.QueryRetryOptions(),
+                                            outputRequest));
+                                }
+                            }
 
                             // TODO: All the other output methods
 
@@ -213,26 +247,63 @@ namespace TheLongRunLeaguesFunction.Queries.Output
             if (null != results )
             {
                 var payloadAsJSON = new StringContent(JsonConvert.SerializeObject(results.Results));
+
+
+                // TODO : Use the binder to bind to an HTTP client to send the results to
                 using (var client = new HttpClient())
                 {
-                    var response = await client.PostAsync(results.Target, payloadAsJSON);
-                    if (response.IsSuccessStatusCode  )
+                    HttpResponseMessage msgResp = await client.PostAsync(results.Target, payloadAsJSON);
+                    if (null != msgResp )
                     {
-                        ret.Message = $"Transfer succeeded {response.StatusCode} ";
-                    }
-                    else
-                    {
-                        // We don't mark this as a fatal error as we want any successful sends to go ahead anyway
-                        ret.Message = $"Webhook transfer failed {response.StatusCode} - {response.ReasonPhrase} ";
+                        ret.Message = $"Output sent - {msgResp.ReasonPhrase}";
                     }
                 }
+
             }
 
             return ret;
 
         }
 
+        /// <summary>
+        /// Run the specified projection and return the results to the caller orchestration
+        /// </summary>
+        /// <remarks>
+        /// The query identifier and results are 
+        /// </remarks>
+        [ApplicationName("The Long Run")]
+        [FunctionName("QueryOutputToBlobActivity")]
+        public static async Task<ActivityResponse> QueryOutputToBlobActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            Binder outputBinder,
+            ILogger log)
+        {
 
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "QueryOutputToBlobActivity" };
+
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"Output  in {ret.FunctionName} ");
+            }
+            #endregion
+
+            // Read the results 
+            QueryOutputRecord<object> results = context.GetInput<QueryOutputRecord<object>>();
+            if (null != results)
+            {
+                var payloadAsJSON = JsonConvert.SerializeObject(results.Results);
+
+                // Use the binder to bind to an blob client to send the results to
+                using (var writer = await outputBinder.BindAsync<TextWriter>(new BlobAttribute(results.Target )))
+                {
+                    await writer.WriteAsync(payloadAsJSON);
+                }
+            }
+
+            return ret;
+
+        }
 
     }
 }

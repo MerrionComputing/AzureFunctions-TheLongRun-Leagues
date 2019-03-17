@@ -41,8 +41,7 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
             QueryLogRecord<Get_League_Summary_Definition> qryRecord = QueryLogRecord<Get_League_Summary_Definition>.Create(
                 queryRequest.QueryName,
                 queryRequest.GetParameters(),
-                queryRequest.ReturnTarget,
-                queryRequest.ReturnPath,
+                queryRequest.ResponseTargets ,
                 queryRequest.QueryUniqueIdentifier);
 
 

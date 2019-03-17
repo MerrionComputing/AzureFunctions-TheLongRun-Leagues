@@ -13,47 +13,6 @@ namespace TheLongRun.Common
     public class QueryLogRecord
     {
 
-        /// <summary>
-        /// How to indicate to a caller application that a requested query is complete
-        /// </summary>
-        /// <remarks>
-        /// Other ways of notifying the caller that a query has completed can be added to this
-        /// list as and when required
-        /// </remarks>
-        public enum QueryReturnTarget
-        {
-            /// <summary>
-            /// No output type specified - just skip over this return target
-            /// </summary>
-            NotSet = 0,
-            /// <summary>
-            /// Store the results of the query in the named azure storage blob, which will either trigger
-            /// the next step or can be polled for (not ideal)
-            /// </summary>
-            AzureBlobStorage = 1,
-            /// <summary>
-            /// Use the defined webhook to pass the results back for the query
-            /// </summary>
-            WebHook = 2,
-            /// <summary>
-            /// Fire off an event grid event with the specified custom topic name to notify that the
-            /// query results are available
-            /// </summary>
-            CustomEventGridTopic = 3,
-            /// <summary>
-            /// Add a message to the given service bus queue to be dealt with by any subscriber(s)
-            /// </summary>
-            ServiceBus = 4,
-            /// <summary>
-            /// Send the answer out by a SignalR message
-            /// </summary>
-            SignalR = 5,
-            /// <summary>
-            /// Raise an event to notify a durable function orchestration that has been paused waiting for
-            /// this query to complete that it is now good to go
-            /// </summary>
-            DurableFunctionOrchestration = 6
-        }
 
         /// <summary>
         /// The folder that new queries are logged to
@@ -99,23 +58,6 @@ namespace TheLongRun.Common
         /// </remarks>
         public string Hash { get; }
 
-        /// <summary>
-        /// Where to notify the requestor that this query has completed
-        /// </summary>
-        /// <remarks>
-        /// This does not preclude other observers also being notified that the 
-        /// query has completed
-        /// </remarks>
-        public QueryReturnTarget ReturnTarget { get; set; }
-
-        /// <summary>
-        /// Depending on the return target, this tells the query processor where 
-        /// exactly to put the results
-        /// </summary>
-        /// <remarks>
-        /// This could be a storeage URI or a webhook or the custom topic name, for instance
-        /// </remarks>
-        public string ReturnPath { get; set; }
 
         public static string MakeFilename(QueryLogRecord queryInstance)
         {
@@ -256,7 +198,7 @@ namespace TheLongRun.Common
         /// <param name="queryReturnTarget"></param>
         /// <param name="value"></param>
         public static void SendOutput(string location, 
-            QueryReturnTarget queryReturnTarget, 
+            QueryResponseTarget.QueryReturnTarget queryReturnTarget, 
             object value)
         {
             if (null != value )
@@ -264,19 +206,39 @@ namespace TheLongRun.Common
                 string valueAsJson = Newtonsoft.Json.JsonConvert.SerializeObject(value);
                 switch (queryReturnTarget )
                 {
-                    case QueryReturnTarget.AzureBlobStorage:
+                    case QueryResponseTarget.QueryReturnTarget.AzureBlobStorage:
                         {
                             SendOutputToBlob(location, valueAsJson);
                             break;
                         }
-                    case QueryReturnTarget.CustomEventGridTopic:
+                    case QueryResponseTarget.QueryReturnTarget.CustomEventGridTopic:
                         {
                             SendOutputToCustomTopic(location, valueAsJson);
                             break;
                         }
-                    case QueryReturnTarget.WebHook:
+                    case QueryResponseTarget.QueryReturnTarget.WebHook:
                         {
                             SendOutputToWebhook(location, valueAsJson);
+                            break;
+                        }
+                    case QueryResponseTarget.QueryReturnTarget.DurableFunctionOrchestration:
+                        {
+                            // TODO: Work out how to send output to trigger a durable function to awaken
+                            break;
+                        }
+                    case QueryResponseTarget.QueryReturnTarget.ServiceBus:
+                        {
+                            // TODO : Send the output to a service bus endpoint
+                            break;
+                        }
+                    case QueryResponseTarget.QueryReturnTarget.SignalR:
+                        {
+                            // TODO: Send the output to a SignalR endpoint
+                            break;
+                        }
+                    case QueryResponseTarget.QueryReturnTarget.NotSet:
+                        {
+                            // Nothing to do here
                             break;
                         }
                 }
@@ -365,8 +327,7 @@ namespace TheLongRun.Common
         /// </param>
         public static QueryLogRecord<TQueryParameters> Create(string queryName,
             TQueryParameters parameters,
-            QueryReturnTarget returnTarget,
-            string returnPath,
+            QueryResponseTarget[] responseTargets,
             Guid queryId )
         {
             QueryLogRecord< TQueryParameters> ret = new QueryLogRecord<TQueryParameters>();
@@ -381,8 +342,6 @@ namespace TheLongRun.Common
             {
                 ret.Parameters = parameters;
             }
-            ret.ReturnTarget = returnTarget;
-            ret.ReturnPath = returnPath;
             return ret;
 
         }

@@ -86,7 +86,7 @@ namespace TheLongRunLeaguesFunction.Queries
                     queryRequest.QueryUniqueIdentifier.ToString(), 
                     log);
 
-                ret.Message = $"Output Results : {queryRequest.QueryUniqueIdentifier  } to {queryRequest.ReturnPath} ";
+                ret.Message = $"Output Results for : {queryRequest.QueryUniqueIdentifier  }  ";
             }
             catch (Exception ex)
             {
