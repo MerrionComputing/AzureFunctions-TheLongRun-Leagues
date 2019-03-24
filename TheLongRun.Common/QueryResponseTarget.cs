@@ -23,7 +23,7 @@ namespace TheLongRun.Common
         /// Other ways of notifying the caller that a query has completed can be added to this
         /// list as and when required
         /// </remarks>
-        public enum QueryReturnTarget
+        public enum ReturnTargetType
         {
             /// <summary>
             /// No output type specified - just skip over this return target
@@ -66,7 +66,7 @@ namespace TheLongRun.Common
         /// query has completed
         /// </remarks>
         [JsonConverter(typeof(StringEnumConverter))]
-        public QueryReturnTarget ReturnTarget { get; set; }
+        public ReturnTargetType ReturnTarget { get; set; }
 
         /// <summary>
         /// Depending on the return target, this tells the query processor where 

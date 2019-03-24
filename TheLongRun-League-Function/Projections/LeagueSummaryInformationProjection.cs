@@ -149,7 +149,7 @@ namespace TheLongRunLeaguesFunction.Projections
 
                             return new ProjectionResultsRecord<Get_League_Summary_Definition_Return>() {
                                 CurrentAsOfDate= prjLeagueInfo.CurrentAsOfDate,
-                                CurrentSequenceNumber = prjLeagueInfo.CurrentSequenceNumber ,
+                                CurrentSequenceNumber = (int)prjLeagueInfo.CurrentSequenceNumber ,
                                 AggregateTypeName = leagueEvents.AggregateTypeName ,
                                 DomainName = leagueEvents.DomainName,
                                 EntityUniqueIdentifier = leagueEvents.AggregateInstanceKey ,

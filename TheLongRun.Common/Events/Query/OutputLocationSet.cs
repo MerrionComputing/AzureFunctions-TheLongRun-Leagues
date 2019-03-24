@@ -26,10 +26,10 @@ namespace TheLongRun.Common.Events.Query
         /// </remarks>
         public string Location { get; set; }
 
-        public QueryResponseTarget.QueryReturnTarget TargetType { get; set; }
+        public QueryResponseTarget.ReturnTargetType TargetType { get; set; }
 
         public OutputLocationSet(string locationIn,
-            QueryResponseTarget.QueryReturnTarget targetTypeIn)
+            QueryResponseTarget.ReturnTargetType targetTypeIn)
         {
             Location = locationIn;
             TargetType = targetTypeIn ;
@@ -43,7 +43,7 @@ namespace TheLongRun.Common.Events.Query
         public OutputLocationSet(SerializationInfo info, StreamingContext context)
         {
             Location = info.GetString(nameof(Location));
-            TargetType = (QueryResponseTarget.QueryReturnTarget)info.GetValue (nameof(TargetType), typeof(QueryResponseTarget.QueryReturnTarget));
+            TargetType = (QueryResponseTarget.ReturnTargetType)info.GetValue (nameof(TargetType), typeof(QueryResponseTarget.ReturnTargetType));
         }
 
         /// <summary>

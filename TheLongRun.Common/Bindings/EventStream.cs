@@ -165,5 +165,17 @@ namespace TheLongRun.Common.Bindings
 
 
 
+        public static string MakeEventStreamName(string tentativeName)
+        {
+            if (! string.IsNullOrWhiteSpace(tentativeName))
+            {
+                return CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase.MakeValidStorageFolderName(tentativeName);
+            }
+            return string.Empty;
+        }
+
     }
+
+    
+
 }

@@ -72,6 +72,8 @@
     <Compile Include="ClassificationRequest.cs" />
     <Compile Include="CommandErrorLogRecord.cs" />
     <Compile Include="CommandLogRecord.cs" />
+    <Compile Include="CommandNotification.cs" />
+    <Compile Include="CommandNotificationImpactedEntity.cs" />
     <Compile Include="CommandRequest.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="CQRSAzureBindings.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Events\Command\ParameterValueSet.cs" />
     <Compile Include="Events\Command\ProcessingCompleted.cs" />
     <Compile Include="Events\Command\ProjectionRequested.cs" />
+    <Compile Include="Events\Command\Projections\Command_Notifications_Projection.cs" />
     <Compile Include="Events\Command\Projections\Command_Summary_Projection.cs" />
     <Compile Include="Events\Command\ProjectionValueReturned.cs" />
     <Compile Include="Events\Command\ReturnHookAdded.cs" />

@@ -168,7 +168,7 @@ namespace TheLongRun.Common
             string aggregateInstanceKey, 
             Nullable<DateTime> asOfDate,
             object projectionValues,
-            uint sequenceNumber,
+            int sequenceNumber,
             IWriteContext writeContext = null)
         {
             EventStream qryEvents = new EventStream(Constants.Domain_Query,
@@ -198,7 +198,7 @@ namespace TheLongRun.Common
         /// <param name="queryReturnTarget"></param>
         /// <param name="value"></param>
         public static void SendOutput(string location, 
-            QueryResponseTarget.QueryReturnTarget queryReturnTarget, 
+            QueryResponseTarget.ReturnTargetType queryReturnTarget, 
             object value)
         {
             if (null != value )
@@ -206,37 +206,37 @@ namespace TheLongRun.Common
                 string valueAsJson = Newtonsoft.Json.JsonConvert.SerializeObject(value);
                 switch (queryReturnTarget )
                 {
-                    case QueryResponseTarget.QueryReturnTarget.AzureBlobStorage:
+                    case QueryResponseTarget.ReturnTargetType.AzureBlobStorage:
                         {
                             SendOutputToBlob(location, valueAsJson);
                             break;
                         }
-                    case QueryResponseTarget.QueryReturnTarget.CustomEventGridTopic:
+                    case QueryResponseTarget.ReturnTargetType.CustomEventGridTopic:
                         {
                             SendOutputToCustomTopic(location, valueAsJson);
                             break;
                         }
-                    case QueryResponseTarget.QueryReturnTarget.WebHook:
+                    case QueryResponseTarget.ReturnTargetType.WebHook:
                         {
                             SendOutputToWebhook(location, valueAsJson);
                             break;
                         }
-                    case QueryResponseTarget.QueryReturnTarget.DurableFunctionOrchestration:
+                    case QueryResponseTarget.ReturnTargetType.DurableFunctionOrchestration:
                         {
                             // TODO: Work out how to send output to trigger a durable function to awaken
                             break;
                         }
-                    case QueryResponseTarget.QueryReturnTarget.ServiceBus:
+                    case QueryResponseTarget.ReturnTargetType.ServiceBus:
                         {
                             // TODO : Send the output to a service bus endpoint
                             break;
                         }
-                    case QueryResponseTarget.QueryReturnTarget.SignalR:
+                    case QueryResponseTarget.ReturnTargetType.SignalR:
                         {
                             // TODO: Send the output to a SignalR endpoint
                             break;
                         }
-                    case QueryResponseTarget.QueryReturnTarget.NotSet:
+                    case QueryResponseTarget.ReturnTargetType.NotSet:
                         {
                             // Nothing to do here
                             break;

@@ -1,6 +1,4 @@
 ﻿using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.Files;
 using TheLongRun.Common.Attributes;
 using System.Threading.Tasks;
 using TheLongRun.Common.Orchestration;
@@ -13,6 +11,9 @@ using TheLongRun.Common.Events.Query.Projections;
 using System;
 using System.Collections.Generic;
 using System.IO;
+
+using Microsoft.Azure.WebJobs.Extensions.EventGrid;
+using Microsoft.Azure.EventGrid.Models;
 
 namespace TheLongRunLeaguesFunction.Queries.Output
 {
@@ -46,7 +47,7 @@ namespace TheLongRunLeaguesFunction.Queries.Output
             #endregion
 
             QueryRequest<object> queryRequest = context.GetInput<QueryRequest<object>>();
-            if (null != queryRequest )
+            if (null != queryRequest)
             {
                 EventStream queryEvents = new EventStream(Constants.Domain_Query,
                     queryRequest.QueryName,
@@ -137,62 +138,97 @@ namespace TheLongRunLeaguesFunction.Queries.Output
 
                             List<Task<ActivityResponse>> allOutputTasks = new List<Task<ActivityResponse>>();
 
-                            foreach (string location in qryOutputs.WebhookTargets)
+                            if (null != request.Results)
                             {
-                                #region Logging
-                                if (null != log)
-                                {
-                                    log.LogDebug($"Target : { location} - being sent by webhook in OutputResultsGetLeagueSummaryQuery");
-                                }
-                                #endregion
+                                // Create a QueryOutputRecord<object>
+                                QueryOutputRecord<object> outputRequest = QueryOutputRecord<object>.Create(request.Results,
+                                    @"",
+                                    request.QueryName,
+                                    queryGuid);
 
-                                if (null != request.Results)
+                                foreach (string location in qryOutputs.WebhookTargets)
                                 {
-                                    // Create a QueryOutputRecord<object>
-                                    QueryOutputRecord<object> outputRequest = QueryOutputRecord<object>.Create(request.Results,
-                                        location,
-                                        request.QueryName,
-                                        queryGuid);
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.LogDebug($"Target : { location} - being sent by webhook in OutputResultsGetLeagueSummaryQuery");
+                                    }
+                                    #endregion
+
+                                    outputRequest.Target = location;
 
                                     // add a task to ouputit it via webhook....
                                     allOutputTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("QueryOutputToWebhookActivity",
                                             DomainSettings.QueryRetryOptions(),
                                             outputRequest));
-                                }
-                            }
 
-                            foreach (string location in qryOutputs.BlobTargets )
-                            {
-                                #region Logging
-                                if (null != log)
-                                {
-                                    log.LogDebug($"Target : { location} - being persisted to a Blob in OutputResultsGetLeagueSummaryQuery");
                                 }
-                                #endregion
 
-                                if (null != request.Results)
+                                foreach (string location in qryOutputs.BlobTargets)
                                 {
-                                    // Create a QueryOutputRecord<object>
-                                    QueryOutputRecord<object> outputRequest = QueryOutputRecord<object>.Create(request.Results,
-                                        location,
-                                        request.QueryName,
-                                        queryGuid);
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.LogDebug($"Target : { location} - being persisted to a Blob in {response.FunctionName}");
+                                    }
+                                    #endregion
+
+                                    outputRequest.Target = location;
 
                                     // add a task to ouputit it via webhook....
                                     allOutputTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("QueryOutputToBlobActivity",
                                             DomainSettings.QueryRetryOptions(),
                                             outputRequest));
-                                }
-                            }
 
-                            // TODO: All the other output methods
+                                }
+
+                                foreach (string location in qryOutputs.ServiceBusTargets)
+                                {
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.LogDebug($"Target : { location} - being sent out via service bus in {response.FunctionName}");
+                                    }
+                                    #endregion
+
+                                    outputRequest.Target = location;
+
+                                    // add a task to ouputit it via service bus....
+                                    allOutputTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("QueryOutputToServiceBusActivity",
+                                            DomainSettings.QueryRetryOptions(),
+                                            outputRequest));
+
+                                }
+
+
+                                //EventGridTargets
+                                foreach (string location in qryOutputs.EventGridTargets )
+                                {
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.LogDebug($"Target : { location} - being sent out via event grid in {response.FunctionName}");
+                                    }
+                                    #endregion
+
+                                    outputRequest.Target = location;
+
+                                    // add a task to ouputit it via event grid....
+                                    allOutputTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("QueryOutputToEventGridActivity",
+                                            DomainSettings.QueryRetryOptions(),
+                                            outputRequest));
+
+                                }
+
+                                // TODO: All the other output methods
+                            }
 
                             // Await for all the outputs to have run in parallel...
                             await Task.WhenAll(allOutputTasks);
 
                             foreach (var returnedResponse in allOutputTasks)
                             {
-                                if (returnedResponse.Result.FatalError )
+                                if (returnedResponse.Result.FatalError)
                                 {
                                     response.FatalError = true;
                                     response.Message = returnedResponse.Result.Message;
@@ -221,11 +257,8 @@ namespace TheLongRunLeaguesFunction.Queries.Output
         }
 
         /// <summary>
-        /// Run the specified projection and return the results to the caller orchestration
+        /// Sends the query output to a specified webhook target as a JSON object
         /// </summary>
-        /// <remarks>
-        /// The query identifier and results are 
-        /// </remarks>
         [ApplicationName("The Long Run")]
         [FunctionName("QueryOutputToWebhookActivity")]
         public static async Task<ActivityResponse> QueryOutputToWebhookActivity(
@@ -243,8 +276,8 @@ namespace TheLongRunLeaguesFunction.Queries.Output
             #endregion
 
             // Read the results 
-            QueryOutputRecord<object> results = context.GetInput<QueryOutputRecord<object>>(); 
-            if (null != results )
+            QueryOutputRecord<object> results = context.GetInput<QueryOutputRecord<object>>();
+            if (null != results)
             {
                 var payloadAsJSON = new StringContent(JsonConvert.SerializeObject(results.Results));
 
@@ -253,12 +286,16 @@ namespace TheLongRunLeaguesFunction.Queries.Output
                 using (var client = new HttpClient())
                 {
                     HttpResponseMessage msgResp = await client.PostAsync(results.Target, payloadAsJSON);
-                    if (null != msgResp )
+                    if (null != msgResp)
                     {
                         ret.Message = $"Output sent - {msgResp.ReasonPhrase}";
                     }
                 }
 
+            }
+            else
+            {
+                ret.Message = $"Unable to get query output record to send to web hook";
             }
 
             return ret;
@@ -266,11 +303,8 @@ namespace TheLongRunLeaguesFunction.Queries.Output
         }
 
         /// <summary>
-        /// Run the specified projection and return the results to the caller orchestration
+        /// Send the query outputs to the named BLOB target
         /// </summary>
-        /// <remarks>
-        /// The query identifier and results are 
-        /// </remarks>
         [ApplicationName("The Long Run")]
         [FunctionName("QueryOutputToBlobActivity")]
         public static async Task<ActivityResponse> QueryOutputToBlobActivity(
@@ -295,15 +329,135 @@ namespace TheLongRunLeaguesFunction.Queries.Output
                 var payloadAsJSON = JsonConvert.SerializeObject(results.Results);
 
                 // Use the binder to bind to an blob client to send the results to
-                using (var writer = await outputBinder.BindAsync<TextWriter>(new BlobAttribute(results.Target )))
+                using (var writer = outputBinder.Bind<TextWriter>(new BlobAttribute(results.Target)))
                 {
                     await writer.WriteAsync(payloadAsJSON);
                 }
+            }
+            else
+            {
+                ret.Message = $"Unable to get query output record to write to Blob";
             }
 
             return ret;
 
         }
 
+
+        /// <summary>
+        /// Send the query outputs to the named service bus queue target
+        /// </summary>
+        [ApplicationName("The Long Run")]
+        [FunctionName("QueryOutputToServiceBusActivity")]
+        public static async Task<ActivityResponse> QueryOutputToServiceBusActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            Binder outputBinder,
+            ILogger log)
+        {
+
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "QueryOutputToServiceBusActivity" };
+
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"Output  in {ret.FunctionName} ");
+            }
+            #endregion
+
+            // Read the results 
+            QueryOutputRecord<object> results = context.GetInput<QueryOutputRecord<object>>();
+            if (null != results)
+            {
+                var queueAttribute = new ServiceBusAttribute(results.Target);
+
+                var payloadAsJSON = JsonConvert.SerializeObject(results.Results);
+
+                using (var writer = outputBinder.Bind<TextWriter>(queueAttribute))
+                {
+                    await writer.WriteAsync(payloadAsJSON);
+                }
+            }
+            else
+            {
+                ret.Message = $"Unable to get query output record to send to Service Bus";
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Send the query outputs to the named service bus queue target
+        /// </summary>
+        [ApplicationName("The Long Run")]
+        [FunctionName("QueryOutputToEventGridActivity")]
+        public static async Task<ActivityResponse> QueryOutputToEventGridActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            Binder outputBinder,
+            ILogger log)
+        {
+
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "QueryOutputToEventGridActivity" };
+
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"Output  in {ret.FunctionName} ");
+            }
+            #endregion
+
+            // Read the results 
+            QueryOutputRecord<object> results = context.GetInput<QueryOutputRecord<object>>();
+            if (null != results)
+            {
+                EventGridAttribute egAttribute = EventGridAttributeFromTarget(results.Target, results.QueryName, results.QueryUniqueIdentifier  );
+
+                if (null != egAttribute)
+                {
+                    // split the target string into an event grid attribute 
+
+                    Microsoft.Azure.EventGrid.Models.EventGridEvent eventGridEvent = new Microsoft.Azure.EventGrid.Models.EventGridEvent()
+                    {
+                        Subject= results.QueryUniqueIdentifier.ToString(),  
+                        Data = results.Results
+                    };
+
+                    IAsyncCollector<EventGridEvent> eventCollector = outputBinder.Bind<IAsyncCollector<EventGridEvent>>(egAttribute);
+                    if (null != eventCollector)
+                    {
+                        await eventCollector.AddAsync(eventGridEvent);
+                        await eventCollector.FlushAsync();
+                    }
+                }
+                else
+                {
+                    ret.Message = $"Unable to determine the event grid target from {results.Target}";
+                }
+            }
+            else
+            {
+                ret.Message = $"Unable to get query output record to send to event grid";
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Turn a query output target into the event grid attribute to which it will be sent
+        /// </summary>
+        public static EventGridAttribute EventGridAttributeFromTarget(string target, 
+            string queryName, 
+            Guid queryUniqueIdentifier)
+        {
+            if (! string.IsNullOrWhiteSpace(target) )
+            {
+                EventGridAttribute ret = new EventGridAttribute();
+                ret.TopicEndpointUri = target;
+                ret.TopicKeySetting = EventStream.MakeEventStreamName( queryName);
+            }
+
+            // If we reach the end with not enough info to create an event grid target return null
+            return null;
+        }
     }
+
 }

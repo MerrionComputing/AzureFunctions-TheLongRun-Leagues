@@ -54,7 +54,7 @@ namespace TheLongRun.Common.Events.Query
         /// This can be used to see if a projection needs rerunning if the query is
         /// rerun at a later point in time
         /// </remarks>
-        public uint AsOfSequenceNumber { get; set; }
+        public int AsOfSequenceNumber { get; set; }
 
         public ProjectionValueReturned(string domainNameIn,
             string aggregateTypeNameIn,
@@ -62,7 +62,7 @@ namespace TheLongRun.Common.Events.Query
             string projectionTypeNameIn,
             DateTime asOfDateIn,
             object returnedValueIn,
-            uint asOfSequenceIn
+            int asOfSequenceIn
          )
         {
             DomainName = domainNameIn;
@@ -90,7 +90,7 @@ namespace TheLongRun.Common.Events.Query
             AggregateInstanceKey = info.GetString(nameof(AggregateInstanceKey));
             ProjectionTypeName = info.GetString(nameof(ProjectionTypeName));
             AsOfDate = info.GetDateTime(nameof(AsOfDate));
-            AsOfSequenceNumber = info.GetUInt32(nameof(AsOfSequenceNumber));
+            AsOfSequenceNumber = info.GetInt32(nameof(AsOfSequenceNumber));
             ReturnedValue = (IEnumerable < object >)info.GetValue(nameof(ReturnedValue), typeof(IEnumerable<object>));
         }
 

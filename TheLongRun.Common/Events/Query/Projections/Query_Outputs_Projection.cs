@@ -27,10 +27,10 @@ namespace TheLongRun.Common.Events.Query.Projections
 
         #region Private members
         private ILogger log = null;
-        private Dictionary<string, QueryResponseTarget.QueryReturnTarget> targets = new Dictionary<string, QueryResponseTarget.QueryReturnTarget>();
+        private Dictionary<string, QueryResponseTarget.ReturnTargetType> targets = new Dictionary<string, QueryResponseTarget.ReturnTargetType>();
         #endregion
 
-        public Dictionary<string, QueryResponseTarget.QueryReturnTarget> Targets
+        public Dictionary<string, QueryResponseTarget.ReturnTargetType> Targets
         {
             get
             {
@@ -47,7 +47,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.WebHook).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.ReturnTargetType.WebHook).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }
@@ -62,7 +62,22 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.AzureBlobStorage).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.ReturnTargetType.AzureBlobStorage).Select(f => f.Key).AsEnumerable();
+                }
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        /// <summary>
+        /// The subset of outputs for sending as service bus messages
+        /// </summary>
+        public IEnumerable<string> ServiceBusTargets
+        {
+            get
+            {
+                if (null != targets)
+                {
+                    return targets.Where(f => f.Value == QueryResponseTarget.ReturnTargetType.ServiceBus ).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }
@@ -77,7 +92,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.CustomEventGridTopic).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.ReturnTargetType.CustomEventGridTopic).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }
@@ -92,7 +107,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.SignalR).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.ReturnTargetType.SignalR).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }
@@ -107,7 +122,7 @@ namespace TheLongRun.Common.Events.Query.Projections
             {
                 if (null != targets)
                 {
-                    return targets.Where(f => f.Value == QueryResponseTarget.QueryReturnTarget.DurableFunctionOrchestration).Select(f => f.Key).AsEnumerable();
+                    return targets.Where(f => f.Value == QueryResponseTarget.ReturnTargetType.DurableFunctionOrchestration).Select(f => f.Key).AsEnumerable();
                 }
                 return Enumerable.Empty<string>();
             }

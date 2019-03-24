@@ -18,6 +18,9 @@ namespace TheLongRun.Common
         /// <summary>
         /// Text description of the current status of the query request
         /// </summary>
+        /// <remarks>
+        /// This allows for the query to be resent as a retry
+        /// </remarks>
         public string Status { get; set; }
 
 

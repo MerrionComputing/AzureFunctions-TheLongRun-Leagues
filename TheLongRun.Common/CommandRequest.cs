@@ -17,6 +17,9 @@ namespace TheLongRun.Common
         /// <summary>
         /// Text description of the current status of the command request
         /// </summary>
+        /// <remarks>
+        /// This can allow a command to be retried if neccessary
+        /// </remarks>
         public string Status { get; set; }
 
         /// <summary>

@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using CQRSAzure.EventSourcing;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using TheLongRun.Common.Events.Command;
 
 namespace TheLongRun.Common.Events.Command.Projections
 {
     /// <summary>
     /// A projection to get the current state of a command based on the events that have occured to it
     /// </summary>
-    [CQRSAzure.EventSourcing.Category("Command")]
+    [CQRSAzure.EventSourcing.Category(Constants.Domain_Command  )]
     public class Command_Summary_Projection :
         CQRSAzure.EventSourcing.ProjectionBaseUntyped,
         CQRSAzure.EventSourcing.IHandleEvent<CommandCreated>,

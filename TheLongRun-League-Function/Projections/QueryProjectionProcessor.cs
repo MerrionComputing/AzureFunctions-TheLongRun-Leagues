@@ -370,6 +370,8 @@ namespace TheLongRunLeaguesFunction.Projections
             }
         }
 
+
+
         /// <summary>
         /// Run the specified projection and return the results to the caller function
         /// </summary>
@@ -446,6 +448,7 @@ namespace TheLongRunLeaguesFunction.Projections
                                 DomainName = request.DomainName,
                                 AggregateTypeName = request.AggregateTypeName,
                                 EntityUniqueIdentifier = request.AggregateInstanceUniqueIdentifier,
+                                CurrentSequenceNumber = projectionResponse.AsOfSequenceNumber , 
                                 CurrentAsOfDate = projectionResponse.AsOfDate.GetValueOrDefault(DateTime.UtcNow),
                                 CorrelationIdentifier = request.CorrelationIdentifier,
                                 ParentRequestName = request.ParentRequestName,

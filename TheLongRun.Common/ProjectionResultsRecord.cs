@@ -46,7 +46,7 @@ namespace TheLongRun.Common
         /// <summary>
         /// The as-of sequence number the results were returned for
         /// </summary>
-        public uint CurrentSequenceNumber { get; set; }
+        public int CurrentSequenceNumber { get; set; }
 
         /// <summary>
         /// This is set to true if an error occured so the projection result should not be trusted
