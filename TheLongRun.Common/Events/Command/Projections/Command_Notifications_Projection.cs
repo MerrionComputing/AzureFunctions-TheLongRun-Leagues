@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using CQRSAzure.EventSourcing;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -24,6 +24,17 @@ namespace TheLongRun.Common.Events.Command.Projections
         private ILogger log = null;
         private List<ReturnHookAdded> targetHooks = new List<ReturnHookAdded>();
         #endregion
+
+        /// <summary>
+        /// The set of target hooks added to this command
+        /// </summary>
+        public IEnumerable<ReturnHookAdded > NotificationTargetHooks
+        {
+            get
+            {
+                return targetHooks; 
+            }
+        }
 
         /// <summary>
         /// There is no value in storing snapshots for command summaries as they should be only a few events
@@ -135,5 +146,73 @@ namespace TheLongRun.Common.Events.Command.Projections
                 log = logIn;
             }
         }
+    }
+
+
+    /// <summary>
+    /// Extension classes for making the code dealing with collections of ReturnHookAdded more readable
+    /// </summary>
+    public static class ReturnHookAddedExtensions
+    {
+
+        /// <summary>
+        /// The set of return hooks that should be notified if the command has failed
+        /// </summary>
+        /// <param name="source">
+        /// The set of all the ReturnHookAdded events 
+        /// </param>
+        public static IEnumerable<ReturnHookAdded > ForFailedCommands(this IEnumerable<ReturnHookAdded> source)
+        {
+            if (null != source )
+            {
+                return source.Where(f => f.NotifyOnError == true);
+            }
+            else
+            {
+                // Return an empty set for composability
+                return Enumerable.Empty<ReturnHookAdded>();
+            }
+        }
+
+
+        /// <summary>
+        /// The set of return hooks that should be notified if the command has completed
+        /// </summary>
+        /// <param name="source">
+        /// The set of all the ReturnHookAdded events 
+        /// </param>
+        public static IEnumerable<ReturnHookAdded> ForCompletedCommands(this IEnumerable<ReturnHookAdded> source)
+        {
+            if (null != source)
+            {
+                return source.Where(f => f.NotifyOnCompletion == true);
+            }
+            else
+            {
+                // Return an empty set for composability
+                return Enumerable.Empty<ReturnHookAdded>();
+            }
+        }
+
+
+        /// <summary>
+        /// The set of return hooks that should be notified after each step of a command is completed
+        /// </summary>
+        /// <param name="source">
+        /// The set of all the ReturnHookAdded events 
+        /// </param>
+        public static IEnumerable<ReturnHookAdded> ForCommandSteps(this IEnumerable<ReturnHookAdded> source)
+        {
+            if (null != source)
+            {
+                return source.Where(f => f.NotifyStepComplete == true);
+            }
+            else
+            {
+                // Return an empty set for composability
+                return Enumerable.Empty<ReturnHookAdded>();
+            }
+        }
+
     }
 }
