@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,6 +15,25 @@ namespace TheLongRun.Common
     /// </remarks>
     public class CommandNotification
     {
+
+        /// <summary>
+        /// The different things a command can notify 
+        /// </summary>
+        public enum CommandNotificationType
+        {
+            /// <summary>
+            /// A command has completed successfully
+            /// </summary>
+            CommandComplete = 1,
+            /// <summary>
+            /// An intermediate step of a command has completed successfully
+            /// </summary>
+            StepComplete = 2,
+            /// <summary>
+            /// A command has halted in an error state
+            /// </summary>
+            Error = 3
+        }
 
         /// <summary>
         /// The name of the command that was executed
@@ -30,6 +51,13 @@ namespace TheLongRun.Common
         /// This allows the recipeint to filter notifications on their origin as well as their type
         /// </remarks>
         public string NotificationSource { get; set; }
+
+
+        /// <summary>
+        /// The type of command event that this message is for
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public CommandNotificationType NotificationType { get; set; }
 
         /// <summary>
         /// The entities impacted by the command
