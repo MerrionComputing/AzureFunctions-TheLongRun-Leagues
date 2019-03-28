@@ -8,14 +8,16 @@ namespace TheLongRun.Common.Events.Command
     /// A new command has been created
     /// </summary>
     [Serializable()]
-    [CQRSAzure.EventSourcing.DomainNameAttribute("Command" )]
-    [CQRSAzure.EventSourcing.Category("Command")]
-    [CQRSAzure.EventSourcing.EventAsOfDateAttribute("Date_Logged")]
+    [CQRSAzure.EventSourcing.DomainNameAttribute(Constants.Domain_Command )]
+    [CQRSAzure.EventSourcing.Category(Constants.Domain_Command)]
+    [CQRSAzure.EventSourcing.EventAsOfDateAttribute(nameof (Date_Logged))]
     public class CommandCreated
         : IEvent 
     {
 
-
+        /// <summary>
+        /// The name of the command to be executed
+        /// </summary>
         public string CommandName { get; set; }
 
         /// <summary>

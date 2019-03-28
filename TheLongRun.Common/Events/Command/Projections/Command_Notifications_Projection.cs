@@ -17,12 +17,14 @@ namespace TheLongRun.Common.Events.Command.Projections
     public class Command_Notifications_Projection:
         CQRSAzure.EventSourcing.ProjectionBaseUntyped,
         CQRSAzure.EventSourcing.IHandleEvent<ReturnHookAdded >,
+        CQRSAzure.EventSourcing.IHandleEvent<CommandStepCompleted >,
         IProjectionUntyped
     {
 
         #region Private members
         private ILogger log = null;
         private List<ReturnHookAdded> targetHooks = new List<ReturnHookAdded>();
+        private List<CommandNotificationImpactedEntity> impactedEntities = new List<CommandNotificationImpactedEntity>();
         #endregion
 
         /// <summary>
@@ -33,6 +35,17 @@ namespace TheLongRun.Common.Events.Command.Projections
             get
             {
                 return targetHooks; 
+            }
+        }
+
+        /// <summary>
+        /// The set of entities impacted by the command in any way
+        /// </summary>
+        public IEnumerable<CommandNotificationImpactedEntity> ImpactedEntities
+        {
+            get
+            {
+                return impactedEntities;
             }
         }
 
@@ -55,6 +68,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             if (eventFullName == typeof(ReturnHookAdded ).FullName)
             {
                 HandleEvent<ReturnHookAdded>(eventToHandle.ToObject<ReturnHookAdded>());
+            }
+
+            if (eventFullName == typeof(CommandStepCompleted ).FullName)
+            {
+                HandleEvent<CommandStepCompleted >(eventToHandle.ToObject<CommandStepCompleted >());
             }
         }
 
@@ -81,6 +99,10 @@ namespace TheLongRun.Common.Events.Command.Projections
                 return true;
             }
 
+            if (eventTypeFullName == typeof(CommandStepCompleted ).FullName)
+            {
+                return true;
+            }
 
             return false;
         }
@@ -99,6 +121,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             if (eventToHandle.GetType() == typeof(ReturnHookAdded ))
             {
                 HandleEvent(eventToHandle as ReturnHookAdded);
+            }
+
+            if (eventToHandle.GetType() == typeof(CommandStepCompleted ))
+            {
+                HandleEvent(eventToHandle as CommandStepCompleted );
             }
         }
 
@@ -134,6 +161,49 @@ namespace TheLongRun.Common.Events.Command.Projections
                 {
                     log.LogWarning($"HandleEvent( ReturnHookAdded ) - parameter was null",
                         nameof(Command_Notifications_Projection ));
+                }
+                #endregion
+            }
+        }
+
+        public void HandleEvent(CommandStepCompleted  eventHandled)
+        {
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"HandleEvent( CommandStepCompleted )",
+                    nameof(Command_Notifications_Projection));
+            }
+            #endregion
+
+            if (null != eventHandled)
+            {
+                // add the location to the internal lists
+                #region Logging
+                if (null != log)
+                {
+                    log.LogDebug($"Command step completed notification added  {eventHandled.StepName} ",
+                        nameof(Command_Notifications_Projection));
+                }
+                #endregion
+                if (null != eventHandled.ImpactedEntities )
+                {
+                    foreach (var entity in eventHandled.ImpactedEntities )
+                    {
+                        if (!impactedEntities.Contains(entity))
+                        {
+                            impactedEntities.Add(entity);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.LogWarning($"HandleEvent( CommandStepCompleted ) - parameter was null",
+                        nameof(Command_Notifications_Projection));
                 }
                 #endregion
             }

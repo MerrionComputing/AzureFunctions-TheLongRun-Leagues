@@ -85,6 +85,7 @@
     <Compile Include="Events\Command\Classifiers\Command_Complete_Classifier.cs" />
     <Compile Include="Events\Command\Classifiers\Command_Failed_Classifier.cs" />
     <Compile Include="Events\Command\CommandCreated.cs" />
+    <Compile Include="Events\Command\CommandStepCompleted.cs" />
     <Compile Include="Events\Command\ParameterValueSet.cs" />
     <Compile Include="Events\Command\ProcessingCompleted.cs" />
     <Compile Include="Events\Command\ProjectionRequested.cs" />

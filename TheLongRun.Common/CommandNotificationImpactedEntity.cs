@@ -11,6 +11,7 @@ namespace TheLongRun.Common
     /// A command notification will have 1..n impacted entities
     /// </remarks>
     public class CommandNotificationImpactedEntity
+        : IEquatable<CommandNotificationImpactedEntity> 
     {
 
         /// <summary>
@@ -23,5 +24,19 @@ namespace TheLongRun.Common
         /// </summary>
         public string InstanceUniqueIdentifier { get; set; }
 
+        public bool Equals(CommandNotificationImpactedEntity other)
+        {
+            if (null != other )
+            {
+                if (other.EntityType.Equals(EntityType )  )
+                {
+                    if (other.InstanceUniqueIdentifier.Equals(InstanceUniqueIdentifier ) )
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 }
