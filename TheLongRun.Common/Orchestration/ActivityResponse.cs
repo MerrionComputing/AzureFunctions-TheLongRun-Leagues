@@ -29,5 +29,14 @@ namespace TheLongRun.Common.Orchestration
         /// </summary>
         public bool FatalError { get; set; }
 
+        /// <summary>
+        /// This specific step failed
+        /// </summary>
+        /// <remarks>
+        /// This might not be considered a fatal error but may need to be logged for investigation.
+        /// If FatalError is set you can assume the step failed too
+        /// </remarks>
+        public bool StepFailure { get; set; }
+
     }
 }

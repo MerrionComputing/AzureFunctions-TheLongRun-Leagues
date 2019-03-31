@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using TheLongRun.Common.Orchestration;
+using System.Collections.Generic;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -139,6 +140,15 @@ namespace TheLongRunLeaguesFunction
                     context.SetCustomStatus(resp);
                 }
 
+                // Get the impacted entities from the command request - in this command they are passed as parameters
+                IEnumerable<CommandNotificationImpactedEntity> impactedEntities = null;
+                Set_Email_Address_Definition parameters = cmdRequest.GetParameters();
+                if (null != parameters )
+                {
+                    Tuple<string, string>[] entitiesImpacted = new Tuple<string, string>[] { new Tuple<string, string>(@"League", parameters.LeagueName ) };
+                    impactedEntities = CommandNotificationImpactedEntity.CreateImpactedEntityList(entitiesImpacted); 
+                }
+
                 if (!resp.FatalError)
                 {
                     // 1) Validate the command
@@ -166,6 +176,22 @@ namespace TheLongRunLeaguesFunction
                         {
                             context.SetCustomStatus(resp);
                         }
+
+                        // 3) Mark the step as complete
+                        CommandStepResponse stepResponse = new CommandStepResponse()
+                        {
+                            CommandName = cmdRequest.CommandName ,
+                            CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
+                            StepName= resp.FunctionName ,
+                            Message= resp.Message ,
+                            ImpactedEntities = impactedEntities
+                        };
+                        resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepResponse);
+
+
+
+                        // 4) Mark the command as complete
+
                     }
                     else
                     {

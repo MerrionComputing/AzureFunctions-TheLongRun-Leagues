@@ -162,7 +162,7 @@ namespace TheLongRunLeaguesFunction
                 if (! resp.FatalError )
                 {
                     // validate the command
-                    bool valid = await context.CallActivityWithRetryAsync<bool>("CreateLeagueCommandValidationAction",
+                    bool valid = await context.CallActivityWithRetryAsync<bool>("CreateLeagueCommandValidationActivity",
                         DomainSettings.CommandRetryOptions(),
                         cmdRequest); 
 

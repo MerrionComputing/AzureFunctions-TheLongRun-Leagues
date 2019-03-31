@@ -20,6 +20,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
     public static partial class SetLeagueEmailAddressCommandHandler
     {
 
+        const string COMMAND_NAME = @"set-league-email-address";
+
         [ApplicationName("The Long Run")]
         [DomainName("Leagues")]
         [AggregateRoot("League")]
@@ -47,7 +49,9 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
             }
 
             bool valid = false;
-            if (await ValidateSetLeagueEmailAddressCommand(commandId, log))
+            if (await ValidateSetLeagueEmailAddressCommand(COMMAND_NAME ,
+                commandId, 
+                log))
             {
                 valid = true;
             }
@@ -82,11 +86,17 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         {
 
             // Return the validation result
-            string commandId = setLeagueEmailAddressCommandContect.GetInput<string>();
-            if (! string.IsNullOrWhiteSpace(commandId ) )
+            CommandRequest<Set_Email_Address_Definition> cmdRequest = setLeagueEmailAddressCommandContect.GetInput<CommandRequest<Set_Email_Address_Definition>>();
+
+            if (null != cmdRequest)
             {
-                return await ValidateSetLeagueEmailAddressCommand(commandId, log,
-                     new WriteContext("SetLeagueEmailAddressCommandValidationActivity", setLeagueEmailAddressCommandContect.InstanceId ));
+                if (!cmdRequest.CommandUniqueIdentifier.Equals(Guid.Empty ) )
+                {
+                    return await ValidateSetLeagueEmailAddressCommand(cmdRequest.CommandName,
+                        cmdRequest.CommandUniqueIdentifier.ToString(), 
+                        log,
+                        new WriteContext("SetLeagueEmailAddressCommandValidationActivity", setLeagueEmailAddressCommandContect.InstanceId));
+                }
             }
 
             return false;
@@ -103,12 +113,13 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         /// <remarks>
         /// This is common functionality, whether called by function chaining or by duarble functions
         /// </remarks>
-        private static async Task<bool>  ValidateSetLeagueEmailAddressCommand(string commandId, 
+        private static async Task<bool>  ValidateSetLeagueEmailAddressCommand(string commandName,
+            string commandId, 
             ILogger log,
             CQRSAzure.EventSourcing.IWriteContext writeContext =null )
         {
 
-            const string COMMAND_NAME = @"set-league-email-address";
+            
 
             Guid commandGuid;
 
@@ -122,8 +133,8 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 #endregion
 
                 // Get the current state of the command...
-                Projection getCommandState = new Projection(@"Command",
-                    COMMAND_NAME,
+                Projection getCommandState = new Projection(Constants.Domain_Command ,
+                    commandName ,
                     commandGuid.ToString(),
                     nameof(Command_Summary_Projection));
 
@@ -191,7 +202,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                             if (cmdProjection.ParameterIsSet(nameof(Set_Email_Address_Definition.LeagueName)))
                             {
                                 // League name may not be blank
-                                string leagueName = cmdProjection.GetParameter<string>(nameof(Create_New_League_Definition.LeagueName));
+                                string leagueName = cmdProjection.GetParameter<string>(nameof(Set_Email_Address_Definition.LeagueName));
                                 if (string.IsNullOrWhiteSpace(leagueName))
                                 {
                                     await CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name may not be blank",
@@ -208,11 +219,16 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                     leagueNameValid = true;
                                 }
                             }
+                            else
+                            {
+                                await CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, true, "League name parameter has not been set",
+                                        writeContext);
+                            }
 
                             // The email address should not be blank
-                            if (cmdProjection.ParameterIsSet(nameof(Create_New_League_Definition.Email_Address )))
+                            if (cmdProjection.ParameterIsSet(nameof(Set_Email_Address_Definition.New_Email_Address )))
                             {
-                                string emailAddress = cmdProjection.GetParameter<string >(nameof(Create_New_League_Definition.Email_Address ));
+                                string emailAddress = cmdProjection.GetParameter<string >(nameof(Set_Email_Address_Definition.New_Email_Address));
                                 if (string.IsNullOrEmpty(emailAddress) )
                                 {
                                    await  CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Email address is blank",
@@ -228,6 +244,11 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                 {
                                     emailAddressValid = true;
                                 }
+                            }
+                            else
+                            {
+                                await CommandErrorLogRecord.LogCommandValidationError(commandGuid, COMMAND_NAME, false, "Email address parameter has not been set",
+                                       writeContext);
                             }
 
                             if (emailAddressValid && leagueNameValid)

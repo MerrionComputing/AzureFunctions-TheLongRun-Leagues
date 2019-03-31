@@ -28,6 +28,9 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
     /// </remarks>
     public static partial class CreateLeagueCommandHandler
     {
+
+        const string COMMAND_NAME = @"create-league";
+
         [ApplicationName("The Long Run")]
         [TheLongRun.Common.Attributes.DomainName("Leagues")]
         [AggregateRoot("League")]
@@ -38,8 +41,9 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
             ILogger log)
         {
 
-                #region Logging
-                if (null != log)
+
+            #region Logging
+            if (null != log)
                 {
                     log.LogDebug("Function triggered HTTP in CreateLeagueCommandValidation");
                 }
@@ -55,7 +59,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                     commandId = data?.CommandId;
                 }
 
-               bool valid  = await ValidateCreateLeagueCommand(commandId, log);
+               bool valid  = await ValidateCreateLeagueCommand(COMMAND_NAME , commandId, log);
 
                 return commandId == null
                     ? req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a commandId on the query string or in the request body")
@@ -67,18 +71,30 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         [TheLongRun.Common.Attributes.DomainName("Leagues")]
         [AggregateRoot("League")]
         [CommandName("Create League")]
-        [FunctionName("CreateLeagueCommandValidationAction")]
-        public static async Task<bool> CreateLeagueCommandValidationAction
-            ([ActivityTrigger] CommandRequest<Create_New_League_Definition > cmdRequest,
+        [FunctionName("CreateLeagueCommandValidationActivity")]
+        public static async Task<bool> CreateLeagueCommandValidationActivity
+            ([ActivityTrigger] DurableActivityContext createLeageContext,
             ILogger log)
         {
 
-            if (null != log)
-            {
-                log.LogInformation($"CreateLeagueCommandValidationAction called for command : {cmdRequest.CommandUniqueIdentifier}");
-            }
+            CommandRequest<Create_New_League_Definition> cmdRequest = createLeageContext.GetInput<CommandRequest<Create_New_League_Definition>>();
 
-            return await ValidateCreateLeagueCommand(cmdRequest.CommandUniqueIdentifier.ToString(), log);
+            if (null != cmdRequest)
+            {
+                if (null != log)
+                {
+                    log.LogInformation($"CreateLeagueCommandValidationAction called for command : {cmdRequest.CommandUniqueIdentifier}");
+                }
+
+                return await ValidateCreateLeagueCommand(cmdRequest.CommandName,
+                    cmdRequest.CommandUniqueIdentifier.ToString(),
+                    log,
+                    new WriteContext("CreateLeagueCommandValidationActivity", createLeageContext.InstanceId));
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -87,12 +103,12 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
         /// <param name="commandId">
         /// The unique identifier of the command to validate
         /// </param>
-        private static async Task<bool> ValidateCreateLeagueCommand(string commandId,
+        private static async Task<bool> ValidateCreateLeagueCommand(
+            string commandName,
+            string commandId,
             ILogger log,
             IWriteContext writeContext = null)
         {
-
-            const string COMMAND_NAME = @"create-league";
 
             Guid commandGuid;
 
@@ -110,7 +126,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
 
                     // Get the current state of the command...
                     Projection getCommandState = new Projection(Constants.Domain_Command,
-                        COMMAND_NAME,
+                        commandName ,
                         commandGuid.ToString(),
                         nameof(Command_Summary_Projection));
 
