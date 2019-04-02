@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using CQRSAzure.EventSourcing;
-using static TheLongRun.Common.QueryResponseTarget;
+using static TheLongRun.Common.CommandNotificationTarget;
 
 namespace TheLongRun.Common.Events.Command
 {
@@ -16,9 +16,9 @@ namespace TheLongRun.Common.Events.Command
     {
 
         /// <summary>
-        /// The type of hook (e.g. webhook, email etc)
+        /// The type of hook (e.g. webhook, event grid etc)
         /// </summary>
-        public QueryResponseTarget.ReturnTargetType HookType { get; set; }
+        public CommandNotificationTarget.NotificationTargetType HookType { get; set; }
 
         /// <summary>
         /// The address of the hook to be notified
@@ -40,7 +40,7 @@ namespace TheLongRun.Common.Events.Command
         /// </summary>
         public bool NotifyOnCompletion { get; set; }
 
-        public ReturnHookAdded(ReturnTargetType  hookTypeIn,
+        public ReturnHookAdded(NotificationTargetType hookTypeIn,
             string hookAddressIn,
             bool notifyErrorIn,
             bool notifyStepIn,
@@ -61,7 +61,7 @@ namespace TheLongRun.Common.Events.Command
 
         public ReturnHookAdded(SerializationInfo info, StreamingContext context)
         {
-            HookType  = (ReturnTargetType)info.GetValue  (nameof(HookType), typeof(ReturnTargetType ));
+            HookType  = (NotificationTargetType)info.GetValue  (nameof(HookType), typeof(NotificationTargetType));
             HookAddress  = info.GetString(nameof(HookAddress ));
             NotifyOnError  = info.GetBoolean(nameof(NotifyOnError ));
             NotifyStepComplete  = info.GetBoolean(nameof(NotifyStepComplete ));

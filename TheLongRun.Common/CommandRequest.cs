@@ -40,6 +40,11 @@ namespace TheLongRun.Common
         /// </summary>
         public string CommandName { get; set; }
 
+        /// <summary>
+        /// The set of targets to which to send command notifications
+        /// </summary>
+        public CommandNotificationTarget[] NotificationTargets { get; set; }
+
         public TCommandParameters GetParameters()
         {
             if (null != Parameters)

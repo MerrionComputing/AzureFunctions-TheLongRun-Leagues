@@ -74,6 +74,7 @@
     <Compile Include="CommandLogRecord.cs" />
     <Compile Include="CommandNotification.cs" />
     <Compile Include="CommandNotificationImpactedEntity.cs" />
+    <Compile Include="CommandNotificationTarget.cs" />
     <Compile Include="CommandRequest.cs" />
     <Compile Include="CommandStep.cs" />
     <Compile Include="Constants.cs" />
