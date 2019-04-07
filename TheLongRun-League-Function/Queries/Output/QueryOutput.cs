@@ -15,6 +15,9 @@ using System.IO;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
 
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using TheLongRun.Common.Attributes.Settings;
+
 namespace TheLongRunLeaguesFunction.Queries.Output
 {
     /// <summary>
@@ -202,7 +205,7 @@ namespace TheLongRunLeaguesFunction.Queries.Output
 
 
                                 //EventGridTargets
-                                foreach (string location in qryOutputs.EventGridTargets )
+                                foreach (string location in qryOutputs.EventGridTargets)
                                 {
                                     #region Logging
                                     if (null != log)
@@ -215,6 +218,25 @@ namespace TheLongRunLeaguesFunction.Queries.Output
 
                                     // add a task to ouputit it via event grid....
                                     allOutputTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("QueryOutputToEventGridActivity",
+                                            DomainSettings.QueryRetryOptions(),
+                                            outputRequest));
+
+                                }
+
+
+                                foreach (string location in qryOutputs.SignalRTargets)
+                                {
+                                    #region Logging
+                                    if (null != log)
+                                    {
+                                        log.LogDebug($"Target : { location} - being sent out via SignalR in {response.FunctionName}");
+                                    }
+                                    #endregion
+
+                                    outputRequest.Target = location;
+
+                                    // add a task to ouputit it via SignalR....
+                                    allOutputTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("QueryOutputToSignalRActivity",
                                             DomainSettings.QueryRetryOptions(),
                                             outputRequest));
 
@@ -386,7 +408,7 @@ namespace TheLongRunLeaguesFunction.Queries.Output
         }
 
         /// <summary>
-        /// Send the query outputs to the named service bus queue target
+        /// Send the query outputs to the named event grid target
         /// </summary>
         [ApplicationName("The Long Run")]
         [FunctionName("QueryOutputToEventGridActivity")]
@@ -409,7 +431,7 @@ namespace TheLongRunLeaguesFunction.Queries.Output
             QueryOutputRecord<object> results = context.GetInput<QueryOutputRecord<object>>();
             if (null != results)
             {
-                EventGridAttribute egAttribute = EventGridAttributeFromTarget(results.Target, results.QueryName, results.QueryUniqueIdentifier  );
+                EventGridAttribute egAttribute = EventGridAttributeFromTarget(results.Target, results.QueryName, results.QueryUniqueIdentifier);
 
                 if (null != egAttribute)
                 {
@@ -417,7 +439,7 @@ namespace TheLongRunLeaguesFunction.Queries.Output
 
                     Microsoft.Azure.EventGrid.Models.EventGridEvent eventGridEvent = new Microsoft.Azure.EventGrid.Models.EventGridEvent()
                     {
-                        Subject= results.QueryUniqueIdentifier.ToString(),  
+                        Subject = results.QueryUniqueIdentifier.ToString(),
                         Data = results.Results
                     };
 
@@ -444,18 +466,88 @@ namespace TheLongRunLeaguesFunction.Queries.Output
         /// <summary>
         /// Turn a query output target into the event grid attribute to which it will be sent
         /// </summary>
-        public static EventGridAttribute EventGridAttributeFromTarget(string target, 
-            string queryName, 
+        public static EventGridAttribute EventGridAttributeFromTarget(string target,
+            string queryName,
             Guid queryUniqueIdentifier)
         {
-            if (! string.IsNullOrWhiteSpace(target) )
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 EventGridAttribute ret = new EventGridAttribute();
                 ret.TopicEndpointUri = target;
-                ret.TopicKeySetting = EventStream.MakeEventStreamName( queryName);
+                ret.TopicKeySetting = EventStream.MakeEventStreamName(queryName);
             }
 
             // If we reach the end with not enough info to create an event grid target return null
+            return null;
+        }
+
+
+        //QueryOutputToSignalRActivity
+        /// <summary>
+        /// Send the query outputs to the SignalR target grid target
+        /// </summary>
+        [ApplicationName("The Long Run")]
+        [FunctionName("QueryOutputToSignalRActivity")]
+        public static async Task<ActivityResponse> QueryOutputToSignalRActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            Binder outputBinder,
+            ILogger log)
+        {
+            ActivityResponse ret = new ActivityResponse() { FunctionName = "QueryOutputToSignalRActivity" };
+
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"Output  in {ret.FunctionName} ");
+            }
+            #endregion
+
+            // Read the results 
+            QueryOutputRecord<object> results = context.GetInput<QueryOutputRecord<object>>();
+            if (null != results)
+            {
+                SignalRAttribute signalRAttribute = SignalRAttributeFromTarget(results.Target);
+
+                IAsyncCollector<SignalRMessage> eventCollector = outputBinder.Bind<IAsyncCollector<SignalRMessage>>(signalRAttribute);
+
+                // Create and add a SignalRMessage
+                if (null != eventCollector)
+                {
+                    // Make a SignalR message for the query results - note that we pass the entire results structure so
+                    // the recipeint gets the context as well as the results data
+                    SignalRMessage queryMessage = new SignalRMessage()
+                    {
+                        Target = results.QueryName ,
+                        Arguments = new object[] { results }
+                    };
+
+                    await eventCollector.AddAsync(queryMessage);
+                    // and flush the message out
+                    await eventCollector.FlushAsync();
+                }
+            }
+            else
+            {
+                ret.Message = $"Unable to get query output record to send to event grid";
+            }
+
+            return ret;
+
+        }
+
+        private static SignalRAttribute SignalRAttributeFromTarget(string target)
+        {
+            if (!string.IsNullOrWhiteSpace(target))
+            {
+                SignalRAttribute ret = new SignalRAttribute()
+                {
+                    // Look up the connection string from the hub name
+                    ConnectionStringSetting= ConnectionStringNameAttribute.DefaultConnectionStringName(Constants.Domain_Query   , target),
+                    HubName = target  
+                };
+                return ret;
+            }
+
             return null;
         }
     }
