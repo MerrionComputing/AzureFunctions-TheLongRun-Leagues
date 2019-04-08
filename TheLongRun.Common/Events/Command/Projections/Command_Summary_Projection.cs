@@ -18,6 +18,7 @@ namespace TheLongRun.Common.Events.Command.Projections
         CQRSAzure.EventSourcing.IHandleEvent<ValidationErrorOccured >,
         CQRSAzure.EventSourcing.IHandleEvent<ValidationSucceeded >,
         CQRSAzure.EventSourcing.IHandleEvent<ProcessingCompleted >,
+        CQRSAzure.EventSourcing.IHandleEvent<CommandCompleted >,
         IProjectionUntyped
     {
 
@@ -98,9 +99,13 @@ namespace TheLongRun.Common.Events.Command.Projections
             /// </summary>
             InProgress = 3,
             /// <summary>
+            /// The work of the command has been done but "wrap-up" is not yet done
+            /// </summary>
+            Processed =4,
+            /// <summary>
             /// A command marked as complete
             /// </summary>
-            Completed =4
+            Completed =5
         }
 
         public CommandState CurrentState
@@ -222,6 +227,10 @@ namespace TheLongRun.Common.Events.Command.Projections
                 HandleEvent(eventToHandle as ProcessingCompleted);
             }
 
+            if (eventToHandle.GetType() == typeof(CommandCompleted ))
+            {
+                HandleEvent(eventToHandle as CommandCompleted);
+            }
         }
 
         public  void HandleEvent(CommandCreated eventHandled)
@@ -414,8 +423,8 @@ namespace TheLongRun.Common.Events.Command.Projections
 
             if (null != eventHandled)
             {
-                // Set the status as "Validated"
-                base.AddOrUpdateValue<CommandState>(nameof(CurrentState), 0, CommandState.Completed);
+                // Set the status as "processed"
+                base.AddOrUpdateValue<CommandState>(nameof(CurrentState), 0, CommandState.Processed);
             }
             else
             {
@@ -423,6 +432,34 @@ namespace TheLongRun.Common.Events.Command.Projections
                 if (null != log)
                 {
                     log.LogWarning($"HandleEvent( ProcessingCompleted ) - parameter was null",
+                        nameof(Command_Summary_Projection));
+                }
+                #endregion
+            }
+        }
+
+        public void HandleEvent(CommandCompleted  eventHandled)
+        {
+
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"HandleEvent( CommandCompleted )",
+                    nameof(Command_Summary_Projection));
+            }
+            #endregion
+
+            if (null != eventHandled)
+            {
+                // Set the status as "processed"
+                base.AddOrUpdateValue<CommandState>(nameof(CurrentState), 0, CommandState.Completed);
+            }
+            else
+            {
+                #region Logging
+                if (null != log)
+                {
+                    log.LogWarning($"HandleEvent( CommandCompleted ) - parameter was null",
                         nameof(Command_Summary_Projection));
                 }
                 #endregion
@@ -463,6 +500,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             {
                 HandleEvent<ProcessingCompleted>(eventToHandle.ToObject<ProcessingCompleted>());
             }
+
+            if (eventFullName == typeof(CommandCompleted ).FullName)
+            {
+                HandleEvent<CommandCompleted>(eventToHandle.ToObject<CommandCompleted>());
+            }
         }
 
         public override bool HandlesEventTypeByName(string eventTypeFullName)
@@ -497,6 +539,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             }
 
             if (eventTypeFullName == typeof(ProcessingCompleted ).FullName)
+            {
+                return true;
+            }
+
+            if (eventTypeFullName == typeof(CommandCompleted).FullName)
             {
                 return true;
             }

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using TheLongRun.Common.Orchestration;
+using System.Collections.Generic;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -145,6 +146,14 @@ namespace TheLongRunLeaguesFunction
                     DomainSettings.CommandRetryOptions(),
                     cmdRequest);
 
+                Create_New_League_Definition parameters = cmdRequest.GetParameters();
+                IEnumerable<CommandNotificationImpactedEntity> impactedEntities = null;
+                if (null != parameters)
+                {
+                    Tuple<string, string>[] entitiesImpacted = new Tuple<string, string>[] { new Tuple<string, string>(@"League", parameters.LeagueName) };
+                    impactedEntities = CommandNotificationImpactedEntity.CreateImpactedEntityList(entitiesImpacted);
+                }
+
                 #region Logging
                 if (null != log)
                 {
@@ -159,27 +168,39 @@ namespace TheLongRunLeaguesFunction
                     context.SetCustomStatus(resp);
                 }
 
-                if (! resp.FatalError )
+                if (!resp.FatalError)
                 {
                     // validate the command
                     bool valid = await context.CallActivityWithRetryAsync<bool>("CreateLeagueCommandValidationActivity",
                         DomainSettings.CommandRetryOptions(),
-                        cmdRequest); 
+                        cmdRequest);
 
-                    if (! valid)
+                    if (!valid)
                     {
                         resp.Message = $"Validation failed for command {cmdRequest.CommandName} id: {cmdRequest.CommandUniqueIdentifier }";
                         resp.FatalError = true;
                     }
                 }
 
+                if (!resp.FatalError)
+                {
+                    CommandStepResponse stepResponse = new CommandStepResponse()
+                    {
+                        CommandName = cmdRequest.CommandName,
+                        CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
+                        StepName = resp.FunctionName,
+                        Message = resp.Message,
+                        ImpactedEntities = impactedEntities
+                    };
+                    resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepResponse);
+                }
 
                 if (!resp.FatalError)
                 {
                     // execute the command
                     resp = await context.CallActivityWithRetryAsync<ActivityResponse>("CreateLeagueCommandHandlerAction",
                         DomainSettings.CommandRetryOptions(),
-                        cmdRequest );
+                        cmdRequest);
 
                     #region Logging
                     if (null != log)
@@ -195,6 +216,40 @@ namespace TheLongRunLeaguesFunction
                         context.SetCustomStatus(resp);
                     }
                 }
+
+                if (!resp.FatalError)
+                {
+                    // 3) Mark the step as complete
+                    CommandStepResponse stepResponse = new CommandStepResponse()
+                    {
+                        CommandName = cmdRequest.CommandName,
+                        CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
+                        StepName = resp.FunctionName,
+                        Message = resp.Message,
+                        ImpactedEntities = impactedEntities
+                    };
+                    resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepResponse);
+                }
+
+                if (!resp.FatalError)
+                {
+                    resp = await context.CallActivityAsync<ActivityResponse>("CommandCompleteActivity", cmdRequest);
+                }
+
+                #region Logging
+                if (null != log)
+                {
+                    if (null != resp)
+                    {
+                        log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                    }
+                }
+                #endregion
+                if (null != resp)
+                {
+                    context.SetCustomStatus(resp);
+                }
+
             }
             else
             {

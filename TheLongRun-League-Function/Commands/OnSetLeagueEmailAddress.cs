@@ -156,6 +156,19 @@ namespace TheLongRunLeaguesFunction
                         DomainSettings.CommandRetryOptions(),
                         cmdRequest);
 
+                    if (!resp.FatalError)
+                    {
+                        CommandStepResponse stepResponse = new CommandStepResponse()
+                        {
+                            CommandName = cmdRequest.CommandName,
+                            CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
+                            StepName = resp.FunctionName,
+                            Message = resp.Message,
+                            ImpactedEntities = impactedEntities
+                        };
+                        resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepResponse);
+                    }
+
                     if (valid)
                     {
                         // 2) Perform the operation of the command
@@ -177,20 +190,40 @@ namespace TheLongRunLeaguesFunction
                             context.SetCustomStatus(resp);
                         }
 
-                        // 3) Mark the step as complete
-                        CommandStepResponse stepResponse = new CommandStepResponse()
+                        //  Mark the step as complete
+                        if (!resp.FatalError)
                         {
-                            CommandName = cmdRequest.CommandName ,
-                            CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
-                            StepName= resp.FunctionName ,
-                            Message= resp.Message ,
-                            ImpactedEntities = impactedEntities
-                        };
-                        resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepResponse);
+                            CommandStepResponse stepResponse = new CommandStepResponse()
+                            {
+                                CommandName = cmdRequest.CommandName,
+                                CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
+                                StepName = resp.FunctionName,
+                                Message = resp.Message,
+                                ImpactedEntities = impactedEntities
+                            };
+                            resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepResponse);
+                        }
 
 
+                        // Mark the command as complete
+                        if (!resp.FatalError)
+                        {
+                            resp = await context.CallActivityAsync<ActivityResponse>("CommandCompleteActivity", cmdRequest );
+                        }
 
-                        // 4) Mark the command as complete
+                        #region Logging
+                        if (null != log)
+                        {
+                            if (null != resp)
+                            {
+                                log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                            }
+                        }
+                        #endregion
+                        if (null != resp)
+                        {
+                            context.SetCustomStatus(resp);
+                        }
 
                     }
                     else

@@ -156,7 +156,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                         if ( (cmdProjection.CurrentSequenceNumber > 0) || (cmdProjection.ProjectionValuesChanged()))
                         {
                             if (cmdProjection.CurrentState ==
-                                Command_Summary_Projection.CommandState.Completed)
+                                Command_Summary_Projection.CommandState.Completed) 
                             {
                                 // No need to process a completed projection
 #region Logging
@@ -168,21 +168,10 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                                 return;
                             }
 
-                            if (cmdProjection.CurrentState ==   Command_Summary_Projection.CommandState.Created )
-                            {
-                                // No need to process a completed projection
-#region Logging
-                                if (null != log)
-                                {
-                                    log.LogWarning($"Command {commandId} is not yet validated so cannot process in HandleCreateLeagueCommand");
-                                }
-#endregion
-                                return;
-                            }
 
                             if (cmdProjection.CurrentState == Command_Summary_Projection.CommandState.Invalid  )
                             {
-                                // No need to process a completed projection
+                                // No need to process a command marked as invalid
 #region Logging
                                 if (null != log)
                                 {
