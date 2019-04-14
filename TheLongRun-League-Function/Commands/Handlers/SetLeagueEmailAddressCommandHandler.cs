@@ -116,7 +116,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                 #endregion
 
                 // Get the current state of the command...
-                Projection getCommandState = new Projection(@"Command",
+                Projection getCommandState = new Projection(Constants.Domain_Command ,
                     COMMAND_NAME,
                     commandGuid.ToString(),
                     nameof(Command_Summary_Projection));

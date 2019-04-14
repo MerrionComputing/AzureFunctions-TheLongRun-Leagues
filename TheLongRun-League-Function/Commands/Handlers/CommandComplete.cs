@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using TheLongRun.Common.Orchestration;
-using CQRSAzure.EventSourcing;
 using System.Threading.Tasks;
 using System;
 using TheLongRun.Common;

@@ -39,4 +39,18 @@ namespace TheLongRun.Common.Orchestration
         public bool StepFailure { get; set; }
 
     }
+
+    /// <summary>
+    /// A class to give feedback from a durable function that also has returned data
+    /// </summary>
+    public class ActivityResponse<TDataPayload>
+        : ActivityResponse 
+    {
+
+        /// <summary>
+        /// The data returned from the durable functions activity
+        /// </summary>
+        TDataPayload ReturnedData { get; set; }
+
+    }
 }

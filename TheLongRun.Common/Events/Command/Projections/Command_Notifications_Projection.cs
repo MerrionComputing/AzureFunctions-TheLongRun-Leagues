@@ -18,10 +18,13 @@ namespace TheLongRun.Common.Events.Command.Projections
         CQRSAzure.EventSourcing.ProjectionBaseUntyped,
         CQRSAzure.EventSourcing.IHandleEvent<ReturnHookAdded >,
         CQRSAzure.EventSourcing.IHandleEvent<CommandStepCompleted >,
+        CQRSAzure.EventSourcing.IHandleEvent<CommandCompleted >,
         IProjectionUntyped
     {
 
         #region Private members
+        private bool complete = false;
+        private List<CommandStepCompleted> commandStepsCompleted = new List<CommandStepCompleted>(); 
         private ILogger log = null;
         private List<ReturnHookAdded> targetHooks = new List<ReturnHookAdded>();
         private List<CommandNotificationImpactedEntity> impactedEntities = new List<CommandNotificationImpactedEntity>();
@@ -50,6 +53,38 @@ namespace TheLongRun.Common.Events.Command.Projections
         }
 
         /// <summary>
+        /// Has this command completed
+        /// </summary>
+        /// <remarks>
+        /// If so then a "completed" notification should be sent - otherwise the notification(s) for the completed steps should be sent
+        /// </remarks>
+        public bool Completed
+        {
+            get
+            {
+                return complete;
+            }
+        }
+
+        /// <summary>
+        /// The steps completed so far for this command
+        /// </summary>
+        public IEnumerable<CommandStepCompleted> StepsCompleted
+        {
+            get
+            {
+                if (null != commandStepsCompleted )
+                {
+                    return commandStepsCompleted.AsEnumerable();
+                }
+                else
+                {
+                    return Enumerable.Empty<CommandStepCompleted>(); 
+                }
+            }
+        }
+
+        /// <summary>
         /// There is no value in storing snapshots for command summaries as they should be only a few events
         /// </summary>
         public override bool SupportsSnapshots => false;
@@ -73,6 +108,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             if (eventFullName == typeof(CommandStepCompleted ).FullName)
             {
                 HandleEvent<CommandStepCompleted >(eventToHandle.ToObject<CommandStepCompleted >());
+            }
+
+            if (eventFullName == typeof(CommandCompleted ).FullName)
+            {
+                HandleEvent<CommandCompleted>(eventToHandle.ToObject<CommandCompleted>());
             }
         }
 
@@ -104,6 +144,11 @@ namespace TheLongRun.Common.Events.Command.Projections
                 return true;
             }
 
+            if (eventTypeFullName == typeof(CommandCompleted ).FullName)
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -126,6 +171,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             if (eventToHandle.GetType() == typeof(CommandStepCompleted ))
             {
                 HandleEvent(eventToHandle as CommandStepCompleted );
+            }
+
+            if (eventToHandle.GetType() == typeof(CommandCompleted ))
+            {
+                HandleEvent(eventToHandle as CommandCompleted);
             }
         }
 
@@ -186,6 +236,9 @@ namespace TheLongRun.Common.Events.Command.Projections
                         nameof(Command_Notifications_Projection));
                 }
                 #endregion
+
+                commandStepsCompleted.Add(eventHandled); 
+
                 if (null != eventHandled.ImpactedEntities )
                 {
                     foreach (var entity in eventHandled.ImpactedEntities )
@@ -209,8 +262,24 @@ namespace TheLongRun.Common.Events.Command.Projections
             }
         }
 
-        public Command_Notifications_Projection(ILogger logIn = null)
+        public void HandleEvent(CommandCompleted  eventHandled)
         {
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"HandleEvent( CommandCompleted )",
+                    nameof(Command_Notifications_Projection));
+            }
+            #endregion
+
+            if (null != eventHandled)
+            {
+                complete = true;
+            }
+        }
+
+        public Command_Notifications_Projection(ILogger logIn = null)
+        { 
             if (null != logIn)
             {
                 log = logIn;
