@@ -19,11 +19,13 @@ namespace TheLongRun.Common.Events.Command.Projections
         CQRSAzure.EventSourcing.IHandleEvent<ReturnHookAdded >,
         CQRSAzure.EventSourcing.IHandleEvent<CommandStepCompleted >,
         CQRSAzure.EventSourcing.IHandleEvent<CommandCompleted >,
+        CQRSAzure.EventSourcing.IHandleEvent<ValidationErrorOccured>,
         IProjectionUntyped
     {
 
         #region Private members
         private bool complete = false;
+        private bool inError = false;
         private List<CommandStepCompleted> commandStepsCompleted = new List<CommandStepCompleted>(); 
         private ILogger log = null;
         private List<ReturnHookAdded> targetHooks = new List<ReturnHookAdded>();
@@ -63,6 +65,17 @@ namespace TheLongRun.Common.Events.Command.Projections
             get
             {
                 return complete;
+            }
+        }
+
+        /// <summary>
+        /// Has this command halted due to an error condition
+        /// </summary>
+        public bool InError
+        {
+            get
+            {
+                return inError;
             }
         }
 
@@ -114,6 +127,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             {
                 HandleEvent<CommandCompleted>(eventToHandle.ToObject<CommandCompleted>());
             }
+
+            if (eventFullName == typeof(ValidationErrorOccured ).FullName)
+            {
+                HandleEvent<ValidationErrorOccured>(eventToHandle.ToObject<ValidationErrorOccured>());
+            }
         }
 
 
@@ -149,6 +167,11 @@ namespace TheLongRun.Common.Events.Command.Projections
                 return true;
             }
 
+            if (eventTypeFullName == typeof(ValidationErrorOccured ).FullName)
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -176,6 +199,11 @@ namespace TheLongRun.Common.Events.Command.Projections
             if (eventToHandle.GetType() == typeof(CommandCompleted ))
             {
                 HandleEvent(eventToHandle as CommandCompleted);
+            }
+
+            if (eventToHandle.GetType() == typeof(ValidationErrorOccured ))
+            {
+                HandleEvent(eventToHandle as ValidationErrorOccured);
             }
         }
 
@@ -275,6 +303,22 @@ namespace TheLongRun.Common.Events.Command.Projections
             if (null != eventHandled)
             {
                 complete = true;
+            }
+        }
+
+        public void HandleEvent(ValidationErrorOccured  eventHandled)
+        {
+            #region Logging
+            if (null != log)
+            {
+                log.LogDebug($"HandleEvent( ValidationErrorOccured )",
+                    nameof(Command_Notifications_Projection));
+            }
+            #endregion
+
+            if (null != eventHandled)
+            {
+                inError = true;
             }
         }
 

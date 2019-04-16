@@ -50,7 +50,7 @@ namespace TheLongRun.Common.Orchestration
         /// <summary>
         /// The data returned from the durable functions activity
         /// </summary>
-        TDataPayload ReturnedData { get; set; }
+       public TDataPayload ReturnedData { get; set; }
 
     }
 }

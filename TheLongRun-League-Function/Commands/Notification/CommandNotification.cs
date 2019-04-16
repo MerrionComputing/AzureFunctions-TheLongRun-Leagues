@@ -64,7 +64,7 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
             }
 
             // Fire the orchestration to do the actual work of sending notifications
-            Command_Notification_Request payload = new Command_Notification_Request()
+            Command_Get_Notifications_Request payload = new Command_Get_Notifications_Request()
             {
                 CommandName = commandName ,
                 CommandUniqueIdentifier = commandId 
@@ -105,7 +105,7 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
         {
             ActivityResponse < Command_Notification_Response > response = new ActivityResponse<Command_Notification_Response>() { FunctionName = "CommandNotificationOrchestrator" };
 
-            Command_Notification_Request request = context.GetInput<Command_Notification_Request>();
+            Command_Get_Notifications_Request request = context.GetInput<Command_Get_Notifications_Request>();
 
             if (null != request)
             {
@@ -114,7 +114,51 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
                 if (Guid.TryParse(request.CommandUniqueIdentifier, out UniqueIdentifierGuid))
                 {
                     // run the [Command_Notifications_Projection]..
-                    response = await context.CallActivityAsync<ActivityResponse<Command_Notification_Response>>("CommandNotificationActivity", request); 
+                    response = await context.CallActivityAsync<ActivityResponse<Command_Notification_Response>>("GetCommandNotificationsActivity", request); 
+
+                    if (null != response )
+                    {
+                        if ( (! response.FatalError ) && ( ! response.StepFailure  ))
+                        {
+                            if (null != response.ReturnedData)
+                            {
+
+                                List<Task<ActivityResponse>> allNotificationTasks = new List<Task<ActivityResponse>>();
+
+                                // fire off all the notifications in parrallel
+                                foreach (var recipient in response.ReturnedData.NotificationTargetHooks)
+                                {
+                                    foreach (var notificationTarget in response.ReturnedData.NotificationTargetHooks)
+                                    {
+                                        // create an individual notification request
+                                        Command_Notification_Request notifyRequest = new Command_Notification_Request()
+                                        {
+                                            CommandName = request.CommandName
+                                            // TODO : Other properties to define a single notification request
+                                        };
+
+                                        // add a task to send to one recipient..
+                                        allNotificationTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("RunNotificationsActivity",
+                                            DomainSettings.QueryRetryOptions(),
+                                            notifyRequest));
+                                    }
+                                }
+
+                                // Run the projections in parallel...
+                                await Task.WhenAll(allNotificationTasks);
+                            }
+                        }
+                        else
+                        {
+                            #region Logging
+                            if (null != log )
+                            {
+                                log.LogError($"{response.FunctionName} error - no data returned - {response.Message} ");
+                            }
+                            #endregion
+                        }
+                    }
+
                 }
                 else
                 {
@@ -128,17 +172,21 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
 
 
         /// <summary>
-        /// Durable function activity to send all the command notifications for a specified command
+        /// Durable function activity to get all the command notifications for a specified command
         /// </summary>
         [ApplicationName("The Long Run")]
-        [FunctionName("CommandNotificationActivity")]
-        public static async Task<ActivityResponse<Command_Notification_Response> > CommandNotificationActivity([ActivityTrigger] DurableActivityContext context,
+        [FunctionName("GetCommandNotificationsActivity")]
+        public static async Task<ActivityResponse<Command_Notification_Response> > GetCommandNotificationsActivity([ActivityTrigger] DurableActivityContext context,
             ILogger log)
         {
 
-            ActivityResponse<Command_Notification_Response> response = new ActivityResponse<Command_Notification_Response>() { FunctionName = "CommandNotificationActivity" };
+            ActivityResponse<Command_Notification_Response> response = new ActivityResponse<Command_Notification_Response>()
+            {
+                FunctionName = "CommandNotificationActivity",
+                ReturnedData = new Command_Notification_Response()
+            };
 
-            Command_Notification_Request payload = context.GetInput<Command_Notification_Request>();
+            Command_Get_Notifications_Request payload = context.GetInput<Command_Get_Notifications_Request>();
 
             if (null != payload)
             {
@@ -158,6 +206,12 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
                     if (cmdProjection.Completed )
                     {
                         // make it an "all completed" notification
+                        response.ReturnedData.Completed = true;
+                    }
+                    else if(cmdProjection.InError )
+                    {
+                        // make it an "all completed" notification
+                        response.ReturnedData.InError = true;
                     }
                     else
                     {
@@ -167,6 +221,16 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
                             // make it a "steps completed" notification
 
                         }
+                    }
+
+                    if (null != cmdProjection.ImpactedEntities )
+                    {
+                        response.ReturnedData.ImpactedEntities = cmdProjection.ImpactedEntities;
+                    }
+
+                    if (null != cmdProjection.NotificationTargetHooks )
+                    {
+                        response.ReturnedData.NotificationTargetHooks = cmdProjection.NotificationTargetHooks;
                     }
                 }
 
@@ -186,7 +250,7 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
     /// This may be added to if we choose to allow filters to be specified
     /// or any extension functionality like that
     /// </remarks>
-    public class Command_Notification_Request
+    public class Command_Get_Notifications_Request
     {
 
         /// <summary>
@@ -198,6 +262,19 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
         /// The unique identifier of the command to send notifications for
         /// </summary>
         public string CommandUniqueIdentifier { get; set; }
+
+    }
+
+    /// <summary>
+    /// Request to send a single notification for a command
+    /// </summary>
+    public class Command_Notification_Request
+    {
+        /// <summary>
+        /// The name of the command for which notification is sent
+        /// </summary>
+        public string CommandName { get; set; }
+
 
     }
 
