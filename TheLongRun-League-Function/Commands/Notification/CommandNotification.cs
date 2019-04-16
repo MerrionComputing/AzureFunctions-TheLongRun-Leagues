@@ -126,26 +126,41 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
                                 List<Task<ActivityResponse>> allNotificationTasks = new List<Task<ActivityResponse>>();
 
                                 // fire off all the notifications in parrallel
-                                foreach (var recipient in response.ReturnedData.NotificationTargetHooks)
+                                foreach (var notifyEntity in response.ReturnedData.ImpactedEntities)
                                 {
                                     foreach (var notificationTarget in response.ReturnedData.NotificationTargetHooks)
                                     {
                                         // create an individual notification request
                                         Command_Notification_Request notifyRequest = new Command_Notification_Request()
                                         {
-                                            CommandName = request.CommandName
-                                            // TODO : Other properties to define a single notification request
+                                            CommandName = request.CommandName,
+                                            CommandNotificationType = Command_Notification_Request.NotificationType.StepComplete ,
+                                            HookAddress = notificationTarget.HookAddress ,
+                                            HookType = notificationTarget.HookType  ,
+                                            ImpactedEntity = notifyEntity 
                                         };
 
+                                        if (response.ReturnedData.InError )
+                                        {
+                                            notifyRequest.CommandNotificationType = Command_Notification_Request.NotificationType.Error;
+                                        }
+                                        
+                                        if (response.ReturnedData.Completed )
+                                        {
+                                            notifyRequest.CommandNotificationType = Command_Notification_Request.NotificationType.CommandComplete; 
+                                        }
+
                                         // add a task to send to one recipient..
-                                        allNotificationTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("RunNotificationsActivity",
-                                            DomainSettings.QueryRetryOptions(),
+                                        allNotificationTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("RunNotificationActivity",
+                                            DomainSettings.CommandRetryOptions (),
                                             notifyRequest));
                                     }
                                 }
 
                                 // Run the projections in parallel...
                                 await Task.WhenAll(allNotificationTasks);
+
+
                             }
                         }
                         else
@@ -238,6 +253,19 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
 
             return response;
         }
+
+
+
+        /// <summary>
+        /// Durable function activity to send a single notification
+        /// </summary>
+        [ApplicationName("The Long Run")]
+        [FunctionName("RunNotificationActivity")]
+        public static async Task<ActivityResponse<Command_Notification_Response>> RunNotificationActivity([ActivityTrigger] DurableActivityContext context,
+            ILogger log)
+        {
+
+        }
     }
 
 
@@ -270,12 +298,52 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
     /// </summary>
     public class Command_Notification_Request
     {
+
+        /// <summary>
+        /// The different types of notification that can be sent
+        /// </summary>
+        public enum NotificationType
+        {
+            /// <summary>
+            /// A step in a command was completed
+            /// </summary>
+            StepComplete = 1,
+            /// <summary>
+            /// An entire command was completed
+            /// </summary>
+            CommandComplete = 2,
+            /// <summary>
+            /// An error has occured
+            /// </summary>
+            Error=2
+        }
+
         /// <summary>
         /// The name of the command for which notification is sent
         /// </summary>
         public string CommandName { get; set; }
 
 
+        /// <summary>
+        /// What type of notification are we sending
+        /// </summary>
+        public NotificationType CommandNotificationType { get; set; }
+
+        /// <summary>
+        /// The type of notification target to send the notification to
+        /// </summary>
+        public CommandNotificationTarget.NotificationTargetType HookType { get; set; }
+
+
+        /// <summary>
+        /// The address of the hook to be notified
+        /// </summary>
+        public string HookAddress { get; set; }
+
+        /// <summary>
+        /// The unique identifier of the entity that was affected by this command and is being notified about
+        /// </summary>
+        public CommandNotificationImpactedEntity ImpactedEntity { get; set; }
     }
 
 

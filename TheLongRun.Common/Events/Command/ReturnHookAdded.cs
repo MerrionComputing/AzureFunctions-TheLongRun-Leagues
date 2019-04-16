@@ -77,4 +77,11 @@ namespace TheLongRun.Common.Events.Command
             info.AddValue(nameof(NotifyStepComplete ), NotifyStepComplete);
         }
     }
+
+    public  static partial class Extensions
+    {
+
+
+
+    }
 }
