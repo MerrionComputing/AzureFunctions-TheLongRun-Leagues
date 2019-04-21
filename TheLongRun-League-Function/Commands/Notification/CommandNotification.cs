@@ -14,6 +14,8 @@ using TheLongRun.Common.Events.Command.Projections;
 using System.Collections.Generic;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using Newtonsoft.Json;
 
 namespace TheLongRunLeaguesFunction.Commands.Notification
 {
@@ -385,7 +387,17 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
 
             if (null != notifyRequest)
             {
+                var payloadAsJSON = new StringContent(JsonConvert.SerializeObject(notifyRequest));
 
+                // Use the binder to bind to an HTTP client to send the results to
+                using (var client = new HttpClient())
+                {
+                    HttpResponseMessage msgResp = await client.PostAsync(notifyRequest.HookAddress, payloadAsJSON);
+                    if (null != msgResp)
+                    {
+                        response.Message = $"Output sent - {msgResp.ReasonPhrase}";
+                    }
+                }
             }
             else
             {
@@ -396,8 +408,23 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
             return response;
         }
 
+        private static SignalRAttribute SignalRAttributeFromTarget(string hookAddress)
+        {
+            if (!string.IsNullOrWhiteSpace(hookAddress))
+            {
+                SignalRAttribute ret = new SignalRAttribute()
+                {
+                    // Look up the connection string from the hub name
+                    ConnectionStringSetting = ConnectionStringNameAttribute.DefaultConnectionStringName(Constants.Domain_Command , hookAddress ),
+                    HubName = hookAddress 
+                };
+                return ret;
+            }
 
-        //RunSignalRNotificationActivity
+            return null;
+        }
+
+
         /// <summary>
         /// Durable function activity to send a single notification
         /// </summary>
@@ -415,7 +442,25 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
             if (null != notifyRequest)
             {
                 // send the notification by SignalR
+                SignalRAttribute signalRAttribute = SignalRAttributeFromTarget(notifyRequest.HookAddress);
 
+                IAsyncCollector<SignalRMessage> eventCollector = outputBinder.Bind<IAsyncCollector<SignalRMessage>>(signalRAttribute);
+
+                // Create and add a SignalRMessage
+                if (null != eventCollector)
+                {
+                    // Make a SignalR message for the query results - note that we pass the entire results structure so
+                    // the recipeint gets the context as well as the results data
+                    SignalRMessage queryMessage = new SignalRMessage()
+                    {
+                        Target = notifyRequest.CommandName,
+                        Arguments = new object[] { notifyRequest }
+                    };
+
+                    await eventCollector.AddAsync(queryMessage);
+                    // and flush the message out
+                    await eventCollector.FlushAsync();
+                }
             }
             else
             {
