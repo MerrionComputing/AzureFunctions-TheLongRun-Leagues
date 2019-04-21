@@ -12,6 +12,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using System.Net.Http;
 using TheLongRun.Common.Events.Command.Projections;
 using System.Collections.Generic;
+using Microsoft.Azure.WebJobs.Extensions.EventGrid;
+using Microsoft.Azure.EventGrid.Models;
 
 namespace TheLongRunLeaguesFunction.Commands.Notification
 {
@@ -125,11 +127,32 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
 
                                 List<Task<ActivityResponse>> allNotificationTasks = new List<Task<ActivityResponse>>();
 
-                                // fire off all the notifications in parrallel
-                                foreach (var notifyEntity in response.ReturnedData.ImpactedEntities)
+                                // Only process the notifications that match the state of the command...
+                                IEnumerable<ReturnHookAdded> notificationHooks = null;
+                                if (response.ReturnedData.InError)
                                 {
-                                    foreach (var notificationTarget in response.ReturnedData.NotificationTargetHooks)
+                                    notificationHooks = response.ReturnedData.NotificationTargetHooks.ForErrors();
+                                }
+                                else
+                                {
+                                    if (response.ReturnedData.Completed)
                                     {
+                                        notificationHooks = response.ReturnedData.NotificationTargetHooks.ForCompleteCommands();
+                                    }
+                                    else
+                                    {
+                                        notificationHooks = response.ReturnedData.NotificationTargetHooks.ForStepComplete ();
+                                    }
+                                }
+
+                                // fire off all the notifications in parrallel
+                                foreach (var notificationTarget in notificationHooks)
+                                {
+
+
+                                    foreach (var notifyEntity in response.ReturnedData.ImpactedEntities)
+                                    { 
+                                    
                                         // create an individual notification request
                                         Command_Notification_Request notifyRequest = new Command_Notification_Request()
                                         {
@@ -140,20 +163,41 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
                                             ImpactedEntity = notifyEntity 
                                         };
 
-                                        if (response.ReturnedData.InError )
+                                        if (response.ReturnedData.InError)
                                         {
                                             notifyRequest.CommandNotificationType = Command_Notification_Request.NotificationType.Error;
                                         }
-                                        
-                                        if (response.ReturnedData.Completed )
+                                        else
                                         {
-                                            notifyRequest.CommandNotificationType = Command_Notification_Request.NotificationType.CommandComplete; 
+                                            if (response.ReturnedData.Completed)
+                                            {
+                                                notifyRequest.CommandNotificationType = Command_Notification_Request.NotificationType.CommandComplete;
+                                            }
                                         }
 
-                                        // add a task to send to one recipient..
-                                        allNotificationTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("RunNotificationActivity",
-                                            DomainSettings.CommandRetryOptions (),
-                                            notifyRequest));
+                                        if (notificationTarget.HookType == CommandNotificationTarget.NotificationTargetType.CustomEventGridTopic  )
+                                        {
+                                            // RunCustomEventGridTopicNotificationActivity
+                                            allNotificationTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("RunCustomEventGridTopicNotificationActivity",
+                                                        DomainSettings.CommandRetryOptions(),
+                                                        notifyRequest));
+                                        }
+
+                                        if (notificationTarget.HookType == CommandNotificationTarget.NotificationTargetType.WebHook )
+                                        {
+                                            // RunWebHookNotificationActivity
+                                            allNotificationTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("RunWebHookNotificationActivity",
+                                                    DomainSettings.CommandRetryOptions(),
+                                                    notifyRequest));
+                                        }
+
+                                        if (notificationTarget.HookType == CommandNotificationTarget.NotificationTargetType.SignalR )
+                                        {
+                                            //RunSignalRNotificationActivity
+                                            allNotificationTasks.Add(context.CallActivityWithRetryAsync<ActivityResponse>("RunSignalRNotificationActivity",
+                                                    DomainSettings.CommandRetryOptions(),
+                                                    notifyRequest));
+                                        }
                                     }
                                 }
 
@@ -260,13 +304,129 @@ namespace TheLongRunLeaguesFunction.Commands.Notification
         /// Durable function activity to send a single notification
         /// </summary>
         [ApplicationName("The Long Run")]
-        [FunctionName("RunNotificationActivity")]
-        public static async Task<ActivityResponse<Command_Notification_Response>> RunNotificationActivity([ActivityTrigger] DurableActivityContext context,
+        [FunctionName("RunCustomEventGridTopicNotificationActivity")]
+        public static async Task<ActivityResponse> RunCustomEventGridTopicNotificationActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            Binder outputBinder,
             ILogger log)
         {
 
+            ActivityResponse response = new ActivityResponse() { FunctionName = "RunCustomEventGridTopicNotificationActivity" };
+
+            Command_Notification_Request notifyRequest = context.GetInput<Command_Notification_Request>();
+
+            if (null != notifyRequest)
+            {
+                EventGridAttribute egAttribute = EventGridAttributeFromNotifyRequest(notifyRequest.HookAddress, notifyRequest.CommandName);
+
+                if (null != egAttribute)
+                {
+                    // split the target string into an event grid attribute 
+
+                    Microsoft.Azure.EventGrid.Models.EventGridEvent eventGridEvent = new Microsoft.Azure.EventGrid.Models.EventGridEvent()
+                    {
+                        Subject = $"/{EventStream.MakeEventStreamName(notifyRequest.ImpactedEntity.EntityType)}/{EventStream.MakeEventStreamName(notifyRequest.ImpactedEntity.InstanceUniqueIdentifier)}",
+                        Data = notifyRequest
+                    };
+
+                    IAsyncCollector<EventGridEvent> eventCollector = outputBinder.Bind<IAsyncCollector<EventGridEvent>>(egAttribute);
+                    if (null != eventCollector)
+                    {
+                        await eventCollector.AddAsync(eventGridEvent);
+                        await eventCollector.FlushAsync();
+                    }
+                    response.Message = $"Sent notification to {egAttribute.TopicEndpointUri} for {notifyRequest.ImpactedEntity.EntityType}:{notifyRequest.ImpactedEntity.InstanceUniqueIdentifier }  ";
+                }
+                else
+                {
+                    response.StepFailure = true;
+                    response.Message = "Unable to create an event grid attribute to send the notification to";
+                }
+            }
+            else
+            {
+                response.StepFailure = true;
+                response.Message = "Unable to read command notification request from context";
+            }
+
+
+            return response;
+        }
+
+
+        private static EventGridAttribute EventGridAttributeFromNotifyRequest(string hookAddress, string commandName)
+        {
+            if (!string.IsNullOrWhiteSpace(hookAddress))
+            {
+                EventGridAttribute ret = new EventGridAttribute();
+                ret.TopicEndpointUri = hookAddress;
+                ret.TopicKeySetting = EventStream.MakeEventStreamName(commandName);
+            }
+
+            // If we reach the end with not enough info to create an event grid target return null
+            return null;
+        }
+
+
+        // RunWebHookNotificationActivity
+        /// <summary>
+        /// Durable function activity to send a single notification
+        /// </summary>
+        [ApplicationName("The Long Run")]
+        [FunctionName("RunWebHookNotificationActivity")]
+        public static async Task<ActivityResponse> RunWebHookNotificationActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            Binder outputBinder,
+            ILogger log)
+        {
+            ActivityResponse response = new ActivityResponse() { FunctionName = "RunWebHookNotificationActivity" };
+
+            Command_Notification_Request notifyRequest = context.GetInput<Command_Notification_Request>();
+
+            if (null != notifyRequest)
+            {
+
+            }
+            else
+            {
+                response.StepFailure = true;
+                response.Message = "Unable to read command notification request from context";
+            }
+
+            return response;
+        }
+
+
+        //RunSignalRNotificationActivity
+        /// <summary>
+        /// Durable function activity to send a single notification
+        /// </summary>
+        [ApplicationName("The Long Run")]
+        [FunctionName("RunSignalRNotificationActivity")]
+        public static async Task<ActivityResponse> RunSignalRNotificationActivity(
+            [ActivityTrigger] DurableActivityContext context,
+            Binder outputBinder,
+            ILogger log)
+        {
+            ActivityResponse response = new ActivityResponse() { FunctionName = "RunSignalRNotificationActivity" };
+
+            Command_Notification_Request notifyRequest = context.GetInput<Command_Notification_Request>();
+
+            if (null != notifyRequest)
+            {
+                // send the notification by SignalR
+
+            }
+            else
+            {
+                response.StepFailure = true;
+                response.Message = "Unable to read command notification request from context";
+            }
+
+            return response;
         }
     }
+
 
 
 
