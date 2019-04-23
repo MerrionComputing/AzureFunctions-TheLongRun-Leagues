@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using TheLongRun.Common.Orchestration;
 using System.Collections.Generic;
+using TheLongRunLeaguesFunction.Commands.Notification;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -250,6 +251,29 @@ namespace TheLongRunLeaguesFunction
                     context.SetCustomStatus(resp);
                 }
 
+                // Fire the orchestration to do the actual work of sending notifications
+                Command_Get_Notifications_Request payload = new Command_Get_Notifications_Request()
+                {
+                    CommandName = cmdRequest.CommandName,
+                    CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier.ToString()
+                };
+
+                // call the orchestrator...
+                resp = await context.CallSubOrchestratorAsync<ActivityResponse>("CommandNotificationOrchestrator", payload);
+
+                #region Logging
+                if (null != log)
+                {
+                    if (null != resp)
+                    {
+                        log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                    }
+                }
+                #endregion
+                if (null != resp)
+                {
+                    context.SetCustomStatus(resp);
+                }
             }
             else
             {

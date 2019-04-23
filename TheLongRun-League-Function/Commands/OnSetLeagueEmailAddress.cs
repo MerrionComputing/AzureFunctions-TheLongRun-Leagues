@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using TheLongRun.Common.Orchestration;
 using System.Collections.Generic;
+using TheLongRunLeaguesFunction.Commands.Notification;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -156,18 +157,16 @@ namespace TheLongRunLeaguesFunction
                         DomainSettings.CommandRetryOptions(),
                         cmdRequest);
 
-                    if (!resp.FatalError)
+                    CommandStepResponse stepValidateResponse = new CommandStepResponse()
                     {
-                        CommandStepResponse stepResponse = new CommandStepResponse()
-                        {
-                            CommandName = cmdRequest.CommandName,
-                            CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
-                            StepName = resp.FunctionName,
-                            Message = resp.Message,
-                            ImpactedEntities = impactedEntities
-                        };
-                        resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepResponse);
-                    }
+                        CommandName = cmdRequest.CommandName,
+                        CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
+                        StepName = "Set League Email Address Command Validation",
+                        Message = resp.Message,
+                        ImpactedEntities = impactedEntities
+                    };
+                    resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepValidateResponse );
+                    
 
                     if (valid)
                     {
@@ -193,7 +192,7 @@ namespace TheLongRunLeaguesFunction
                         //  Mark the step as complete
                         if (!resp.FatalError)
                         {
-                            CommandStepResponse stepResponse = new CommandStepResponse()
+                            CommandStepResponse stepCommandResponse = new CommandStepResponse()
                             {
                                 CommandName = cmdRequest.CommandName,
                                 CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier,
@@ -201,7 +200,7 @@ namespace TheLongRunLeaguesFunction
                                 Message = resp.Message,
                                 ImpactedEntities = impactedEntities
                             };
-                            resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepResponse);
+                            resp = await context.CallActivityAsync<ActivityResponse>("CommandStepCompleteActivity", stepCommandResponse);
                         }
 
 
@@ -225,6 +224,29 @@ namespace TheLongRunLeaguesFunction
                             context.SetCustomStatus(resp);
                         }
 
+                        // Fire the orchestration to do the actual work of sending notifications
+                        Command_Get_Notifications_Request payload = new Command_Get_Notifications_Request()
+                        {
+                            CommandName = cmdRequest.CommandName,
+                            CommandUniqueIdentifier = cmdRequest.CommandUniqueIdentifier.ToString()
+                        };
+
+                        // call the orchestrator...
+                        resp = await context.CallSubOrchestratorAsync<ActivityResponse>("CommandNotificationOrchestrator", payload);
+
+                        #region Logging
+                        if (null != log)
+                        {
+                            if (null != resp)
+                            {
+                                log.LogInformation($"{resp.FunctionName} complete: {resp.Message } ");
+                            }
+                        }
+                        #endregion
+                        if (null != resp)
+                        {
+                            context.SetCustomStatus(resp);
+                        }
                     }
                     else
                     {
@@ -241,10 +263,6 @@ namespace TheLongRunLeaguesFunction
                         }
                     }
                 }
-            }
-            else
-            {
-
             }
         }
     }
