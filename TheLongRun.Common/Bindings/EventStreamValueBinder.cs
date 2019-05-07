@@ -12,6 +12,7 @@ namespace TheLongRun.Common.Bindings
     {
 
         private readonly ParameterInfo _parameter;
+        private EventStream _item;
 
         public Type Type {
             get
@@ -20,59 +21,46 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
-        /*
+        
         /// <summary>
         /// Turn the parameter (with attribute) into an EventStream object
         /// </summary>
         /// <returns>
         /// A built [EventStream] object
         /// </returns>
-        public override Task<object> GetValueAsync()
+        public Task<object> GetValueAsync()
         {
-            object item = null;
 
-            if (null != _parameter)
+            if (null == _item)
             {
-                EventStreamAttribute attribute = _parameter.GetCustomAttribute<EventStreamAttribute>(inherit: false);
-                if (null != attribute)
-                { 
-                    item = new EventStream(attribute);
+                if (null != _parameter)
+                {
+                    EventStreamAttribute attribute = _parameter.GetCustomAttribute<EventStreamAttribute>(inherit: false);
+                    if (null != attribute)
+                    {
+                        _item = new EventStream(attribute);
+                    }
                 }
             }
 
-            return item;
+            return Task.FromResult<object>(_item);
         }
 
-    */
 
         public string ToInvokeString()
         {
+            if (null != _item)
+            {
+                return _item.ToString();
+            }
             return string.Empty;
         }
 
         public Task SetValueAsync(object value, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
-        public async Task<object> GetValueAsync()
-        {
-
-            object item = null;
-
-            await ValidateParameter(_parameter);
-
-            if (null != _parameter)
-            {
-                EventStreamAttribute attribute = _parameter.GetCustomAttribute<EventStreamAttribute>(inherit: false);
-                if (null != attribute)
-                {
-                    item = new EventStream(attribute );
-                }
-            }
-
-            return item;
-        }
 
         /// <summary>
         /// This will be expanded out to make sure the domain and aggregate really exist,

@@ -164,6 +164,10 @@ namespace TheLongRun.Common.Bindings
         }
 
 
+        public override string ToString()
+        {
+            return $"EventStream({DomainName}::{AggregateTypeName}::{AggregateInstanceKey})";
+        }
 
         public static string MakeEventStreamName(string tentativeName)
         {

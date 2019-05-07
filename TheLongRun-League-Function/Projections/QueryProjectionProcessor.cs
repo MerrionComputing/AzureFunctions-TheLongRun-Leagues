@@ -208,26 +208,26 @@ namespace TheLongRunLeaguesFunction.Projections
                     }
 
                     // Now start them running using a fan-out/fan in pattern 
-                    foreach (Query_Projections_Projection_Return projectionRequest in allProjections)
+                    foreach (Query_Projections_Projection_Return projectionRequested in allProjections)
                     {
-                        if (projectionRequest.ProjectionState == Query_Projections_Projection_Return.QueryProjectionState.Queued)
+                        if (projectionRequested.ProjectionState == Query_Projections_Projection_Return.QueryProjectionState.Queued)
                         {
-                            ProjectionRequest projRequest = new ProjectionRequest()
+                            ProjectionRequest projectionRequest = new ProjectionRequest()
                             {
                                 ParentRequestName = request.QueryName,
                                 CorrelationIdentifier = UniqueIdentifierGuid,
-                                DomainName = projectionRequest.Projection.DomainName,
-                                AggregateTypeName = projectionRequest.Projection.AggregateTypeName,
-                                AggregateInstanceUniqueIdentifier = projectionRequest.Projection.InstanceKey,
+                                DomainName = projectionRequested.Projection.DomainName,
+                                AggregateTypeName = projectionRequested.Projection.AggregateTypeName,
+                                AggregateInstanceUniqueIdentifier = projectionRequested.Projection.InstanceKey,
                                 AsOfDate = request.AsOfDate,
-                                ProjectionName = projectionRequest.Projection.ProjectionTypeName
+                                ProjectionName = projectionRequested.Projection.ProjectionTypeName
                             };
 
 
                             // and start running it...
                             allProjectionTasks.Add(context.CallActivityWithRetryAsync<ProjectionResultsRecord<object>>("RunProjectionActivity",
                                 DomainSettings.QueryRetryOptions(), 
-                                projRequest));
+                                projectionRequest));
                         }
                     }
 
