@@ -151,7 +151,7 @@ namespace TheLongRun.Common.Bindings
             string connectionStringName = @"")
         {
             _domainName = attribute.DomainName ;
-            _aggregateTypeName = attribute.AggregateTypeName ;
+            _aggregateTypeName = attribute.AggregateTypeName;
             _aggregateInstanceKey = attribute.InstanceKey ;
             _classifierTypeName = attribute.ClassifierTypeName ;
             

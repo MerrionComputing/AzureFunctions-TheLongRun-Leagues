@@ -13,8 +13,9 @@ namespace TheLongRun.Common.Events.Query.Projections
     /// <summary>
     /// A projection to get the current state of a command based on the events that have occured to it
     /// </summary>
-    [CQRSAzure.EventSourcing.DomainNameAttribute("Query")]
+    [CQRSAzure.EventSourcing.DomainNameAttribute(Constants.Domain_Query )]
     [CQRSAzure.EventSourcing.Category("Query")]
+    [CQRSAzure.EventSourcing.ProjectionName("Query Projections")]
     public class Query_Summary_Projection
         : CQRSAzure.EventSourcing.ProjectionBaseUntyped,
         CQRSAzure.EventSourcing.IHandleEvent<QueryCreated>,

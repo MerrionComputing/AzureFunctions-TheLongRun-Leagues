@@ -14,7 +14,9 @@ namespace TheLongRun.Common.Events.Query.Projections
     /// <summary>
     /// A projection to list the requested and executed projections for this query
     /// </summary>
-    [TheLongRun.Common.Attributes.ProjectionName("Query Projections")]
+    [CQRSAzure.EventSourcing.DomainNameAttribute(Constants.Domain_Query)]
+    [CQRSAzure.EventSourcing.Category("Query")]
+    [CQRSAzure.EventSourcing.ProjectionName("Query Projections")]
     public class Query_Projections_Projection
         : CQRSAzure.EventSourcing.ProjectionBaseUntyped,
         CQRSAzure.EventSourcing.IHandleEvent<ProjectionRequested >,

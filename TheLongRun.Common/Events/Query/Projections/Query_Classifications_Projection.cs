@@ -13,6 +13,9 @@ namespace TheLongRun.Common.Events.Query.Projections
     /// <summary>
     /// A projection to get the state of the classifiers running for any given query
     /// </summary>
+    [CQRSAzure.EventSourcing.DomainNameAttribute(Constants.Domain_Query)]
+    [CQRSAzure.EventSourcing.Category("Query")]
+    [CQRSAzure.EventSourcing.ProjectionName("Query Classifications")]
     public class Query_Classifications_Projection
         : CQRSAzure.EventSourcing.ProjectionBaseUntyped,
         CQRSAzure.EventSourcing.IHandleEvent<ClassificationRequested>,

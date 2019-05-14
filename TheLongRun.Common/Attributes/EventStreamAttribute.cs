@@ -16,11 +16,11 @@ namespace TheLongRun.Common.Attributes
         : Attribute , IEventStreamUntypedIdentity
     {
 
-
         /// <summary>
-        /// The domain name the aggregate instance belongs to
+        /// The domain name the entity instance belongs to
         /// </summary>
         private readonly string _domainName;
+        [AutoResolve]
         public string DomainName
         {
             get
@@ -30,14 +30,15 @@ namespace TheLongRun.Common.Attributes
         }
 
         /// <summary>
-        /// The aggregate type to which the event stream belongs
+        /// The entity type to which the event stream belongs
         /// </summary>
-        private readonly string _aggregateTypeName;
+        private readonly string _entityTypeName;
+        [AutoResolve]
         public string AggregateTypeName
         {
             get
             {
-                return _aggregateTypeName;
+                return _entityTypeName;
             }
         }
 
@@ -55,11 +56,11 @@ namespace TheLongRun.Common.Attributes
         }
 
         public EventStreamAttribute(string domainName,
-            string aggregateTypeName,
+            string entityTypeName,
             string instanceKey)
         {
             _domainName = domainName;
-            _aggregateTypeName = aggregateTypeName;
+            _entityTypeName =  entityTypeName;
             _instanceKey = instanceKey;
         }
     }

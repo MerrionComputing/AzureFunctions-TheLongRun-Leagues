@@ -19,6 +19,9 @@ namespace TheLongRun.Common.Events.Query.Projections
     /// This projection does not care about the status of the query, it just returns the set of output targets 
     /// defined for the query should it run to completion
     /// </remarks>
+    [CQRSAzure.EventSourcing.DomainNameAttribute(Constants.Domain_Query)]
+    [CQRSAzure.EventSourcing.Category("Query")]
+    [CQRSAzure.EventSourcing.ProjectionName("Query Outputs")]
     public class Query_Outputs_Projection
         : CQRSAzure.EventSourcing.ProjectionBaseUntyped,
           CQRSAzure.EventSourcing.IHandleEvent<OutputLocationSet>,

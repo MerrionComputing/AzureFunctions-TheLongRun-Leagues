@@ -9,6 +9,9 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using TheLongRun.Common.Attributes;
 using TheLongRun.Common.Bindings;
+using CQRSAzure.EventSourcing;
+using TheLongRun.Common.Events.Query;
+using System;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -25,7 +28,7 @@ namespace TheLongRunLeaguesFunction
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req,
             ILogger log,
             [EventStream(Constants.Domain_Query, "Test Case", "123")] EventStream esTest,
-            [Projection(Constants.Domain_Query, "Test Case", "123", "Test Projection")] Projection prjTest,
+            [Projection(Constants.Domain_Query, "Test Case", "123", "Query_Summary_Projection")] Projection prjTest,
             [Classifier(Constants.Domain_Query, "Test Case", "123", "Test Classifier")] Classifier clsTest)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -34,6 +37,11 @@ namespace TheLongRunLeaguesFunction
             if (null != esTest )
             {
                 log.LogInformation($"Event stream created {esTest}");
+                // add a test event
+                await esTest.AppendEvent(new QueryCreated("Test Query",
+                    Guid.NewGuid(),
+                    aurhorisationTokenIn:"Duncan test 123"
+                    ));
             }
             else
             {
@@ -88,4 +96,5 @@ namespace TheLongRunLeaguesFunction
         }
 
     }
+
 }

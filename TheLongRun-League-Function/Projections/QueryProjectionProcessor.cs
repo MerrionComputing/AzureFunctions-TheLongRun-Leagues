@@ -183,7 +183,7 @@ namespace TheLongRunLeaguesFunction.Projections
                                 ParentRequestName = request.QueryName,
                                 CorrelationIdentifier = UniqueIdentifierGuid,
                                 DomainName = projectionRequest.Projection.DomainName,
-                                AggregateTypeName = projectionRequest.Projection.AggregateTypeName,
+                                AggregateTypeName = projectionRequest.Projection.AggregateTypeName ,
                                 AggregateInstanceUniqueIdentifier = projectionRequest.Projection.InstanceKey,
                                 AsOfDate = request.AsOfDate,
                                 ProjectionName = projectionRequest.Projection.ProjectionTypeName
@@ -217,7 +217,7 @@ namespace TheLongRunLeaguesFunction.Projections
                                 ParentRequestName = request.QueryName,
                                 CorrelationIdentifier = UniqueIdentifierGuid,
                                 DomainName = projectionRequested.Projection.DomainName,
-                                AggregateTypeName = projectionRequested.Projection.AggregateTypeName,
+                                AggregateTypeName = projectionRequested.Projection.AggregateTypeName ,
                                 AggregateInstanceUniqueIdentifier = projectionRequested.Projection.InstanceKey,
                                 AsOfDate = request.AsOfDate,
                                 ProjectionName = projectionRequested.Projection.ProjectionTypeName
