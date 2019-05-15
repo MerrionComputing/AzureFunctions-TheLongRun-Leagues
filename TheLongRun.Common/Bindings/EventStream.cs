@@ -120,15 +120,7 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
-        public EventStream(string domainName,
-            string aggregateTypeName,
-            string aggregateInstanceKey,
-            string connectionStringName = "",
-            IWriteContext context = null)
-            : this(new EventStreamAttribute(domainName, aggregateTypeName , aggregateInstanceKey  ), 
-                  connectionStringName, context   )
-        {
-        }
+
 
         public EventStream(EventStreamAttribute attribute, 
             string connectionStringName = "",
@@ -164,6 +156,7 @@ namespace TheLongRun.Common.Bindings
         }
 
 
+
         public override string ToString()
         {
             return $"EventStream({DomainName}::{AggregateTypeName}::{AggregateInstanceKey})";
@@ -176,6 +169,17 @@ namespace TheLongRun.Common.Bindings
                 return CQRSAzure.EventSourcing.Azure.Blob.BlobEventStreamBase.MakeValidStorageFolderName(tentativeName);
             }
             return string.Empty;
+        }
+
+        public static  EventStream Create(string domainName,
+            string aggregateTypeName,
+            string aggregateInstanceKey,
+            string connectionStringName = "",
+            IWriteContext context = null)
+
+        {
+            return new EventStream(new EventStreamAttribute(domainName, aggregateTypeName, aggregateInstanceKey),
+                  connectionStringName, context);
         }
 
     }

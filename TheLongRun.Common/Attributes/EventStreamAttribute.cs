@@ -32,13 +32,13 @@ namespace TheLongRun.Common.Attributes
         /// <summary>
         /// The entity type to which the event stream belongs
         /// </summary>
-        private readonly string _entityTypeName;
+        private readonly string _aggregateTypeName;
         [AutoResolve]
-        public string AggregateTypeName
+        public string AggregateTypeName 
         {
             get
             {
-                return _entityTypeName;
+                return _aggregateTypeName;
             }
         }
 
@@ -55,12 +55,14 @@ namespace TheLongRun.Common.Attributes
             }
         }
 
+
+
         public EventStreamAttribute(string domainName,
-            string entityTypeName,
+            string aggregateTypeName,
             string instanceKey)
         {
             _domainName = domainName;
-            _entityTypeName =  entityTypeName;
+            _aggregateTypeName = aggregateTypeName;
             _instanceKey = instanceKey;
         }
     }

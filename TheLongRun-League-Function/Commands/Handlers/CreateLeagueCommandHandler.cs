@@ -211,7 +211,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                                     location,
                                     $"{leagueName} created by command {commandGuid} ");
 
-                                EventStream leagueEvents = new EventStream(@"Leagues",
+                                EventStream leagueEvents = EventStream.Create(@"Leagues",
                                         "League",
                                         leagueName );
 

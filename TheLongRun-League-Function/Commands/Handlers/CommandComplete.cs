@@ -39,7 +39,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                          Notes = cmdResponse.Status
                     };
 
-                    EventStream commandEvents = new EventStream(Constants.Domain_Command,
+                    EventStream commandEvents = EventStream.Create(Constants.Domain_Command,
                             cmdResponse.CommandName,
                             cmdResponse.CommandUniqueIdentifier.ToString());
 

@@ -40,7 +40,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                         log.LogInformation($"CreateLeagueCommandLogParametersActivity : Logging parameters for command {cmdRequest.CommandUniqueIdentifier} ");
                     }
 
-                    EventStream commandEvents = new EventStream(@"Command",
+                    EventStream commandEvents = EventStream.Create(@"Command",
                         cmdRequest.CommandName,
                         cmdRequest.CommandUniqueIdentifier.ToString());
 

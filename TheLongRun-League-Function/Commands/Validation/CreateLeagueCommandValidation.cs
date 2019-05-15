@@ -210,7 +210,7 @@ namespace TheLongRunLeaguesFunction.Commands.Validation
                                         leagueNameValid = true;
 
                                         // was the name already used?
-                                        EventStream leagueEvents = new EventStream(@"Leagues",
+                                        EventStream leagueEvents = EventStream.Create(@"Leagues",
                                             "League",
                                             leagueName);
 

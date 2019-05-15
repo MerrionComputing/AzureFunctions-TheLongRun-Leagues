@@ -12,6 +12,7 @@ using TheLongRun.Common.Bindings;
 using CQRSAzure.EventSourcing;
 using TheLongRun.Common.Events.Query;
 using System;
+using TheLongRun.Common.Events.Query.Projections;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -28,7 +29,7 @@ namespace TheLongRunLeaguesFunction
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req,
             ILogger log,
             [EventStream(Constants.Domain_Query, "Test Case", "123")] EventStream esTest,
-            [Projection(Constants.Domain_Query, "Test Case", "123", "Query_Summary_Projection")] Projection prjTest,
+            [Projection(Constants.Domain_Query, "Test Case", "123", nameof(Query_Summary_Projection)] Projection prjTest,
             [Classifier(Constants.Domain_Query, "Test Case", "123", "Test Classifier")] Classifier clsTest)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -51,6 +52,13 @@ namespace TheLongRunLeaguesFunction
             if (null != prjTest)
             {
                 log.LogInformation($"Projection created {prjTest}");
+                //
+                Query_Summary_Projection projection = await prjTest.Process< Query_Summary_Projection>();
+                if (null != projection )
+                {
+                    log.LogInformation($"Projection created {projection.CurrentSequenceNumber} status {projection.CurrentState } ");
+                }
+
             }
             else
             {

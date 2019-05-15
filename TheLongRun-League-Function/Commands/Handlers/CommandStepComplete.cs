@@ -40,7 +40,7 @@ namespace TheLongRunLeaguesFunction.Commands.Handlers
                         ImpactedEntities=cmdStepResponse.ImpactedEntities
                     }; 
 
-                    EventStream commandEvents = new EventStream(Constants.Domain_Command ,
+                    EventStream commandEvents = EventStream.Create(Constants.Domain_Command ,
                             cmdStepResponse.CommandName ,
                             cmdStepResponse.CommandUniqueIdentifier.ToString() );
 

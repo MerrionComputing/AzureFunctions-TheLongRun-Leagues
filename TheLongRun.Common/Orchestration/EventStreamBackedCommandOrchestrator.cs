@@ -281,7 +281,7 @@ namespace TheLongRun.Common.Orchestration
                 throw new ArgumentException("No event specified to append to the entity event stream");
             }
 
-            EventStream targetStream = new EventStream(domainName,
+            EventStream targetStream = EventStream.Create(domainName,
                 entityTypeName,
                 entityInstanceKey);
 

@@ -47,7 +47,7 @@ namespace TheLongRunLeaguesFunction.Queries.Handlers
 
             if (null != qryRecord)
             {
-                EventStream queryEvents = new EventStream(Constants.Domain_Query ,
+                EventStream queryEvents = EventStream.Create(Constants.Domain_Query ,
                         queryRequest.QueryName,
                         qryRecord.QueryUniqueIdentifier.ToString());
 

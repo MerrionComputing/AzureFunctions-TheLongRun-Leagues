@@ -86,7 +86,7 @@ namespace TheLongRun.Common
             IWriteContext writeContext = null)
         {
 
-            EventStream qryEvents = new EventStream(Constants.Domain_Query,
+            EventStream qryEvents = EventStream.Create(Constants.Domain_Query,
             queryName ,
             queryGuid.ToString());
             if (null != qryEvents )
@@ -110,7 +110,7 @@ namespace TheLongRun.Common
             Nullable<DateTime > asOfDate,
             IWriteContext writeContext = null)
         {
-            EventStream qryEvents = new EventStream(Constants.Domain_Query,
+            EventStream qryEvents = EventStream.Create(Constants.Domain_Query,
             queryName,
             queryGuid.ToString());
             if (null != qryEvents)
@@ -138,7 +138,7 @@ namespace TheLongRun.Common
             string projectionRunneridentifier,
             IWriteContext writeContext = null)
         {
-            EventStream qryEvents = new EventStream(Constants.Domain_Query,
+            EventStream qryEvents = EventStream.Create(Constants.Domain_Query,
             queryName,
             queryGuid.ToString());
 
@@ -171,7 +171,7 @@ namespace TheLongRun.Common
             int sequenceNumber,
             IWriteContext writeContext = null)
         {
-            EventStream qryEvents = new EventStream(Constants.Domain_Query,
+            EventStream qryEvents = EventStream.Create(Constants.Domain_Query,
             queryName,
             queryGuid.ToString());
             if (null != qryEvents)

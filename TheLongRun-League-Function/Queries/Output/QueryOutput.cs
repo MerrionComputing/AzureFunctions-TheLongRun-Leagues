@@ -52,7 +52,7 @@ namespace TheLongRunLeaguesFunction.Queries.Output
             QueryRequest<object> queryRequest = context.GetInput<QueryRequest<object>>();
             if (null != queryRequest)
             {
-                EventStream queryEvents = new EventStream(Constants.Domain_Query,
+                EventStream queryEvents = EventStream.Create(Constants.Domain_Query,
                     queryRequest.QueryName,
                     queryRequest.QueryUniqueIdentifier.ToString());
 

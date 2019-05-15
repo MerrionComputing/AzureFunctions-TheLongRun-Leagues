@@ -450,6 +450,11 @@ namespace TheLongRun.Common.Events.Query.Projections
             }
         }
 
+
+        public Query_Summary_Projection()
+        {
+        }
+
         public Query_Summary_Projection(ILogger logToUse = null)
         {
             if (null != logToUse)

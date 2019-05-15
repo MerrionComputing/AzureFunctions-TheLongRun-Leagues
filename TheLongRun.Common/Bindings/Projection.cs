@@ -77,6 +77,13 @@ namespace TheLongRun.Common.Bindings
             }
         }
 
+        public async Task<TProjection> Process<TProjection>() where TProjection: IProjectionUntyped, new()
+        {
+            TProjection projectionToProcess = new TProjection();
+            await _projectionProcessor.Process(projectionToProcess);
+            return projectionToProcess;
+        }
+
         /// <summary>
         /// Process the projection asynchronously and return the end state of the projection
         /// </summary>

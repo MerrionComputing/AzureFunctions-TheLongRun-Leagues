@@ -53,7 +53,7 @@ namespace TheLongRun.Common
             IWriteContext writeContext = null)
         {
 
-            EventStream commandEvents = new EventStream(Constants.Domain_Command,
+            EventStream commandEvents =  EventStream.Create (Constants.Domain_Command,
                         CommandName,
                         commandGuid.ToString());
             if (null != commandEvents)
@@ -80,7 +80,7 @@ namespace TheLongRun.Common
             IWriteContext writeContext = null)
         {
 
-            EventStream commandEvents = new EventStream(Constants.Domain_Command,
+            EventStream commandEvents = EventStream.Create(Constants.Domain_Command,
                     commandName,
                     commandGuid.ToString());
             if (null != commandEvents)
