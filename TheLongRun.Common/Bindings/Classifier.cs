@@ -126,6 +126,39 @@ namespace TheLongRun.Common.Bindings
         }
 
 
+        /// <summary>
+        /// Classify whether the aggregate instance is inside or outside the group as determined by the type of classifier
+        /// </summary>
+        /// <typeparam name="TClassifier">
+        /// The type of the class containing the classifier logic to run
+        /// </typeparam>
+        /// <param name="effectiveDateTime">
+        /// The time as-of which to ge the classificiation (or if null, get the latest possible )
+        /// </param>
+        /// <param name="forceExclude">
+        /// If set, consider anything not classified as included to be excluded
+        /// </param>
+        /// <param name="projection">
+        /// If set and the classification depends on the result of a projection use the projection
+        /// </param>
+        public async Task<IClassifierDataSourceHandler.EvaluationResult> Classify<TClassifier>(DateTime? effectiveDateTime = null,
+            bool forceExclude = false,
+            IProjectionUntyped projection = null) where TClassifier:IClassifierUntyped, new()
+        {
+            IClassifierUntyped classifierToProcess = new TClassifier();
+            if (null != classifierToProcess)
+            {
+                return await Classify(classifierToProcess,
+                    effectiveDateTime,
+                    forceExclude, projection);
+            }
+            else
+            {
+                return await Task.FromResult(IClassifierDataSourceHandler.EvaluationResult.Unchanged);
+            }
+        }
+
+
         public Classifier (string domainName,
                             string aggregateTypeName,
                             string aggregateInstanceKey,

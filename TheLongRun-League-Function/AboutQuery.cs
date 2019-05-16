@@ -13,6 +13,7 @@ using CQRSAzure.EventSourcing;
 using TheLongRun.Common.Events.Query;
 using System;
 using TheLongRun.Common.Events.Query.Projections;
+using TheLongRun.Common.Events.Query.Classifiers;
 
 namespace TheLongRunLeaguesFunction
 {
@@ -29,8 +30,8 @@ namespace TheLongRunLeaguesFunction
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req,
             ILogger log,
             [EventStream(Constants.Domain_Query, "Test Case", "123")] EventStream esTest,
-            [Projection(Constants.Domain_Query, "Test Case", "123", nameof(Query_Summary_Projection)] Projection prjTest,
-            [Classifier(Constants.Domain_Query, "Test Case", "123", "Test Classifier")] Classifier clsTest)
+            [Projection(Constants.Domain_Query, "Test Case", "123", nameof(Query_Summary_Projection))] Projection prjTest,
+            [Classifier(Constants.Domain_Query, "Test Case", "123", nameof(Query_InError_Classifier))] Classifier clsTest)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
@@ -68,6 +69,9 @@ namespace TheLongRunLeaguesFunction
             if (null != clsTest)
             {
                 log.LogInformation($"Classifier created {clsTest}");
+                var result = await clsTest.Classify<Query_InError_Classifier>(forceExclude: true);
+                log.LogInformation($"Classifier created {clsTest.ClassifierTypeName} result {result  } ");
+
             }
             else
             {
